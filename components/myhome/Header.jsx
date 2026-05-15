@@ -27,7 +27,13 @@ export default function MyHomeHeader() {
     // Wait for hero loader to finish before sliding header in.
     gsap.set(headerRef.current, { yPercent: -110, autoAlpha: 0 });
 
+    let revealed = false;
+    let hidden = false;
+    let lastY = typeof window !== "undefined" ? window.scrollY : 0;
+
     const slideIn = () => {
+      revealed = true;
+      hidden = false;
       gsap.to(headerRef.current, {
         yPercent: 0,
         autoAlpha: 1,
@@ -44,7 +50,49 @@ export default function MyHomeHeader() {
     };
     window.addEventListener("mh:loader-done", onDone);
 
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const hideHeader = () => {
+      if (hidden) return;
+      hidden = true;
+      gsap.to(headerRef.current, {
+        yPercent: -110,
+        autoAlpha: 0,
+        duration: 0.45,
+        ease: "power2.out",
+        overwrite: true,
+      });
+    };
+
+    const showHeader = () => {
+      if (!hidden) return;
+      hidden = false;
+      gsap.to(headerRef.current, {
+        yPercent: 0,
+        autoAlpha: 1,
+        duration: 0.5,
+        ease: "expo.out",
+        overwrite: true,
+      });
+    };
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 60);
+
+      if (!revealed) {
+        lastY = y;
+        return;
+      }
+
+      const delta = y - lastY;
+      if (y <= 10) {
+        showHeader();
+      } else if (delta > 6) {
+        hideHeader();
+      } else if (delta < -6) {
+        showHeader();
+      }
+      lastY = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
 
