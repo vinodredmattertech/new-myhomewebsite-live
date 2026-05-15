@@ -1,0 +1,320 @@
+import React, { useRef, useState } from "react";
+import Image from "next/image";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
+
+/**
+ * Hero banner — opens with a cinematic "Welcome HOME" loader on a #2a2828
+ * panel. The loader text fades + mask-reveals, the text slides down out of
+ * its clip mask, then the entire dark panel slides up off-screen to reveal
+ * the property image with bottom-left copy + the white Enquire-Now button.
+ *
+ * Animation states (replicated from Figma 2609:2746 → 2609:2774 → 2609:2808).
+ */
+export default function HeroBanner() {
+  const rootRef = useRef(null);
+  const bgRef = useRef(null);
+  const loaderRef = useRef(null);
+  const welcomeRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const shimmerRef = useRef(null);
+  const copyHeadingRef = useRef(null);
+  const copyBodyRef = useRef(null);
+  const btnRef = useRef(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useGSAP(
+    () => {
+      registerGsap();
+
+      // Initial visual state
+      gsap.set(bgRef.current, { scale: 1.18, autoAlpha: 0.7, filter: "blur(8px)" });
+      gsap.set(welcomeRef.current, { yPercent: 105, autoAlpha: 0 });
+      gsap.set(subtitleRef.current, { yPercent: 110, autoAlpha: 0 });
+      gsap.set([copyHeadingRef.current, copyBodyRef.current, btnRef.current], {
+        y: 50,
+        autoAlpha: 0,
+      });
+
+      // Lock scroll while loader plays
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "hidden";
+      }
+      window.dispatchEvent(new CustomEvent("mh:loader-start"));
+
+      const tl = gsap.timeline({
+        defaults: { ease: "expo.out" },
+        onComplete: () => {
+          if (typeof document !== "undefined") {
+            document.body.style.overflow = "";
+          }
+        },
+      });
+
+      // Phase 1 — "Welcome HOME" rises into its mask + fades in
+      tl.to(
+        welcomeRef.current,
+        {
+          yPercent: 0,
+          autoAlpha: 1,
+          duration: 1.4,
+          ease: "expo.out",
+        },
+        0.5
+      )
+        // subtitle staggered just after
+        .to(
+          subtitleRef.current,
+          {
+            yPercent: 0,
+            autoAlpha: 1,
+            duration: 1.2,
+            ease: "expo.out",
+          },
+          0.85
+        )
+        // Phase 2 — hold (let the eye breathe)
+        .addLabel("hold", "+=1.4")
+        // Phase 3 — text slides DOWN out of mask
+        .to(
+          welcomeRef.current,
+          {
+            yPercent: 115,
+            autoAlpha: 0,
+            duration: 1.0,
+            ease: "power3.in",
+          },
+          "hold"
+        )
+        .to(
+          subtitleRef.current,
+          {
+            yPercent: 120,
+            autoAlpha: 0,
+            duration: 0.9,
+            ease: "power3.in",
+          },
+          "hold+=0.08"
+        )
+        // shimmer line fades out
+        .to(
+          shimmerRef.current,
+          { autoAlpha: 0, duration: 0.5 },
+          "hold"
+        )
+        // Phase 4 — dark loader slides UP off-screen + slight blur
+        .to(
+          loaderRef.current,
+          {
+            yPercent: -101,
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
+          "hold+=0.85"
+        )
+        // image scales in & un-blurs simultaneously
+        .to(
+          bgRef.current,
+          {
+            scale: 1,
+            autoAlpha: 1,
+            filter: "blur(0px)",
+            duration: 1.8,
+            ease: "expo.out",
+          },
+          "hold+=0.7"
+        )
+        // Phase 5 — notify header to slide in
+        .add(() => {
+          window.dispatchEvent(new CustomEvent("mh:loader-done"));
+          setLoading(false);
+        }, "hold+=1.1")
+        // Phase 6 — bottom-left copy & button fade in (slow, premium)
+        .to(
+          copyHeadingRef.current,
+          { y: 0, autoAlpha: 1, duration: 1.1, ease: "expo.out" },
+          "hold+=1.25"
+        )
+        .to(
+          copyBodyRef.current,
+          { y: 0, autoAlpha: 1, duration: 1.0, ease: "expo.out" },
+          "hold+=1.45"
+        )
+        .to(
+          btnRef.current,
+          { y: 0, autoAlpha: 1, duration: 0.9, ease: "expo.out" },
+          "hold+=1.6"
+        );
+
+      // Scroll parallax on the hero image — kicks in after loader is gone
+      gsap.to(bgRef.current, {
+        yPercent: 14,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.6,
+        },
+      });
+
+      return () => {
+        if (typeof document !== "undefined") {
+          document.body.style.overflow = "";
+        }
+      };
+    },
+    { scope: rootRef }
+  );
+
+  return (
+    <section
+      ref={rootRef}
+      className="relative w-full overflow-hidden bg-[#2a2828] h-[100svh] min-h-[640px]"
+      data-section="hero"
+    >
+      {/* ---------- Hero image (revealed under the loader) ---------- */}
+      <div ref={bgRef} className="absolute inset-0 will-change-transform">
+        <Image
+          src="/assets/myhome/hero-tower.jpg"
+          alt="My Home Group flagship tower at twilight"
+          fill
+          priority
+          quality={92}
+          sizes="100vw"
+          className="object-cover object-bottom"
+        />
+        {/* gradient washes for depth */}
+        <div className="absolute inset-0 bg-black/25" />
+        <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-black/55 via-black/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      </div>
+
+      {/* ---------- Bottom hero block: copy + Enquire button ---------- */}
+      <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[8.333vw] pb-[40px] sm:pb-12 md:pb-14 lg:pb-[7.291vw]">
+        <div className="flex flex-col gap-[14px] sm:gap-6 md:gap-7 lg:flex-row lg:items-end lg:justify-between lg:gap-10 xl:gap-[4vw]">
+          {/* Copy */}
+          <div
+            className="text-white w-full lg:max-w-[52vw] xl:max-w-[51.7vw]"
+          >
+            <h1
+              ref={copyHeadingRef}
+              className="will-change-transform leading-[1.4] tracking-[0.025em] capitalize"
+              style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
+            >
+              <span className="Tartuffo_Trial_Regular block text-[18px] xs:text-[20px] sm:text-[24px] md:text-[30px] lg:text-[2.083vw] tracking-[0.044em] font-[300] leading-[1.4]">
+                Elevate to Exquisite Living
+              </span>
+              <span className="Tartuffo_Trial_Regular block italic mt-[2px] sm:mt-1.5 md:mt-2 text-[30px] xs:text-[34px] sm:text-[40px] md:text-[48px] lg:text-[3.125vw] font-[300] leading-[1.4]">
+                <i className="Tartuffo_Trial_Regular font-[300]">
+                  Hyderabad&apos;s Pinnacle of Gated Elegance
+                </i>
+              </span>
+            </h1>
+            <p
+              ref={copyBodyRef}
+              className="font-montserrat font-medium mt-3 sm:mt-4 md:mt-5 lg:mt-[1.25vw] text-[12px] xs:text-[13px] md:text-[15px] lg:text-[0.938vw] leading-[22px] sm:leading-[1.65] lg:leading-[1.667vw] text-white/95 max-w-[309px] sm:max-w-[36ch] lg:max-w-none"
+            >
+              Discover 25 iconic sanctuaries crafted since 1981. Award-winning
+              sustainable opulence awaits.
+            </p>
+          </div>
+
+          {/* Enquire button */}
+          <a
+            ref={btnRef}
+            href="#footer"
+            className="group self-start lg:self-end shrink-0 inline-flex items-center justify-center lg:justify-between gap-0 lg:gap-[1.041vw] w-[152px] sm:w-[180px] lg:w-[15.354vw] xl:w-[15.354vw] h-[42px] sm:h-[50px] lg:h-[3.125vw] px-4 sm:px-5 lg:px-[1.5vw] bg-white text-[#2a2828] hover:bg-mh-red hover:text-white transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden whitespace-nowrap"
+          >
+            <span
+              className="font-montserrat font-medium uppercase text-[12px] sm:text-[13px] lg:text-[0.833vw] tracking-[0.08em] whitespace-nowrap"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              Enquire now
+            </span>
+            <svg
+              viewBox="0 0 36 14"
+              fill="none"
+              className="hidden lg:block shrink-0 w-[28px] sm:w-[32px] lg:w-[2.03vw] h-auto transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5"
+            >
+              <path
+                d="M0 7h33M27 1l6 6-6 6"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="square"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      {/* ============== LOADER OVERLAY ============== */}
+      <div
+        ref={loaderRef}
+        className="absolute inset-0 z-[80] bg-[#2a2828] flex flex-col items-center justify-center will-change-transform"
+        aria-hidden={!loading}
+      >
+        {/* subtle noise/texture for premium feel */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+          }}
+        />
+
+        {/* radial glow accent */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(239,73,61,0.05) 0%, transparent 55%)",
+          }}
+        />
+
+        {/* mask container for "Welcome HOME" */}
+        <div className="overflow-hidden h-[80px] xs:h-[96px] sm:h-[120px] md:h-[140px] lg:h-[7.812vw] flex items-center justify-center px-5">
+          <h2
+            ref={welcomeRef}
+            className="Tartuffo_Trial_Regular capitalize text-white text-center leading-[1] tracking-[0.04em] text-[44px] xs:text-[56px] sm:text-[72px] md:text-[88px] lg:text-[5.286vw] font-[300] will-change-transform"
+            style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
+          >
+            Welcome{" "}
+            <span
+              className="Tartuffo_Trial_Regular whitespace-nowrap"
+              style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
+            >
+              HOME
+            </span>
+          </h2>
+        </div>
+
+        {/* mask container for subtitle */}
+        <div className="overflow-hidden mt-5 sm:mt-7 lg:mt-[2.083vw] h-[24px] sm:h-[32px] md:h-[40px] lg:h-[2.5vw] px-5">
+          <p
+            ref={subtitleRef}
+            className="font-montserrat font-normal uppercase text-white/90 text-center text-[10px] xs:text-[11px] sm:text-[14px] md:text-[18px] lg:text-[1.458vw] tracking-[0.22em] sm:tracking-[0.28em] md:tracking-[0.32em] leading-[1.3] will-change-transform"
+            style={{ fontFamily: "Montserrat, sans-serif" }}
+          >
+            Where life finds its rhythm
+          </p>
+        </div>
+
+        {/* thin shimmer progress line */}
+        <div
+          ref={shimmerRef}
+          className="absolute bottom-12 md:bottom-16 left-1/2 -translate-x-1/2 w-[220px] md:w-[260px] h-px bg-white/15 overflow-hidden"
+        >
+          <span className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/90 to-transparent animate-[loaderShimmer_2.2s_ease-in-out_infinite]" />
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes loaderShimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(360%); }
+        }
+      `}</style>
+    </section>
+  );
+}
