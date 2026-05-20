@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y } from "swiper/modules";
+import { Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { ArrowUpRight, ArrowLeft, ArrowRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
@@ -93,8 +93,7 @@ export default function NriFeaturedProjects() {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const subRef = useRef(null);
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
+  const swiperRef = useRef(null);
 
   useGSAP(
     () => {
@@ -178,16 +177,12 @@ export default function NriFeaturedProjects() {
           />
 
           <Swiper
-            modules={[Navigation, Keyboard, A11y]}
+            modules={[Keyboard, A11y]}
             slidesPerView={1.05}
             spaceBetween={16}
             speed={700}
             keyboard={{ enabled: true }}
-            onBeforeInit={(swiper) => {
-              swiper.params.navigation.prevEl = prevRef.current;
-              swiper.params.navigation.nextEl = nextRef.current;
-            }}
-            navigation={{ prevEl: null, nextEl: null }}
+            onSwiper={(s) => (swiperRef.current = s)}
             breakpoints={{
               640: { slidesPerView: 1.5, spaceBetween: 20 },
               768: { slidesPerView: 1.8, spaceBetween: 24 },
@@ -208,9 +203,9 @@ export default function NriFeaturedProjects() {
       <div className="mt-[28px] md:mt-[40px] lg:mt-[3.125vw] px-5 md:px-10 lg:pl-[13.59vw] lg:pr-[8.333vw]">
         <div className="flex items-center gap-[12px] lg:gap-[1.042vw]">
           <button
-            ref={prevRef}
             type="button"
             aria-label="Previous project"
+            onClick={() => swiperRef.current?.slidePrev()}
             className="inline-flex items-center justify-center rounded-full
                        border border-[#33333344] text-[#333]
                        w-[44px] h-[44px] md:w-[54px] md:h-[54px] lg:w-[3.645vw] lg:h-[3.645vw]
@@ -220,9 +215,9 @@ export default function NriFeaturedProjects() {
             <ArrowLeft className="w-[16px] h-[16px] lg:w-[1.094vw] lg:h-[1.094vw]" />
           </button>
           <button
-            ref={nextRef}
             type="button"
             aria-label="Next project"
+            onClick={() => swiperRef.current?.slideNext()}
             className="inline-flex items-center justify-center rounded-full
                        border border-[#33333344] text-[#333]
                        w-[44px] h-[44px] md:w-[54px] md:h-[54px] lg:w-[3.645vw] lg:h-[3.645vw]

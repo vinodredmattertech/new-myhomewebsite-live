@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y, Controller, EffectFade } from "swiper/modules";
+import { Keyboard, A11y, Controller, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -52,8 +52,6 @@ const JOURNEY = [
 export default function AboutJourney() {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
   const [active, setActive] = useState(0);
   const [imageSwiper, setImageSwiper] = useState(null);
   const [contentSwiper, setContentSwiper] = useState(null);
@@ -77,6 +75,9 @@ export default function AboutJourney() {
     if (imageSwiper) imageSwiper.slideToLoop(i);
     if (contentSwiper) contentSwiper.slideToLoop(i);
   };
+
+  const goPrev = () => contentSwiper?.slidePrev();
+  const goNext = () => contentSwiper?.slideNext();
 
   const total = JOURNEY.length;
   // With justify-around each year sits in its own equal-height slot;
@@ -200,7 +201,7 @@ export default function AboutJourney() {
           {/* ============ RIGHT: Content Swiper ============ */}
           <div className="lg:col-span-5 relative lg:h-[33.75vw]">
             <Swiper
-              modules={[Controller, Navigation, Keyboard, A11y]}
+              modules={[Controller, Keyboard, A11y]}
               slidesPerView={1}
               spaceBetween={32}
               speed={700}
@@ -208,13 +209,6 @@ export default function AboutJourney() {
               keyboard={{ enabled: true }}
               onSwiper={setContentSwiper}
               onSlideChange={(s) => setActive(s.realIndex)}
-              onInit={(swiper) => {
-                swiper.params.navigation.prevEl = prevRef.current;
-                swiper.params.navigation.nextEl = nextRef.current;
-                swiper.navigation.init();
-                swiper.navigation.update();
-              }}
-              navigation={{ prevEl: null, nextEl: null }}
               controller={{ control: imageSwiper }}
               className="w-full h-full"
             >
@@ -293,9 +287,9 @@ export default function AboutJourney() {
 
           <div className="flex items-center gap-[12px] lg:gap-[1.042vw]">
             <button
-              ref={prevRef}
               type="button"
               aria-label="Previous year"
+              onClick={goPrev}
               className="inline-flex items-center justify-center rounded-full
                          border border-[#33333344] text-[#333]
                          w-[44px] h-[44px] md:w-[54px] md:h-[54px] lg:w-[3.645vw] lg:h-[3.645vw]
@@ -305,9 +299,9 @@ export default function AboutJourney() {
               <ArrowLeft className="w-[16px] h-[16px] lg:w-[1.094vw] lg:h-[1.094vw]" />
             </button>
             <button
-              ref={nextRef}
               type="button"
               aria-label="Next year"
+              onClick={goNext}
               className="inline-flex items-center justify-center rounded-full
                          border border-[#33333344] text-[#333]
                          w-[44px] h-[44px] md:w-[54px] md:h-[54px] lg:w-[3.645vw] lg:h-[3.645vw]
