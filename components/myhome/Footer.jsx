@@ -37,14 +37,14 @@ import {
  */
 
 const QUICK_LINKS = [
-  { label: "About Us", href: "#who-we-are" },
-  { label: "Our Projects", href: "#featured" },
+  { label: "About Us", href: "/about-us" },
+  { label: "Our Projects", href: "/projects" },
   { label: "CSR", href: "#footer" },
-  { label: "NRI", href: "#footer" },
+  { label: "NRI", href: "/nri" },
   { label: "Channel Partner", href: "#footer" },
   { label: "Career", href: "#footer" },
   { label: "Blogs", href: "#footer" },
-  { label: "Contact Us", href: "#footer" },
+  { label: "Contact Us", href: "/contact-us" },
 ];
 
 export default function MyHomeFooter() {

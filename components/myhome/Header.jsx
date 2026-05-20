@@ -6,13 +6,13 @@ import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
 
 const NAV_ITEMS = [
-  { label: "About Us", href: "#who-we-are" },
-  { label: "Our Projects", href: "#featured" },
+  { label: "About Us", href: "/about-us" },
+  { label: "Our Projects", href: "/projects" },
   { label: "Verticals", href: "#verticals" },
   { label: "Testimonials", href: "#testimonials" },
   { label: "Career", href: "#footer" },
   { label: "CSR", href: "#footer" },
-  { label: "NRI", href: "#footer" },
+  { label: "NRI", href: "/nri" },
   { label: "Blogs", href: "#footer" },
 ];
 
@@ -179,7 +179,7 @@ export default function MyHomeHeader() {
           </Link>
 
           <Link
-            href="#footer"
+            href="/contact-us"
             className="hidden md:inline-flex ml-auto items-center font-montserrat font-medium uppercase text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group"
           >
             <span>Contact Us</span>
