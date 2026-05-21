@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import { mediaUrl } from "@/lib/strapi";
 
 const STATUSES = [
   { key: "All", label: "All", Icon: Check },
@@ -60,7 +61,7 @@ const PRICE_MIN = 1000000;
 const PRICE_MAX = 4000000;
 const PAGE_SIZE = 4;
 
-const PROJECTS = [
+const FALLBACK_PROJECTS = [
   {
     title: "My Home Krishe",
     locationKey: "Madhapur",
@@ -259,14 +260,17 @@ function ProjectCard({ project }) {
                  transition-shadow duration-500 hover:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.35)]"
     >
       <div className="relative w-full px-[18px] pt-[18px] lg:px-[0.937vw] lg:pt-[0.937vw]">
-        <div className="relative w-full aspect-[488/393] rounded-t-[10px] overflow-hidden">
-          <Image
-            src={project.image}
-            alt={project.title}
-            fill
-            sizes="(min-width:1024px) 28vw, (min-width:640px) 45vw, 90vw"
-            className="object-cover object-center select-none transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
-          />
+        <div className="relative w-full aspect-[488/393] rounded-t-[10px] overflow-hidden bg-[#f5f1eb]">
+          {project.image && (
+            <Image
+              src={project.image}
+              alt={project.title}
+              fill
+              unoptimized
+              sizes="(min-width:1024px) 28vw, (min-width:640px) 45vw, 90vw"
+              className="object-cover object-center select-none transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+            />
+          )}
           {project.badge && (
             <span
               className="absolute top-[14px] right-[14px] lg:top-[1.042vw] lg:right-[1.042vw]
@@ -362,7 +366,35 @@ function ProjectCard({ project }) {
   );
 }
 
-export default function ProjectsListing() {
+function normaliseCmsProject(p) {
+  return {
+    title: p.title || "",
+    locationKey: p.locationKey || "",
+    location: p.location || "",
+    description: p.description || "",
+    bhks: (p.bhks || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+    bhkLabel: p.bhkLabel || "",
+    acres: p.acres || "",
+    image: mediaUrl(p.image),
+    status: p.status || "Residential",
+    badge: p.badge || null,
+    price: typeof p.price === "number" ? p.price : 0,
+    year: typeof p.year === "number" ? p.year : 0,
+    href: p.ctaLink || (p.slug ? `/projects/${p.slug}` : "#"),
+  };
+}
+
+export default function ProjectsListing({ projects = [], heading }) {
+  // Use the CMS list when present, otherwise fall back to the static list
+  // so the page still renders during local development without the backend.
+  const PROJECTS =
+    projects.length > 0
+      ? projects.map(normaliseCmsProject).filter((p) => p.title)
+      : FALLBACK_PROJECTS;
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const gridRef = useRef(null);
@@ -556,7 +588,7 @@ export default function ProjectsListing() {
             fontWeight: 300,
           }}
         >
-          A Portfolio Built on Excellence
+          {heading || "A Portfolio Built on Excellence"}
         </h2>
 
         {/* Filter pill bar */}

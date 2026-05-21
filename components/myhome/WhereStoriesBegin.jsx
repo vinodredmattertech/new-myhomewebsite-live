@@ -7,6 +7,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { mediaUrl, relationList } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Where Stories Begin — Figma node 3152:3465
@@ -28,37 +30,19 @@ import "swiper/css/navigation";
    - `sketch` → b&w architectural sketch shown when slide sits on either
                 side (Figma 3152:3497 / 3152:3502 use the sketch artwork for
                 both flanking cards). Shared whoweare-sketch.png placeholder. */
-const SIDE_SKETCH = "/assets/myhome/whoweare-sketch.png";
+export default function WhereStoriesBegin({ data }) {
+  // `projects` is now a relation to the Project collection. Flatten the v4
+  // envelope, sort by `order`, then map onto the shape this section expects.
+  const rawProjects = relationList(data?.projects);
+  rawProjects.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const PROJECTS = rawProjects.map((p) => ({
+    title: p.title || "",
+    sub: p.subTitle || "",
+    image: mediaUrl(p.image),
+    ctaText: p.ctaText || "",
+    ctaLink: p.ctaLink || (p.slug ? `/projects/${p.slug}` : ""),
+  }));
 
-const PROJECTS = [
-  {
-    title: "My Home Nishada",
-    sub: "3 & 4 BHK Ultra-Luxury Apartments, Neopolis, Kokapet",
-    image: "/assets/myhome/whymyhome-slide-2.jpg",
-  },
-  {
-    title: "My Home Grava",
-    sub: "4 BHK Ultra-Luxury Apartments, Neopolis, Kokapet",
-    image: "/assets/myhome/whymyhome-slide-1b.jpg",
-  },
-  {
-    title: "My Home Sayuk",
-    sub: "2, 2.5 & 3 BHK Premium Lifestyle Apartments, Tellapur",
-    image: "/assets/myhome/whymyhome-slide-1.jpg",
-  },
-  {
-    title: "My Home Avatar",
-    sub: "3 & 4 BHK Skyline Residences, Financial District",
-    image: "/assets/myhome/hero-tower.jpg",
-  },
-  {
-    title: "My Home Tarkshya",
-    sub: "Premium Residences, Hyderabad Skyline",
-    image: "/assets/myhome/whoweare-color.jpg",
-  },
-];
-
-export default function WhereStoriesBegin() {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const paraRef = useRef(null);
@@ -90,6 +74,10 @@ export default function WhereStoriesBegin() {
     },
     { scope: rootRef }
   );
+
+  if (!data || !PROJECTS.length) return null;
+
+  const SIDE_SKETCH = mediaUrl(data.sideSketchImage);
 
   return (
     <section
@@ -132,7 +120,7 @@ export default function WhereStoriesBegin() {
               fontFamily: "Montserrat, sans-serif",
             }}
           >
-            Featured Projects
+            {data.label}
           </span>
         </div>
 
@@ -150,7 +138,7 @@ export default function WhereStoriesBegin() {
                 '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
             }}
           >
-            Where Stories Begin
+            {data.heading}
           </h2>
           <p
             ref={paraRef}
@@ -160,9 +148,7 @@ export default function WhereStoriesBegin() {
                        w-full max-w-[318px] lg:w-[39.114vw] lg:max-w-none"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            Each of our projects carries its own story — of families who chose
-            us, of skylines we helped define, of mornings that begin quietly in
-            spaces we've built with care.
+            <RichText>{data.body}</RichText>
           </p>
         </div>
 
@@ -259,17 +245,19 @@ export default function WhereStoriesBegin() {
                                   ? "lg:w-full lg:aspect-[647/485] lg:shadow-[0_30px_70px_-25px_rgba(0,0,0,0.35)]"
                                   : "lg:w-[60%] lg:mx-auto lg:aspect-[327/376]"}`}
                   >
-                    <Image
-                      src={isActive ? p.image : p.image}
-                      alt={p.title}
-                      fill
-                      unoptimized
-                      sizes={isActive ? "(min-width:1024px) 34vw, calc(100vw - 48px)" : "(min-width:1024px) 20vw, calc(100vw - 48px)"}
-                      className={`object-cover object-bottom ${isActive ? "" : "lg:hidden"}`}
-                    />
+                    {p.image && (
+                      <Image
+                        src={p.image}
+                        alt={p.title}
+                        fill
+                        unoptimized
+                        sizes={isActive ? "(min-width:1024px) 34vw, calc(100vw - 48px)" : "(min-width:1024px) 20vw, calc(100vw - 48px)"}
+                        className={`object-cover object-bottom ${isActive ? "" : "lg:hidden"}`}
+                      />
+                    )}
                     {/* Desktop side card uses the b&w sketch (Figma 3152:3497).
                         Mobile keeps the real photo on every slide. */}
-                    {!isActive && (
+                    {!isActive && SIDE_SKETCH && (
                       <Image
                         src={SIDE_SKETCH}
                         alt=""
@@ -316,7 +304,7 @@ export default function WhereStoriesBegin() {
                         Desktop active (3152:3493): 224×58 outlined, 18px
                         Desktop inactive: hidden (Figma side cards have no button) */}
                     <a
-                      href={`#${p.title.replace(/\s+/g, "-").toLowerCase()}`}
+                      href={p.ctaLink || "#"}
                       className={`group relative mt-[24.451px] lg:mt-[1.823vw] inline-flex items-center justify-center
                                   whitespace-nowrap overflow-hidden
                                   w-[156.488px] h-[40.519px]
@@ -337,7 +325,7 @@ export default function WhereStoriesBegin() {
                                    text-[#ef493d] group-hover:!text-white transition-colors duration-500"
                         style={{ fontFamily: "Montserrat, sans-serif" }}
                       >
-                        Know More
+                        {p.ctaText}
                       </span>
                     </a>
                   </div>

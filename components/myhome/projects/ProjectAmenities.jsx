@@ -99,7 +99,7 @@ export default function ProjectAmenities({
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[4.167vw] top-[4.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="hidden lg:flex absolute left-[4.167vw] top-[0.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
         aria-hidden="true"
       >
         <span className="block h-[3.125vw] w-px bg-[#ef493d]" />

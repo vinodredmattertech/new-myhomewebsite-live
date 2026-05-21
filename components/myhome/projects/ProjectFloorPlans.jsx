@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { Dialog } from "@headlessui/react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, X } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import { submitLead } from "@/lib/strapi";
 
 const FLOOR_PLAN_IMG = "/assets/myhome/projects/floor-plan.png";
 
@@ -42,11 +45,16 @@ const DEFAULT_TABS = [
   },
 ];
 
+// localStorage namespaced by project so unlocking Akrida doesn't auto-unlock
+// every other project's plans.
+const STORAGE_PREFIX = "mh:floorplans-unlocked:";
+
 export default function ProjectFloorPlans({
   sidebarLabel = "Space With Purpose",
   heading = "Live The Way You Want",
   description = "Discover the art of spatial intelligence. From the intimate comfort of our 2 BHK residences to the expansive luxury of our 3 BHK layouts, every floor plan is engineered to maximize natural light, cross-ventilation, and functional flow.",
   tabs = DEFAULT_TABS,
+  projectName = "Project Floor Plans",
 }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -60,6 +68,69 @@ export default function ProjectFloorPlans({
 
   const [activeTab, setActiveTab] = useState(tabs[0]?.key);
   const activePlans = tabs.find((t) => t.key === activeTab)?.plans || [];
+
+  // ===== Unlock state =====
+  const storageKey = `${STORAGE_PREFIX}${projectName}`;
+  const [unlocked, setUnlocked] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({ mode: "onBlur" });
+
+  // Initialise unlock state from localStorage on the client (SSR-safe).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(storageKey) === "1") setUnlocked(true);
+  }, [storageKey]);
+
+  const onUnlockSubmit = async (data) => {
+    setSubmitting(true);
+    setSubmitError(null);
+    const payload = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      project: projectName,
+      formSource: "Project Floor Plans Unlock",
+    };
+    try {
+      // CRM push + Strapi lead in parallel — Strapi is canonical here since
+      // the CRM route is currently a no-op (still resolves OK).
+      const [crmRes, leadOk] = await Promise.all([
+        fetch("/api/pushToCRM", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            project_name: payload.project,
+            FormSource: payload.formSource,
+          }),
+        }),
+        submitLead(payload),
+      ]);
+      if (crmRes.ok || leadOk) {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(storageKey, "1");
+        }
+        setUnlocked(true);
+        setModalOpen(false);
+        reset();
+      } else {
+        setSubmitError("Couldn't save your details. Please try again.");
+      }
+    } catch (err) {
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useGSAP(
     () => {
@@ -117,19 +188,19 @@ export default function ProjectFloorPlans({
   return (
     <section
       ref={rootRef}
-      className="relative w-full bg-white pt-[80px] pb-[80px] lg:pt-[1.667vw] lg:pb-[4.688vw] overflow-hidden"
+      className="relative w-full bg-white pt-[0px] pb-[80px] lg:pt-[1.667vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-floor-plans"
     >
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[4.167vw] top-[4.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="hidden lg:flex absolute left-[1.167vw] top-[0] flex-col items-center gap-[1.094vw] w-[2.813vw]"
         aria-hidden="true"
       >
-        <span className="block h-[3.125vw] w-px bg-[#ef493d]" />
-        <span className="flex items-center justify-center h-[12.917vw] w-[1.51vw]">
+        <span className="block h-[2.125vw] w-px bg-[#ef493d]" />
+        <span className="flex items-center justify-center h-[13.917vw] w-[1.51vw]">
           <span
-            className="-rotate-90 whitespace-nowrap capitalize text-[#ef493d] text-[1.25vw]"
+            className="-rotate-90 whitespace-nowrap capitalize text-[#ef493d] text-[1vw]"
             style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
           >
             {sidebarLabel}
@@ -262,13 +333,77 @@ export default function ProjectFloorPlans({
                     alt={`${plan.bhk} ${plan.label}`}
                     fill
                     sizes="(min-width:1024px) 41vw, (min-width:640px) 70vw, 95vw"
-                    className="object-contain object-center select-none"
+                    className={`object-contain object-center select-none transition-[filter] duration-500 ease-out ${
+                      unlocked ? "" : "blur-[14px] scale-[1.03]"
+                    }`}
                   />
                 </div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
+
+        {/* Locked overlay — single CTA over the whole slider while gated */}
+        {!unlocked && (
+          <div
+            className="absolute inset-0 z-[6] flex items-center justify-center
+                       pointer-events-none"
+          >
+            <div
+              className="pointer-events-auto bg-white/95 backdrop-blur-md border border-[rgba(51,51,51,0.12)]
+                         rounded-[12px] shadow-[0_30px_60px_-25px_rgba(0,0,0,0.3)]
+                         px-[24px] py-[20px] sm:px-[32px] sm:py-[26px] lg:px-[2.083vw] lg:py-[1.563vw]
+                         flex flex-col items-center text-center gap-[12px] lg:gap-[0.781vw]
+                         max-w-[440px] lg:max-w-[28vw] mx-4"
+            >
+              <span
+                className="inline-flex items-center justify-center rounded-full
+                           bg-[#ef493d]/10 text-[#ef493d]
+                           w-[44px] h-[44px] lg:w-[2.604vw] lg:h-[2.604vw]"
+              >
+                <Lock className="w-[20px] h-[20px] lg:w-[1.146vw] lg:h-[1.146vw]" strokeWidth={1.8} />
+              </span>
+              <h3
+                className="text-[#333] leading-[1.2]
+                           text-[20px] sm:text-[24px] lg:text-[1.563vw]"
+                style={{
+                  fontFamily:
+                    '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+                  fontWeight: 400,
+                }}
+              >
+                View Detailed Floor Plans
+              </h3>
+              <p
+                className="font-montserrat text-[#6d6d6d]
+                           text-[13px] sm:text-[14px] lg:text-[0.833vw]
+                           leading-[20px] sm:leading-[22px] lg:leading-[1.302vw]"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                Share a few details and we&apos;ll unlock every plan instantly. Your details stay with our advisors only.
+              </p>
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="group relative inline-flex items-center justify-center
+                           whitespace-nowrap overflow-hidden mt-[6px] lg:mt-[0.417vw]
+                           h-[44px] sm:h-[48px] lg:h-[2.708vw]
+                           px-[24px] lg:px-[1.563vw]
+                           bg-[#ef493d] text-white border border-[#ef493d]
+                           transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+                           hover:bg-transparent hover:text-[#ef493d]"
+              >
+                <span
+                  className="font-montserrat font-medium capitalize
+                             text-[14px] sm:text-[15px] lg:text-[0.938vw] tracking-[0.02em]"
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
+                  Unlock Floor Plans
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Side nav buttons */}
         <button
@@ -298,6 +433,168 @@ export default function ProjectFloorPlans({
           <ArrowRight className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
         </button>
       </div>
+
+      {/* ===== Unlock modal ===== */}
+      <Dialog
+        open={modalOpen}
+        onClose={() => (submitting ? null : setModalOpen(false))}
+        className="fixed inset-0 z-[100]"
+      >
+        <div className="fixed inset-0 bg-black/55 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel
+            className="relative w-full max-w-[460px] lg:max-w-[28vw]
+                       bg-white rounded-[10px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]
+                       px-[24px] py-[28px] sm:px-[32px] sm:py-[36px] lg:px-[2.083vw] lg:py-[2.604vw]"
+          >
+            <button
+              type="button"
+              onClick={() => (submitting ? null : setModalOpen(false))}
+              aria-label="Close"
+              className="absolute right-[12px] top-[12px] lg:right-[0.781vw] lg:top-[0.781vw]
+                         inline-flex items-center justify-center rounded-full
+                         w-[34px] h-[34px] lg:w-[2.083vw] lg:h-[2.083vw]
+                         text-[#333] hover:text-[#ef493d] transition-colors"
+            >
+              <X className="w-[18px] h-[18px] lg:w-[1.146vw] lg:h-[1.146vw]" strokeWidth={1.8} />
+            </button>
+
+            <Dialog.Title
+              className="text-[#333] leading-[1.2] capitalize
+                         text-[22px] sm:text-[26px] lg:text-[1.667vw]"
+              style={{
+                fontFamily:
+                  '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+                fontWeight: 400,
+              }}
+            >
+              Unlock {projectName} Plans
+            </Dialog.Title>
+            <p
+              className="font-montserrat text-[#6d6d6d] mt-[8px] lg:mt-[0.521vw]
+                         text-[13px] sm:text-[14px] lg:text-[0.833vw]
+                         leading-[20px] sm:leading-[22px] lg:leading-[1.302vw]"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              Share your details and we&apos;ll reveal every floor plan instantly.
+            </p>
+
+            <form
+              onSubmit={handleSubmit(onUnlockSubmit)}
+              className="mt-[20px] lg:mt-[1.302vw] flex flex-col gap-[16px] lg:gap-[1.042vw]"
+              noValidate
+            >
+              <div>
+                <input
+                  type="text"
+                  placeholder="Full Name*"
+                  aria-invalid={!!errors.name || undefined}
+                  className={`w-full bg-transparent outline-none border-b
+                              text-[#333] placeholder:text-[#999]
+                              text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                              py-[8px] lg:py-[0.417vw]
+                              ${errors.name ? "border-[#ef493d]" : "border-[#33333322]"}`}
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                  {...register("name", {
+                    required: "Please enter your name",
+                    minLength: { value: 2, message: "Too short" },
+                  })}
+                />
+                {errors.name && (
+                  <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email Address*"
+                  aria-invalid={!!errors.email || undefined}
+                  className={`w-full bg-transparent outline-none border-b
+                              text-[#333] placeholder:text-[#999]
+                              text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                              py-[8px] lg:py-[0.417vw]
+                              ${errors.email ? "border-[#ef493d]" : "border-[#33333322]"}`}
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                  {...register("email", {
+                    required: "Please enter your email",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Enter a valid email",
+                    },
+                  })}
+                />
+                {errors.email && (
+                  <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="tel"
+                  placeholder="Phone Number*"
+                  aria-invalid={!!errors.phone || undefined}
+                  className={`w-full bg-transparent outline-none border-b
+                              text-[#333] placeholder:text-[#999]
+                              text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                              py-[8px] lg:py-[0.417vw]
+                              ${errors.phone ? "border-[#ef493d]" : "border-[#33333322]"}`}
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                  {...register("phone", {
+                    required: "Please enter your phone",
+                    pattern: {
+                      value: /^[0-9+\-\s()]{7,15}$/,
+                      message: "Enter a valid phone",
+                    },
+                  })}
+                />
+                {errors.phone && (
+                  <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.phone.message}</p>
+                )}
+              </div>
+
+              {/* Hidden project name — sent with the lead */}
+              <input type="hidden" value={projectName} readOnly />
+
+              {submitError && (
+                <p className="text-[#ef493d] text-[13px]" role="alert">
+                  {submitError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="group relative inline-flex items-center justify-center
+                           whitespace-nowrap overflow-hidden mt-[6px] lg:mt-[0.521vw]
+                           h-[46px] sm:h-[50px] lg:h-[2.917vw]
+                           px-[24px] lg:px-[1.563vw]
+                           bg-[#ef493d] text-white border border-[#ef493d]
+                           transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+                           hover:bg-transparent hover:text-[#ef493d]
+                           disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                <span
+                  className="font-montserrat font-medium capitalize
+                             text-[14px] sm:text-[15px] lg:text-[0.938vw] tracking-[0.02em]"
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
+                  {submitting ? "Unlocking…" : "Unlock Floor Plans"}
+                </span>
+              </button>
+
+              <p
+                className="font-montserrat text-[#999] text-center
+                           text-[11px] sm:text-[12px] lg:text-[0.677vw]
+                           leading-[1.5] mt-[2px] lg:mt-[0.156vw]"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                Submitting will save your details with our team and unlock all floor plans on this device.
+              </p>
+            </form>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </section>
   );
 }

@@ -9,47 +9,21 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
-const JOURNEY = [
-  {
-    year: 2000,
-    title: "My Home Beginnings",
-    image: "/assets/myhome/about/journey-tycoon.jpg",
-    body: "The foundation stone of My Home Group was laid with a vision to redefine real estate in Hyderabad through trust, quality, and timely delivery — values that continue to anchor the brand today.",
-  },
-  {
-    year: 2001,
-    title: "My Home Tycoon",
-    image: "/assets/myhome/about/journey-tycoon.jpg",
-    body: "My Home Tycoon is home to some of the famous brands in the country – Lifestyle, Virtusa and more! Built in 1996, Tycoon is a commercial landmark located in Begumpet spread over an area of 3, 20, 000 sft and brings together a shopper and a corporate executive on one platform.",
-  },
-  {
-    year: 2002,
-    title: "Residential Milestone",
-    image: "/assets/myhome/about/journey-tycoon.jpg",
-    body: "Crossed our first residential milestone with multiple gated-community launches across Hyderabad — projects that set new benchmarks for sustainable design and homeowner experience.",
-  },
-  {
-    year: 2003,
-    title: "Architectural Awards",
-    image: "/assets/myhome/about/journey-tycoon.jpg",
-    body: "Recognised on the national stage for architectural excellence and sustainability initiatives, marking the start of a long relationship with India's leading design institutions.",
-  },
-  {
-    year: 2004,
-    title: "Expansion of Skyline",
-    image: "/assets/myhome/about/journey-tycoon.jpg",
-    body: "Our towers crossed key elevations across HITEC City and Madhapur, reshaping the western skyline of Hyderabad with iconic, premium residential addresses.",
-  },
-  {
-    year: 2005,
-    title: "Commercial Foray",
-    image: "/assets/myhome/about/journey-tycoon.jpg",
-    body: "Entered large-format commercial development, delivering Grade-A office spaces leased to Fortune 500 occupiers and laying the groundwork for our integrated mixed-use ambitions.",
-  },
-];
-
-export default function AboutJourney() {
+export default function AboutJourney({ data }) {
+  const JOURNEY = Array.isArray(data?.items)
+    ? data.items
+        .slice()
+        .sort((a, b) => (a.year ?? 0) - (b.year ?? 0))
+        .map((m) => ({
+          year: m.year,
+          title: m.title || "",
+          body: m.body || "",
+          image: mediaUrl(m.image),
+        }))
+    : [];
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const [active, setActive] = useState(0);
@@ -70,6 +44,8 @@ export default function AboutJourney() {
     },
     { scope: rootRef }
   );
+
+  if (!data || !JOURNEY.length) return null;
 
   const goTo = (i) => {
     if (imageSwiper) imageSwiper.slideToLoop(i);
@@ -95,7 +71,7 @@ export default function AboutJourney() {
                  py-[60px] md:py-[80px] lg:pt-[4.166vw] lg:pb-[4.166vw]"
     >
       <div className="absolute left-[4.16vw] top-[4.166vw] hidden lg:block">
-        <SectionLabel>Our Journey</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       <h2
@@ -109,7 +85,7 @@ export default function AboutJourney() {
           fontWeight: 300,
         }}
       >
-        A Journey Defined by Purpose
+        {data.heading}
       </h2>
 
       <div className="relative mt-[40px] md:mt-[56px] lg:mt-[2.604vw] px-5 md:px-10 lg:px-[11.146vw]">
@@ -131,13 +107,16 @@ export default function AboutJourney() {
               {JOURNEY.map((slide) => (
                 <SwiperSlide key={`img-${slide.year}`}>
                   <div className="relative w-full h-full">
-                    <Image
-                      src={slide.image}
-                      alt={`${slide.title} — ${slide.year}`}
-                      fill
-                      sizes="(min-width: 1024px) 30vw, 100vw"
-                      className="object-cover"
-                    />
+                    {slide.image && (
+                      <Image
+                        src={slide.image}
+                        alt={`${slide.title} — ${slide.year}`}
+                        fill
+                        unoptimized
+                        sizes="(min-width: 1024px) 30vw, 100vw"
+                        className="object-cover"
+                      />
+                    )}
                   </div>
                 </SwiperSlide>
               ))}
@@ -248,7 +227,7 @@ export default function AboutJourney() {
                                  max-w-[640px] lg:max-w-[30.26vw]"
                       style={{ fontFamily: "Montserrat, sans-serif" }}
                     >
-                      {slide.body}
+                      <RichText>{slide.body}</RichText>
                     </p>
                   </div>
                 </SwiperSlide>
@@ -274,14 +253,14 @@ export default function AboutJourney() {
                 fontWeight: 400,
               }}
             >
-              40
+              {data.experienceYears ?? 40}
             </span>
             <span
               className="font-montserrat text-[#333]/80 max-w-[110px] lg:max-w-[5.781vw]
                          text-[12px] sm:text-[13px] lg:text-[0.818vw] leading-[1.4]"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Years of Experience
+              {data.experienceLabel || "Years of Experience"}
             </span>
           </div>
 

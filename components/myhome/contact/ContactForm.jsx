@@ -1,21 +1,15 @@
 import React, { useRef, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronDown } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import { mediaUrl, submitLead } from "@/lib/strapi";
 
-const PROJECT_OPTIONS = [
-  "Apas",
-  "Akrida",
-  "Avali",
-  "Sayuk",
-  "Tridasa",
-  "Vipina",
-  "Other",
-];
+const DEFAULT_PROJECT_OPTIONS = ["Apas", "Akrida", "Avali", "Sayuk", "Tridasa", "Vipina", "Other"];
 
 const UnderlineField = React.forwardRef(function UnderlineField(
   { label, hasError, errorMessage, dropdown = false, children, ...inputProps },
@@ -58,7 +52,16 @@ const UnderlineField = React.forwardRef(function UnderlineField(
   );
 });
 
-export default function ContactForm() {
+export default function ContactForm({ data }) {
+  const PROJECT_OPTIONS =
+    (data?.projectOptions || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean) ||
+    DEFAULT_PROJECT_OPTIONS;
+  const formImage = mediaUrl(data?.image);
+
+  const router = useRouter();
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const [submitting, setSubmitting] = useState(false);
@@ -95,25 +98,42 @@ export default function ContactForm() {
     { scope: rootRef }
   );
 
-  const onSubmit = async (data) => {
+  if (!data) return null;
+
+  const onSubmit = async (formValues) => {
     setSubmitting(true);
     setSuccess(false);
+    const payload = {
+      name: formValues.name,
+      email: formValues.email,
+      phone: formValues.phone,
+      project: formValues.project || "",
+      message: formValues.message || "",
+      formSource: "Contact Us Page",
+    };
     try {
-      const res = await fetch("/api/pushToCRM", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          project_name: data.project || "-",
-          message: data.message,
-          FormSource: "Contact Us Page",
+      // Fire CRM push + Strapi lead capture in parallel. A successful CRM
+      // POST is still treated as the canonical success signal so the user
+      // flow doesn't change if Strapi happens to be down.
+      const [crmRes] = await Promise.all([
+        fetch("/api/pushToCRM", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            project_name: payload.project || "-",
+            message: payload.message,
+            FormSource: payload.formSource,
+          }),
         }),
-      });
-      if (res.ok) {
+        submitLead(payload),
+      ]);
+      if (crmRes.ok) {
         setSuccess(true);
         reset();
+        router.push("/thank-you");
       }
     } catch (e) {
       /* silent */
@@ -134,7 +154,7 @@ export default function ContactForm() {
 
       {/* vertical side label */}
       <div className="absolute left-[4.16vw] top-[6.25vw]">
-        <SectionLabel>Tailored Assistance</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       <div className="mt-[40px] md:mt-[64px] lg:mt-[2.604vw] px-5 md:px-10 lg:px-[9.375vw]">
@@ -148,20 +168,23 @@ export default function ContactForm() {
             fontWeight: 300,
           }}
         >
-          Forge your future
+          {data.heading}
         </h2>
 
         <div className="mt-[40px] md:mt-[56px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[10.208vw] items-center">
           {/* left: image */}
           <div className="relative w-full rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
                           aspect-[734/653] lg:aspect-auto lg:h-[34vw]">
-            <Image
-              src="/assets/myhome/contact/forge-future.jpg"
-              alt="Residents enjoying a My Home apartment living room"
-              fill
-              sizes="(min-width: 1024px) 38vw, 100vw"
-              className="object-cover"
-            />
+            {formImage && (
+              <Image
+                src={formImage}
+                alt="Residents enjoying a My Home apartment living room"
+                fill
+                unoptimized
+                sizes="(min-width: 1024px) 38vw, 100vw"
+                className="object-cover"
+              />
+            )}
           </div>
 
           {/* right: form */}
@@ -278,7 +301,7 @@ export default function ContactForm() {
                            text-[14px] sm:text-[15px] lg:text-[0.938vw] tracking-[0.02em]"
                 style={{ fontFamily: "Outfit, Montserrat, sans-serif" }}
               >
-                {submitting ? "Sending…" : success ? "Sent ✓" : "Send Message"}
+                {submitting ? "Sending…" : success ? "Sent ✓" : data.submitText || "Send Message"}
               </span>
             </button>
           </form>

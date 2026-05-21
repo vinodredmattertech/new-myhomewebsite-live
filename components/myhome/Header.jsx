@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
+import { getHeaderData, mediaUrl } from "@/lib/strapi";
 
-const NAV_ITEMS = [
+const FALLBACK_NAV_ITEMS = [
   { label: "About Us", href: "/about-us" },
   { label: "Our Projects", href: "/projects" },
   { label: "Verticals", href: "#verticals" },
@@ -16,10 +17,38 @@ const NAV_ITEMS = [
   { label: "Blogs", href: "#footer" },
 ];
 
+const FALLBACK_LOGO = "/assets/myhome/logo.svg";
+
 export default function MyHomeHeader() {
   const headerRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // CMS-driven config; fetched client-side once on mount. Falls back to
+  // the hardcoded list above when Strapi is unreachable.
+  const [cms, setCms] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    getHeaderData().then((data) => {
+      if (alive && data) setCms(data);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const NAV_ITEMS =
+    Array.isArray(cms?.navItems) && cms.navItems.length > 0
+      ? cms.navItems.map((n) => ({
+          label: n.label,
+          href: n.href,
+          openInNewTab: !!n.openInNewTab,
+        }))
+      : FALLBACK_NAV_ITEMS;
+  const LOGO = mediaUrl(cms?.logo) || FALLBACK_LOGO;
+  const MENU_LABEL = cms?.menuLabel || "Menu";
+  const CONTACT_CTA_LABEL = cms?.contactCtaLabel || "Contact Us";
+  const CONTACT_CTA_LINK = cms?.contactCtaLink || "/contact-us";
 
   useGSAP(() => {
     registerGsap();
@@ -117,7 +146,7 @@ export default function MyHomeHeader() {
           {/* ===== Mobile (<md): logo LEFT, Menu RIGHT (matches Figma 3189:5437) ===== */}
           <Link href="/" className="md:hidden block">
             <Image
-              src="/assets/myhome/logo.svg"
+              src={LOGO}
               alt="My Home Group"
               width={137}
               height={72}
@@ -142,7 +171,7 @@ export default function MyHomeHeader() {
               className="font-montserrat font-medium text-[16px] leading-[32px] tracking-wide"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Menu
+              {MENU_LABEL}
             </span>
           </button>
 
@@ -159,7 +188,7 @@ export default function MyHomeHeader() {
               <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
             </span>
             <span className="font-montserrat font-medium text-[16px] lg:text-[0.938vw] leading-none tracking-wide">
-              Menu
+              {MENU_LABEL}
             </span>
           </button>
 
@@ -168,7 +197,7 @@ export default function MyHomeHeader() {
             className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
           >
             <Image
-              src="/assets/myhome/logo.svg"
+              src={LOGO}
               alt="My Home Group"
               width={137}
               height={72}
@@ -179,10 +208,10 @@ export default function MyHomeHeader() {
           </Link>
 
           <Link
-            href="/contact-us"
+            href={CONTACT_CTA_LINK}
             className="hidden md:inline-flex ml-auto items-center font-montserrat font-medium uppercase text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group"
           >
-            <span>Contact Us</span>
+            <span>{CONTACT_CTA_LABEL}</span>
             <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />
           </Link>
         </div>
@@ -207,7 +236,7 @@ export default function MyHomeHeader() {
         >
           <div className="flex items-center justify-between px-8 md:px-12 py-8">
             <Image
-              src="/assets/myhome/logo.svg"
+              src={LOGO}
               alt="My Home Group"
               width={110}
               height={58}
@@ -229,6 +258,8 @@ export default function MyHomeHeader() {
               <Link
                 key={item.label}
                 href={item.href}
+                target={item.openInNewTab ? "_blank" : undefined}
+                rel={item.openInNewTab ? "noopener noreferrer" : undefined}
                 onClick={() => setOpen(false)}
                 className="group inline-flex items-center justify-between border-b border-white/10 py-4 font-tartuffo text-[28px] md:text-[34px] capitalize tracking-wide hover:text-mh-red transition-colors duration-500"
                 style={{

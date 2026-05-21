@@ -7,6 +7,11 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
+import useFancybox from "@/components/common/useFancybox";
+
+const BADGE_COLORS = { red: "#ef493d", gold: "#c39a3e" };
 
 /**
  * Testimonials — Figma node 3152:3507
@@ -22,37 +27,6 @@ import "swiper/css/navigation";
  * Mobile collapses to one testimonial per Swiper slide, image first then
  * text below.
  */
-
-const TESTIMONIALS = [
-  {
-    quote:
-      "Buying a home from 3,000 miles away felt daunting until we met the My Home team. The transparency, documentation, and follow-through were flawless. From site selection to possession, every milestone was honoured. It wasn't just a transaction. It felt like a partnership.",
-    name: "Dr. Srikanth Ega Spine, Hyderabad",
-    image: "/assets/myhome/testimonial-1.jpg",
-    badge: "#ef493d", // red play button
-  },
-  {
-    quote:
-      "What struck us most wasn't the finish or the amenities — it was the people. From our first site visit to the day we moved in, every interaction felt personal. The space planning, the light, the quiet attention to how we actually live — My Home understood before we had to explain.",
-    name: "Mr. Gangula Sudheer, Hyderabad",
-    image: "/assets/myhome/testimonial-2.jpg",
-    badge: "#c39a3e", // gold play button
-  },
-  {
-    quote:
-      "Every detail spoke a language of care — the joinery, the natural light, the gardens. We feel rooted here in a way we hadn't experienced before. My Home didn't just deliver a house; they delivered a life we wanted to live.",
-    name: "Mrs. Anjali Reddy, Hyderabad",
-    image: "/assets/myhome/testimonial-1.jpg",
-    badge: "#ef493d",
-  },
-  {
-    quote:
-      "The handover felt seamless — from the structural walk-through to the snag list. Months later we're still finding small acts of consideration the architects baked in. That's the difference between a building and a home.",
-    name: "Mr. Rajesh Kumar, Hyderabad",
-    image: "/assets/myhome/testimonial-2.jpg",
-    badge: "#c39a3e",
-  },
-];
 
 function QuoteGlyph({ className = "" }) {
   return (
@@ -80,13 +54,44 @@ function PlayIcon({ className = "" }) {
   );
 }
 
-export default function Testimonials() {
+export default function Testimonials({ data }) {
+  const TESTIMONIALS =
+    Array.isArray(data?.items) && data.items.length
+      ? data.items.map((t) => {
+          const videoFileUrl = mediaUrl(t.videoFile);
+          // isVideo=true → play the uploaded videoFile; else → use videoUrl
+          const videoSrc = t.isVideo ? videoFileUrl : t.videoUrl || "";
+          // Decide which Fancybox content type to use. Uploaded files and
+          // direct .mp4/.webm/.mov URLs play as <video>; YouTube/Vimeo and
+          // anything else open as iframe.
+          const isDirectVideo =
+            t.isVideo ||
+            /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(videoSrc || "");
+          return {
+            quote: t.quote || "",
+            name: t.name || "",
+            image: mediaUrl(t.image),
+            badge: BADGE_COLORS[t.badgeColor] || BADGE_COLORS.red,
+            videoSrc,
+            videoType: isDirectVideo ? "video" : "iframe",
+          };
+        })
+      : [];
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const paraRef = useRef(null);
   const labelRef = useRef(null);
   const swiperRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
+
+  // Bind Fancybox to the section so every [data-fancybox] play button opens
+  // its testimonial video in a lightbox modal.
+  const [fancyboxRoot] = useFancybox();
+  const attachFancy = (el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  };
 
   useGSAP(
     () => {
@@ -113,9 +118,11 @@ export default function Testimonials() {
     { scope: rootRef }
   );
 
+  if (!data || !TESTIMONIALS.length) return null;
+
   return (
     <section
-      ref={rootRef}
+      ref={attachFancy}
       id="testimonials"
       data-section="testimonials"
       className="relative w-full bg-white overflow-hidden
@@ -150,7 +157,7 @@ export default function Testimonials() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Testimonial
+          {data.label}
         </span>
       </div>
 
@@ -172,7 +179,7 @@ export default function Testimonials() {
               '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
           }}
         >
-          Trust, in their words
+          {data.heading}
         </h2>
         <p
           ref={paraRef}
@@ -182,8 +189,7 @@ export default function Testimonials() {
                      max-w-[742px] lg:w-[38.646vw] lg:max-w-none"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          Real stories from real homeowners — because the best proof of what we
-          build is how it feels to live there.
+          <RichText>{data.body}</RichText>
         </p>
       </div>
 
@@ -302,30 +308,50 @@ export default function Testimonials() {
                              lg:w-[18.75vw] lg:max-w-none lg:mx-0 lg:h-[28.177vw]
                              rounded-[6px] overflow-hidden shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)]"
                 >
-                  <Image
-                    src={t.image}
-                    alt={t.name}
-                    fill
-                    unoptimized
-                    sizes="(min-width:1024px) 19vw, calc(100vw - 40px)"
-                    className="object-cover object-center"
-                  />
+                  {t.image && (
+                    <Image
+                      src={t.image}
+                      alt={t.name}
+                      fill
+                      unoptimized
+                      sizes="(min-width:1024px) 19vw, calc(100vw - 40px)"
+                      className="object-cover object-center"
+                    />
+                  )}
                   {/* Dark overlay (Figma rgba(0,0,0,0.1)) */}
                   <div className="absolute inset-0 bg-black/10" />
 
-                  {/* Play button — red OR gold per Figma */}
-                  <button
-                    type="button"
-                    aria-label={`Play video testimonial — ${t.name}`}
-                    className="absolute inset-0 m-auto inline-flex items-center justify-center
-                               w-[60px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw]
-                               rounded-full text-white
-                               transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
-                               hover:scale-110"
-                    style={{ background: t.badge }}
-                  >
-                    <PlayIcon className="w-[18px] h-[18px] lg:w-[1.125vw] lg:h-[1.125vw]" />
-                  </button>
+                  {/* Play button — red OR gold per Figma. Opens the
+                      testimonial video in a Fancybox modal. When the item
+                      has no playable source it's rendered disabled. */}
+                  {t.videoSrc ? (
+                    <a
+                      href={t.videoSrc}
+                      data-fancybox={`testimonial-${i}`}
+                      data-type={t.videoType}
+                      aria-label={`Play video testimonial — ${t.name}`}
+                      className="absolute inset-0 m-auto inline-flex items-center justify-center
+                                 w-[60px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw]
+                                 rounded-full text-white
+                                 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+                                 hover:scale-110"
+                      style={{ background: t.badge }}
+                    >
+                      <PlayIcon className="w-[18px] h-[18px] lg:w-[1.125vw] lg:h-[1.125vw]" />
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      aria-label={`Video unavailable — ${t.name}`}
+                      className="absolute inset-0 m-auto inline-flex items-center justify-center
+                                 w-[60px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw]
+                                 rounded-full text-white opacity-60 cursor-not-allowed"
+                      style={{ background: t.badge }}
+                    >
+                      <PlayIcon className="w-[18px] h-[18px] lg:w-[1.125vw] lg:h-[1.125vw]" />
+                    </button>
+                  )}
                 </div>
               </div>
             </SwiperSlide>

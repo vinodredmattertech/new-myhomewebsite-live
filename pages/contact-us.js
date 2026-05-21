@@ -1,30 +1,33 @@
+import Seo from "@/components/Seo/Seo";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import PageBanner from "@/components/myhome/PageBanner";
 import ContactExperts from "@/components/myhome/contact/ContactExperts";
 import ContactForm from "@/components/myhome/contact/ContactForm";
+import { getContactData, mediaUrl } from "@/lib/strapi";
 
-export default function ContactUs() {
+export default function ContactUs({ contact }) {
+  const banner = contact?.banner;
   return (
     <>
+      <Seo seo={contact?.seo} />
       <PageBanner
         sectionId="contact-banner"
-        imageSrc="/assets/myhome/contact/banner-lobby.jpg"
-        imageAlt="My Home Group lobby"
-        heading="Your Gateway to Exceptional Living"
-        breadcrumbLabel="Contact Us"
+        desktopSrc={mediaUrl(banner?.desktopImage)}
+        mobileSrc={mediaUrl(banner?.mobileImage)}
+        imageAlt={banner?.imageAlt}
+        heading={banner?.heading}
+        breadcrumbLabel={banner?.breadcrumbLabel}
         gradientClass="bg-gradient-to-b from-black/35 via-black/15 to-black/75"
       />
-      <ContactExperts />
-      <ContactForm />
+      <ContactExperts data={contact?.experts} />
+      <ContactForm data={contact?.form} />
     </>
   );
 }
 
-ContactUs.getLayout = (page) => (
-  <MyHomeLayout
-    title="Contact Us | My Home Group"
-    description="Connect with our experts at My Home Group. Get in touch for sales enquiries, NRI services, and corporate communication — Hyderabad's most trusted real estate developer."
-  >
-    {page}
-  </MyHomeLayout>
-);
+ContactUs.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+
+export async function getServerSideProps() {
+  const contact = await getContactData();
+  return { props: { contact: contact ?? null } };
+}

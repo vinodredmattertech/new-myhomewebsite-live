@@ -7,6 +7,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Why My Home — Figma node 2609:1613
@@ -22,31 +24,16 @@ import "swiper/css/effect-fade";
  * scroll, snaps to each slide breakpoint, and calls `swiper.slideTo()` on
  * progress updates.
  */
-const SLIDES = [
-  {
-    id: 1,
-    sub: "25 Landmark Addresses Shaping Hyderabad",
-    body:
-      "Since 1981, one conviction has guided every project — that Hyderabad deserves world-class homes, and that world-class homes deserve uncompromising craft, lived-in warmth, and lasting grace.",
-    image: "/assets/myhome/whymyhome-slide-1b.jpg",
-  },
-  {
-    id: 2,
-    sub: "Cement & Building Materials",
-    body:
-      "From the foundations up, every grain of our construction reflects an unwavering pursuit of quality — engineered for permanence, designed for the families who will call it home.",
-    image: "/assets/myhome/whymyhome-slide-2.jpg",
-  },
-  {
-    id: 3,
-    sub: "Global Awards: Sustainability Leader 2024",
-    body:
-      "Recognised across the world for designing with the earth in mind — every tower, every district, every detail engineered for environments that endure.",
-    image: "/assets/myhome/whymyhome-slide-1.jpg",
-  },
-];
-
-export default function WhyMyHome() {
+export default function WhyMyHome({ data }) {
+  const SLIDES =
+    Array.isArray(data?.slides) && data.slides.length
+      ? data.slides.map((s, i) => ({
+          id: s.id ?? i + 1,
+          sub: s.subTitle || "",
+          body: s.body || "",
+          image: mediaUrl(s.image),
+        }))
+      : [];
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const subRef = useRef(null);
@@ -139,6 +126,11 @@ export default function WhyMyHome() {
     { scope: rootRef }
   );
 
+  if (!data || !SLIDES.length) return null;
+
+  // Decorative bottom-left bloom — managed in /public, not in the CMS.
+  const floralImage = "/assets/myhome/whymyhome-floral.png";
+
   return (
     <section
       ref={rootRef}
@@ -166,7 +158,7 @@ export default function WhyMyHome() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Why My Home
+          {data.label}
         </span>
       </div>
 
@@ -182,7 +174,7 @@ export default function WhyMyHome() {
             '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
         }}
       >
-        Choose Unrivaled Prestige
+        {data.heading}
       </h2>
 
       {/* ---------- Decorative floral bottom-left (DESKTOP ONLY)
@@ -195,20 +187,22 @@ export default function WhyMyHome() {
           image) lands at the section's bottom-left corner. overflow-hidden
           clips the oversized image to the 179×338 window without cropping
           the bloom itself. */}
-      <div className="hidden lg:block absolute left-0 bottom-0 z-[2] pointer-events-none overflow-hidden w-[9.323vw] max-w-[200px] aspect-[179/338]">
-        <div
-          className="absolute inset-0"
-          style={{ transform: "scaleY(-1)" }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/myhome/whymyhome-floral.png"
-            alt=""
-            className="absolute top-0 left-0 max-w-none h-auto select-none"
-            style={{ width: "431.17%" }}
-          />
+      {floralImage && (
+        <div className="hidden lg:block absolute left-0 bottom-0 z-[2] pointer-events-none overflow-hidden w-[9.323vw] max-w-[200px] aspect-[179/338]">
+          <div
+            className="absolute inset-0"
+            style={{ transform: "scaleY(-1)" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={floralImage}
+              alt=""
+              className="absolute top-0 left-0 max-w-none h-auto select-none"
+              style={{ width: "431.17%" }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ---------- Slide progress bar (vertical red-fill between text + image, desktop only) ---------- */}
       <div
@@ -267,35 +261,39 @@ export default function WhyMyHome() {
               className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] top-[307px] font-montserrat font-normal text-white text-[14px] leading-[24px] text-justify"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              {slide.body}
+              <RichText>{slide.body}</RichText>
             </p>
 
             {/* ===== Mobile image
                 Figma: top:467 centered, w:460 h:395 (aspect 460/395 = 1.165) */}
-            <div className="lg:hidden absolute z-[3] left-1/2 -translate-x-1/2 top-[467px] w-[min(460px,calc(100vw-24px))] aspect-[460/395]">
-              <Image
-                src={slide.image}
-                alt={slide.sub}
-                fill
-                unoptimized
-                priority={i === 0}
-                sizes="(min-width:480px) 460px, calc(100vw-24px)"
-                className="object-cover object-center select-none"
-              />
-            </div>
-
-            {/* ===== DESKTOP LAYOUT (≥lg) — right-side image + bottom-left text ===== */}
-            <div className="hidden lg:block absolute pointer-events-none inset-0">
-              <div className="absolute right-0 top-0 h-full w-[42.4vw]">
+            {slide.image && (
+              <div className="lg:hidden absolute z-[3] left-1/2 -translate-x-1/2 top-[467px] w-[min(460px,calc(100vw-24px))] aspect-[460/395]">
                 <Image
                   src={slide.image}
                   alt={slide.sub}
                   fill
                   unoptimized
                   priority={i === 0}
-                  sizes="42vw"
+                  sizes="(min-width:480px) 460px, calc(100vw-24px)"
                   className="object-cover object-center select-none"
                 />
+              </div>
+            )}
+
+            {/* ===== DESKTOP LAYOUT (≥lg) — right-side image + bottom-left text ===== */}
+            <div className="hidden lg:block absolute pointer-events-none inset-0">
+              <div className="absolute right-0 top-0 h-full w-[42.4vw]">
+                {slide.image && (
+                  <Image
+                    src={slide.image}
+                    alt={slide.sub}
+                    fill
+                    unoptimized
+                    priority={i === 0}
+                    sizes="42vw"
+                    className="object-cover object-center select-none"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#2a2828]/70 via-[#2a2828]/10 to-transparent" />
               </div>
             </div>
@@ -317,7 +315,7 @@ export default function WhyMyHome() {
                 className="font-montserrat font-normal mt-[0.781vw] text-white/85 text-[0.833vw] leading-[1.563vw] max-w-[30.83vw]"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                {slide.body}
+                <RichText>{slide.body}</RichText>
               </p>
             </div>
           </SwiperSlide>

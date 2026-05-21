@@ -7,11 +7,18 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import useFancybox from "@/components/common/useFancybox";
 
+/**
+ * Default content shown when no CMS data is wired (e.g. local dev).
+ * Image tabs carry { image, alt }; video tabs carry
+ * { title, image (thumbnail), videoSrc, videoType: "video" | "iframe" }.
+ */
 const DEFAULT_TABS = [
   {
     key: "gallery",
     label: "Gallery",
+    kind: "images",
     items: [
       { image: "/assets/myhome/projects/gallery-pool.jpg", alt: "Resort-style pool view" },
       { image: "/assets/myhome/projects/amenity-pool.jpg", alt: "Infinity pool and deck" },
@@ -24,11 +31,15 @@ const DEFAULT_TABS = [
   {
     key: "walkthroughs",
     label: "Walkthroughs",
+    kind: "videos",
     items: [
-      { image: "/assets/myhome/projects/akrida-banner.jpg", alt: "360° tower walkthrough" },
-      { image: "/assets/myhome/projects/akrida-entrance.jpg", alt: "Entrance walkthrough" },
-      { image: "/assets/myhome/projects/amenity-amphitheatre.jpg", alt: "Amphitheatre walkthrough" },
-      { image: "/assets/myhome/projects/gallery-pool.jpg", alt: "Pool deck walkthrough" },
+      {
+        title: "360° Tower Walkthrough",
+        image: "/assets/myhome/projects/akrida-banner.jpg",
+        alt: "360° tower walkthrough",
+        videoSrc: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        videoType: "iframe",
+      },
     ],
   },
 ];
@@ -36,7 +47,7 @@ const DEFAULT_TABS = [
 export default function ProjectGallery({
   sidebarLabel = "A Visual Odyssey",
   heading = "Step Into Your Future Home",
-  description = "Experience the Akrida lifestyle before it's even built. Explore our meticulously designed interiors, sprawling landscapes, and architectural grandeur through our high-definition gallery and immersive 360° virtual tours.",
+  description = "Experience the lifestyle before it's even built. Explore meticulously designed interiors, sprawling landscapes, and architectural grandeur through our gallery and immersive walkthroughs.",
   tabs = DEFAULT_TABS,
 }) {
   const rootRef = useRef(null);
@@ -49,9 +60,21 @@ export default function ProjectGallery({
   const nextRef = useRef(null);
   const swiperRef = useRef(null);
 
+  // Bind Fancybox to the section so every [data-fancybox] walkthrough
+  // tile opens its video in a lightbox modal.
+  const [fancyboxRoot] = useFancybox();
+  const attachFancy = (el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  };
+
   const [activeTab, setActiveTab] = useState(tabs[0]?.key);
-  const activeItems = tabs.find((t) => t.key === activeTab)?.items || [];
-  const isWalkthrough = activeTab === "walkthroughs";
+  const currentTab = tabs.find((t) => t.key === activeTab) || tabs[0];
+  const activeItems = currentTab?.items || [];
+  // Fall back to legacy detection (key === "walkthroughs") when `kind`
+  // hasn't been set yet — keeps older CMS data + the static defaults working.
+  const activeKind =
+    currentTab?.kind || (activeTab === "walkthroughs" ? "videos" : "images");
 
   useGSAP(
     () => {
@@ -104,9 +127,13 @@ export default function ProjectGallery({
     if (key !== activeTab) setActiveTab(key);
   };
 
+  // For the image tab we keep one big slide per image. For the video tab
+  // we show a 2-up grid on desktop so multiple walkthroughs are visible.
+  const isVideoTab = activeKind === "videos";
+
   return (
     <section
-      ref={rootRef}
+      ref={attachFancy}
       className="relative w-full bg-[#2a2828] pt-[80px] pb-[80px] lg:pt-[3.125vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-gallery"
     >
@@ -190,64 +217,166 @@ export default function ProjectGallery({
         </div>
       </div>
 
-      {/* Slider with side nav arrows */}
+      {/* ===== Slider ===== */}
       <div
         ref={sliderWrapRef}
         className="relative mt-[36px] lg:mt-[2.917vw] w-full px-5 md:px-12 lg:px-[2.083vw]"
       >
-        <Swiper
-          key={activeTab}
-          modules={[Navigation, Keyboard, A11y]}
-          slidesPerView={1}
-          spaceBetween={16}
-          speed={650}
-          keyboard={{ enabled: true }}
-          loop={activeItems.length > 1}
-          onSwiper={(s) => {
-            swiperRef.current = s;
-          }}
-          onBeforeInit={(swiper) => {
-            swiper.params.navigation.prevEl = prevRef.current;
-            swiper.params.navigation.nextEl = nextRef.current;
-          }}
-          navigation={{ prevEl: null, nextEl: null }}
-          breakpoints={{
-            1024: { slidesPerView: 1, spaceBetween: 24 },
-          }}
-          className="!overflow-visible"
-        >
-          {activeItems.map((item, idx) => (
-            <SwiperSlide key={`${activeTab}-${idx}`} className="!h-auto">
-              <div className="relative w-full aspect-[1398/632] rounded-[12px] overflow-hidden bg-black/30">
-                <Image
-                  src={item.image}
-                  alt={item.alt || ""}
-                  fill
-                  sizes="(min-width:1024px) 73vw, 95vw"
-                  className="object-cover object-center select-none"
-                  priority={idx === 0}
-                />
-                {isWalkthrough ? (
-                  <button
-                    type="button"
-                    aria-label={`Play walkthrough — ${item.alt || ""}`}
-                    className="absolute inset-0 flex items-center justify-center group"
-                  >
-                    <span className="absolute inset-0 bg-black/25 transition-colors duration-300 group-hover:bg-black/15" />
-                    <span
-                      className="relative inline-flex items-center justify-center rounded-full
-                                 bg-white/90 text-[#ef493d] shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                                 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] lg:w-[5vw] lg:h-[5vw]
-                                 transition-transform duration-300 group-hover:scale-110"
-                    >
-                      <Play className="w-[24px] h-[24px] lg:w-[1.875vw] lg:h-[1.875vw] ml-[3px] lg:ml-[0.156vw] fill-current" />
-                    </span>
-                  </button>
-                ) : null}
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {activeItems.length === 0 ? (
+          <div className="mx-auto max-w-[760px] py-[40px] text-center">
+            <p
+              className="font-montserrat text-white/70 text-[14px] lg:text-[0.938vw]"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              No {isVideoTab ? "walkthroughs" : "gallery"} available yet.
+            </p>
+          </div>
+        ) : isVideoTab ? (
+          <Swiper
+            key={activeTab}
+            modules={[Navigation, Keyboard, A11y]}
+            slidesPerView={1.05}
+            spaceBetween={16}
+            speed={650}
+            keyboard={{ enabled: true }}
+            onSwiper={(s) => {
+              swiperRef.current = s;
+            }}
+            onBeforeInit={(swiper) => {
+              swiper.params.navigation.prevEl = prevRef.current;
+              swiper.params.navigation.nextEl = nextRef.current;
+            }}
+            navigation={{ prevEl: null, nextEl: null }}
+            breakpoints={{
+              640: { slidesPerView: 1.4, spaceBetween: 20 },
+              768: { slidesPerView: 1.8, spaceBetween: 24 },
+              1024: { slidesPerView: 2, spaceBetween: 32 },
+            }}
+            className="!overflow-visible"
+          >
+            {activeItems.map((item, idx) => {
+              const hasVideo = !!item.videoSrc;
+              return (
+                <SwiperSlide
+                  key={`video-${idx}`}
+                  className="!h-auto"
+                >
+                  <div className="relative w-full aspect-[785/440] rounded-[12px] overflow-hidden bg-black/40 group">
+                    {item.image && (
+                      <Image
+                        src={item.image}
+                        alt={item.alt || item.title || ""}
+                        fill
+                        unoptimized
+                        sizes="(min-width:1024px) 36vw, 95vw"
+                        className="object-cover object-center select-none transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                        priority={idx === 0}
+                      />
+                    )}
+                    <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/15 transition-colors duration-300" />
+
+                    {/* Play / disabled */}
+                    {hasVideo ? (
+                      <a
+                        href={item.videoSrc}
+                        data-fancybox={`walkthrough-${activeTab}`}
+                        data-type={item.videoType}
+                        data-caption={item.title || ""}
+                        aria-label={`Play walkthrough — ${item.title || "video"}`}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <span
+                          className="inline-flex items-center justify-center rounded-full
+                                     bg-white/95 text-[#ef493d] shadow-[0_8px_24px_rgba(0,0,0,0.45)]
+                                     w-[60px] h-[60px] sm:w-[72px] sm:h-[72px] lg:w-[4.167vw] lg:h-[4.167vw]
+                                     transition-transform duration-300 group-hover:scale-110"
+                        >
+                          <Play
+                            className="w-[22px] h-[22px] lg:w-[1.563vw] lg:h-[1.563vw] ml-[3px] lg:ml-[0.156vw] fill-current"
+                            strokeWidth={0}
+                          />
+                        </span>
+                      </a>
+                    ) : (
+                      <span
+                        className="absolute inset-0 flex items-center justify-center"
+                        aria-label="Walkthrough coming soon"
+                      >
+                        <span
+                          className="inline-flex items-center justify-center rounded-full
+                                     bg-white/40 text-white opacity-70
+                                     w-[60px] h-[60px] sm:w-[72px] sm:h-[72px] lg:w-[4.167vw] lg:h-[4.167vw]"
+                        >
+                          <Play
+                            className="w-[22px] h-[22px] lg:w-[1.563vw] lg:h-[1.563vw] ml-[3px] lg:ml-[0.156vw] fill-current"
+                            strokeWidth={0}
+                          />
+                        </span>
+                      </span>
+                    )}
+
+                    {/* Title overlay */}
+                    {item.title && (
+                      <div className="absolute inset-x-0 bottom-0 px-[20px] py-[18px] lg:px-[1.563vw] lg:py-[1.302vw] pointer-events-none">
+                        <p
+                          className="text-white text-[14px] sm:text-[16px] lg:text-[1.042vw] leading-[1.3] capitalize"
+                          style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+                        >
+                          {item.title}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+        ) : (
+          <Swiper
+            key={activeTab}
+            modules={[Navigation, Keyboard, A11y]}
+            slidesPerView={1}
+            spaceBetween={16}
+            speed={650}
+            keyboard={{ enabled: true }}
+            loop={activeItems.length > 1}
+            onSwiper={(s) => {
+              swiperRef.current = s;
+            }}
+            onBeforeInit={(swiper) => {
+              swiper.params.navigation.prevEl = prevRef.current;
+              swiper.params.navigation.nextEl = nextRef.current;
+            }}
+            navigation={{ prevEl: null, nextEl: null }}
+            breakpoints={{
+              1024: { slidesPerView: 1, spaceBetween: 24 },
+            }}
+            className="!overflow-visible"
+          >
+            {activeItems.map((item, idx) => (
+              <SwiperSlide key={`image-${idx}`} className="!h-auto">
+                <a
+                  href={item.image}
+                  data-fancybox={`gallery-${activeTab}`}
+                  data-caption={item.alt || ""}
+                  className="relative w-full aspect-[1398/632] rounded-[12px] overflow-hidden bg-black/30 block group"
+                >
+                  {item.image && (
+                    <Image
+                      src={item.image}
+                      alt={item.alt || ""}
+                      fill
+                      unoptimized
+                      sizes="(min-width:1024px) 73vw, 95vw"
+                      className="object-cover object-center select-none transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+                      priority={idx === 0}
+                    />
+                  )}
+                </a>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
 
         {/* Side nav buttons */}
         <button

@@ -3,6 +3,8 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Who We Are — Figma node 2828:2254 (desktop) + 3152:3734 (mobile)
@@ -16,7 +18,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
  * text from the start, side label rotates on the left, and the Know-More
  * button uses a white outline.
  */
-export default function WhoWeAre() {
+export default function WhoWeAre({ data }) {
   const rootRef = useRef(null);
   const colorLayerRef = useRef(null);
   const sketchLayerRef = useRef(null);
@@ -130,6 +132,11 @@ export default function WhoWeAre() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const sketchImage = mediaUrl(data.sketchImage);
+  const colorImage = mediaUrl(data.colorImage);
+
   return (
     <section
       ref={rootRef}
@@ -141,15 +148,17 @@ export default function WhoWeAre() {
         ref={sketchLayerRef}
         className="hidden lg:block absolute inset-0"
       >
-        <Image
-          src="/assets/myhome/whoweare-sketch.png"
-          alt=""
-          fill
-          priority
-          unoptimized
-          sizes="100vw"
-          className="object-cover object-center select-none"
-        />
+        {sketchImage && (
+          <Image
+            src={sketchImage}
+            alt=""
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-center select-none"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-white/0 to-white/20" />
       </div>
 
@@ -160,14 +169,16 @@ export default function WhoWeAre() {
         ref={colorLayerRef}
         className="absolute inset-0 will-change-[clip-path]"
       >
-        <Image
-          src="/assets/myhome/whoweare-color.jpg"
-          alt="My Home Group property at twilight"
-          fill
-          unoptimized
-          sizes="100vw"
-          className="object-cover object-bottom lg:object-center select-none"
-        />
+        {colorImage && (
+          <Image
+            src={colorImage}
+            alt="My Home Group property at twilight"
+            fill
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-bottom lg:object-center select-none"
+          />
+        )}
         {/* Desktop dim gradient for white text readability after reveal */}
         <div className="hidden lg:block absolute inset-0 bg-gradient-to-b from-black/30 via-black/15 to-black/45" />
         {/* Mobile dim gradient — stronger at top so heading + paragraph
@@ -195,7 +206,7 @@ export default function WhoWeAre() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Our Story
+          {data.label}
         </span>
       </div>
 
@@ -213,7 +224,7 @@ export default function WhoWeAre() {
                 '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
             }}
           >
-            Who We Are
+            {data.heading}
           </h2>
 
           {/* Body */}
@@ -224,19 +235,13 @@ export default function WhoWeAre() {
               fontFamily: "Montserrat, sans-serif",
             }}
           >
-            For over four decades, My Home Group has been the quiet force
-            behind Hyderabad&apos;s rising skyline. From our first foundation
-            stone in 1981 to becoming the city&apos;s most trusted name in
-            luxury gated living, we build more than towers — we craft
-            sanctuaries where families return, not just arrive. Design,
-            integrity, and sustainability remain the principles we refuse to
-            compromise.
+            <RichText>{data.body}</RichText>
           </p>
 
           {/* Know-More button — outlined base, red fill + white text on hover */}
           <a
             ref={btnRef}
-            href="#featured"
+            href={data.ctaLink || "#"}
             className="group relative inline-flex items-center justify-center self-start whitespace-nowrap overflow-hidden transition-[border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] w-[154px] sm:w-[180px] md:w-[200px] lg:w-[11.667vw] h-[40px] sm:h-[48px] md:h-[54px] lg:h-[3.02vw] px-5 lg:px-[1.5vw] border border-white lg:border-[#ef493d] hover:border-[#ef493d] bg-transparent"
           >
             {/* Hover fill — slides up from the bottom */}
@@ -249,7 +254,7 @@ export default function WhoWeAre() {
               className="relative z-[2] font-montserrat font-medium capitalize text-[12px] md:text-[15px] lg:text-[0.938vw] tracking-[0.04em] text-white lg:text-[#ef493d] group-hover:!text-white transition-colors duration-500"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Know more
+              {data.ctaText}
             </span>
           </a>
         </div>

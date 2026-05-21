@@ -4,19 +4,21 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Phone, Mail, Clock, MapPin, ArrowUpRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import RichText from "@/components/common/RichText";
 
-const PHONE_ROWS = [
-  { Icon: Phone, text: "Sales Enquiry: +91 99895 55777", href: "tel:+919989555777" },
-  { Icon: Phone, text: "Alternative Sales Support: +91 91549 81691 / 92", href: "tel:+919154981691" },
-  { Icon: Mail, text: "nri@myhomeconstructions.com", href: "mailto:nri@myhomeconstructions.com" },
-  { Icon: Mail, text: "Marketing Support: mktg@myhomeconstructions.com", href: "mailto:mktg@myhomeconstructions.com" },
-  { Icon: Clock, text: "Business Hours: Monday - Friday: 9:00 AM to 5:30 PM (IST)" },
-];
+const KIND_ICON = { phone: Phone, email: Mail, clock: Clock };
 
-const MAPS_URL =
-  "https://www.google.com/maps/dir/?api=1&destination=My+Home+Hub+Hitech+City+Madhapur+Hyderabad";
+export default function ContactExperts({ data }) {
+  const PHONE_ROWS = Array.isArray(data?.channels)
+    ? data.channels.map((c) => ({
+        Icon: KIND_ICON[c.kind] || Phone,
+        text: c.label || "",
+        href: c.href || undefined,
+      }))
+    : [];
+  const MAPS_URL = data?.mapsUrl || "#";
+  const MAP_EMBED = data?.mapEmbedUrl || "";
 
-export default function ContactExperts() {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
 
@@ -35,6 +37,8 @@ export default function ContactExperts() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
   return (
     <section
       ref={rootRef}
@@ -43,7 +47,7 @@ export default function ContactExperts() {
     >
       {/* vertical side label */}
       <div className="absolute left-[4.16vw] top-[4.687vw]">
-        <SectionLabel>Start a Conversation</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       <div className="px-5 md:px-10 lg:px-[9.375vw]">
@@ -58,7 +62,7 @@ export default function ContactExperts() {
             fontWeight: 300,
           }}
         >
-          Connect with Our Experts
+          {data.heading}
         </h2>
 
         <div className="mt-[40px] md:mt-[56px] lg:mt-[3.125vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[2.083vw] items-start">
@@ -75,7 +79,7 @@ export default function ContactExperts() {
                   fontWeight: 300,
                 }}
               >
-                Direct Communication Channels
+                {data.channelsHeading}
               </h3>
               <div className="h-px w-full max-w-[604px] lg:w-[31.458vw] bg-[#33333322]" />
 
@@ -123,7 +127,7 @@ export default function ContactExperts() {
                   fontWeight: 300,
                 }}
               >
-                Corporate Address &amp; Location
+                {data.addressHeading}
               </h3>
               <div className="h-px w-full max-w-[604px] lg:w-[31.458vw] bg-[#33333322]" />
 
@@ -140,7 +144,7 @@ export default function ContactExperts() {
                              max-w-[565px] lg:w-[29.427vw]"
                   style={{ fontFamily: "Montserrat, sans-serif" }}
                 >
-                  8th Floor, 3rd Block, My Home Hub, Hitech City, Madhapur, Hyderabad, Telangana &mdash; 500081
+                  <RichText>{data.address}</RichText>
                 </p>
               </div>
             </div>
@@ -170,7 +174,7 @@ export default function ContactExperts() {
                            text-[14px] sm:text-[15px] lg:text-[0.938vw] tracking-[0.02em]"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                Get Directions
+                {data.ctaText}
               </span>
               <ArrowUpRight
                 className="relative z-[1] text-[#ef493d] group-hover:text-white transition-colors duration-500
@@ -186,14 +190,16 @@ export default function ContactExperts() {
                        border border-[#3333331a] shadow-[0px_0px_10px_rgba(0,0,0,0.05)]
                        aspect-[734/701] lg:aspect-auto lg:h-[36.51vw] bg-[#f5f1eb]"
           >
-            <iframe
-              title="My Home Group corporate office location"
-              src="https://www.google.com/maps?q=My+Home+Hub,+Hitech+City,+Madhapur,+Hyderabad,+Telangana+500081&z=16&output=embed"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full border-0"
-            />
+            {MAP_EMBED && (
+              <iframe
+                title="My Home Group corporate office location"
+                src={MAP_EMBED}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
+              />
+            )}
             <a
               href={MAPS_URL}
               target="_blank"

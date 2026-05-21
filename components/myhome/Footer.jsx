@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -15,6 +16,21 @@ import {
   Linkedin,
   Youtube,
 } from "lucide-react";
+import { getFooterData, mediaUrl, submitLead } from "@/lib/strapi";
+
+const SOCIAL_ICON_MAP = {
+  instagram: Instagram,
+  facebook: Facebook,
+  twitter: Twitter,
+  linkedin: Linkedin,
+  youtube: Youtube,
+};
+
+const CONTACT_ICON_MAP = {
+  location: MapPin,
+  phone: Phone,
+  email: Mail,
+};
 
 /**
  * Footer — Figma node 3152:3554
@@ -36,7 +52,7 @@ import {
  * existing useLeadStore wired up in pages/api.
  */
 
-const QUICK_LINKS = [
+const FALLBACK_QUICK_LINKS = [
   { label: "About Us", href: "/about-us" },
   { label: "Our Projects", href: "/projects" },
   { label: "CSR", href: "#footer" },
@@ -47,12 +63,58 @@ const QUICK_LINKS = [
   { label: "Contact Us", href: "/contact-us" },
 ];
 
+const FALLBACK_LOGO = "/assets/myhome/logo-footer.svg";
+
 export default function MyHomeFooter() {
+  const router = useRouter();
   const rootRef = useRef(null);
   const headingARef = useRef(null);
   const headingBRef = useRef(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // CMS-driven footer config. Fetched once on mount; falls back to the
+  // hardcoded defaults below when Strapi is unreachable.
+  const [cms, setCms] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    getFooterData().then((data) => {
+      if (alive && data) setCms(data);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const FORM_HEADING =
+    cms?.formHeading || "Your Journey Starts With a Conversation";
+  const FORM_INTRO =
+    cms?.formIntro ||
+    "Our team walks alongside you — from first question to final key — making every step feel effortless, informed, and yours alone.";
+  const FORM_CTA_HEADING = cms?.formCtaHeading || "Let's get in touch";
+  const SUBMIT_LABEL = cms?.submitLabel || "Submit";
+  const SUBMITTING_LABEL = cms?.submittingLabel || "Submitting…";
+  const SUCCESS_LABEL = cms?.successLabel || "Submitted ✓";
+  const FORM_SOURCE = cms?.formSource || "Website Footer";
+  const NAME_PLACEHOLDER = cms?.namePlaceholder || "Your name";
+  const EMAIL_PLACEHOLDER = cms?.emailPlaceholder || "Your Email";
+  const PHONE_PLACEHOLDER = cms?.phonePlaceholder || "+91 |  Enter your number";
+  const ADDRESS_HEADING = cms?.addressHeading || "Corporate Address";
+  const QUICK_LINKS_HEADING = cms?.quickLinksHeading || "Quick Links";
+  const QUICK_LINKS =
+    Array.isArray(cms?.quickLinks) && cms.quickLinks.length > 0
+      ? cms.quickLinks.map((l) => ({
+          label: l.label,
+          href: l.href,
+          openInNewTab: !!l.openInNewTab,
+        }))
+      : FALLBACK_QUICK_LINKS;
+  const CONTACT_ROWS = Array.isArray(cms?.contactRows) ? cms.contactRows : [];
+  const SOCIALS = Array.isArray(cms?.socials) ? cms.socials : [];
+  const LOGO = mediaUrl(cms?.logo) || FALLBACK_LOGO;
+  const COPYRIGHT =
+    cms?.copyrightText || "© 2026 My Home Group . All Rights Reserved";
+  const CREDIT = cms?.creditText || "Created by Realatte™";
 
   const {
     register,
@@ -83,24 +145,34 @@ export default function MyHomeFooter() {
     { scope: rootRef }
   );
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (formValues) => {
     setSubmitting(true);
     setSuccess(false);
+    const payload = {
+      name: formValues.name,
+      email: formValues.email,
+      phone: formValues.phone,
+      formSource: FORM_SOURCE,
+    };
     try {
-      const res = await fetch("/api/pushToCRM", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          FormSource: "Website Footer",
-          project_name: "-",
+      const [crmRes] = await Promise.all([
+        fetch("/api/pushToCRM", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            FormSource: payload.formSource,
+            project_name: "-",
+          }),
         }),
-      });
-      if (res.ok) {
+        submitLead(payload),
+      ]);
+      if (crmRes.ok) {
         setSuccess(true);
         reset();
+        router.push("/thank-you");
       }
     } catch (err) {
       // silent — UI still resets after timeout
@@ -143,7 +215,7 @@ export default function MyHomeFooter() {
               fontWeight: 400,
             }}
           >
-            Your Journey Starts With a Conversation
+            {FORM_HEADING}
           </h2>
           <p
             className="normal-case font-montserrat font-normal text-white/85
@@ -152,8 +224,7 @@ export default function MyHomeFooter() {
                        max-w-[700px] lg:w-[36.458vw] lg:max-w-none"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            Our team walks alongside you — from first question to final key —
-            making every step feel effortless, informed, and yours alone.
+            {FORM_INTRO}
           </p>
         </div>
 
@@ -171,7 +242,7 @@ export default function MyHomeFooter() {
               fontWeight: 400,
             }}
           >
-            Let&apos;s get in touch
+            {FORM_CTA_HEADING}
           </h2>
 
           <form
@@ -183,7 +254,7 @@ export default function MyHomeFooter() {
               {/* Row 1: name + email */}
               <div className="grid grid-cols-2 gap-[18px] sm:gap-[24px] lg:gap-[4.375vw]">
                 <FieldInput
-                  placeholder="Your name"
+                  placeholder={NAME_PLACEHOLDER}
                   type="text"
                   hasError={!!errors.name}
                   {...register("name", {
@@ -193,7 +264,7 @@ export default function MyHomeFooter() {
                   errorMessage={errors.name?.message}
                 />
                 <FieldInput
-                  placeholder="Your Email"
+                  placeholder={EMAIL_PLACEHOLDER}
                   type="email"
                   hasError={!!errors.email}
                   {...register("email", {
@@ -209,7 +280,7 @@ export default function MyHomeFooter() {
 
               {/* Row 2: phone (full width) */}
               <FieldInput
-                placeholder="+91 |  Enter your number"
+                placeholder={PHONE_PLACEHOLDER}
                 type="tel"
                 hasError={!!errors.phone}
                 {...register("phone", {
@@ -249,7 +320,7 @@ export default function MyHomeFooter() {
                            text-white transition-colors duration-500"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                {submitting ? "Submitting…" : success ? "Submitted ✓" : "Submit"}
+                {submitting ? SUBMITTING_LABEL : success ? SUCCESS_LABEL : SUBMIT_LABEL}
               </span>
             </button>
           </form>
@@ -266,7 +337,7 @@ export default function MyHomeFooter() {
           {/* Logo (Figma 3152:3579) — 276.743 × 146.039 = 14.413vw × 7.606vw */}
           <Link href="/" className="inline-block">
             <Image
-              src="/assets/myhome/logo-footer.svg"
+              src={LOGO}
               alt="My Home Group"
               width={277}
               height={146}
@@ -275,24 +346,28 @@ export default function MyHomeFooter() {
             />
           </Link>
 
-          {/* Social icons row (Figma 3152:3592) — gap:27.145, ~28×28 each */}
-          <div className="flex items-center gap-[20px] sm:gap-[24px] lg:gap-[1.414vw] text-white/90">
-            <a aria-label="Instagram" href="#" className="hover:text-[#ef493d] transition-colors duration-300">
-              <Instagram className="w-[24px] h-[24px] lg:w-[1.473vw] lg:h-[1.473vw]" />
-            </a>
-            <a aria-label="Facebook" href="#" className="hover:text-[#ef493d] transition-colors duration-300">
-              <Facebook className="w-[24px] h-[24px] lg:w-[1.473vw] lg:h-[1.473vw]" />
-            </a>
-            <a aria-label="LinkedIn" href="#" className="hover:text-[#ef493d] transition-colors duration-300">
-              <Linkedin className="w-[24px] h-[24px] lg:w-[1.473vw] lg:h-[1.473vw]" />
-            </a>
-            <a aria-label="YouTube" href="#" className="hover:text-[#ef493d] transition-colors duration-300">
-              <Youtube className="w-[28px] h-[28px] lg:w-[2.062vw] lg:h-[1.473vw]" />
-            </a>
-            <a aria-label="X (Twitter)" href="#" className="hover:text-[#ef493d] transition-colors duration-300">
-              <Twitter className="w-[24px] h-[24px] lg:w-[1.414vw] lg:h-[1.473vw]" />
-            </a>
-          </div>
+          {/* Social icons row — driven by CMS `socials` list. Falls back
+              to an empty row when no socials are set. */}
+          {SOCIALS.length > 0 && (
+            <div className="flex items-center gap-[20px] sm:gap-[24px] lg:gap-[1.414vw] text-white/90">
+              {SOCIALS.map((s, i) => {
+                const Icon = SOCIAL_ICON_MAP[s.platform];
+                if (!Icon || !s.href) return null;
+                return (
+                  <a
+                    key={`${s.platform}-${i}`}
+                    aria-label={s.label || s.platform}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#ef493d] transition-colors duration-300"
+                  >
+                    <Icon className="w-[24px] h-[24px] lg:w-[1.473vw] lg:h-[1.473vw]" />
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Corporate Address (Figma 3152:3634) — w:426 */}
@@ -307,36 +382,35 @@ export default function MyHomeFooter() {
               fontWeight: 400,
             }}
           >
-            Corporate address
+            {ADDRESS_HEADING}
           </h3>
           <ul className="flex flex-col gap-[12px] lg:gap-[0.625vw] font-montserrat font-normal text-white/90
                          text-[14px] md:text-[15px] lg:text-[0.833vw]
                          leading-[22px] md:leading-[26px] lg:leading-[1.667vw]"
               style={{ fontFamily: "Montserrat, sans-serif" }}>
-            <li className="flex gap-3 lg:gap-[1.094vw]">
-              <MapPin className="mt-1 lg:mt-[0.4vw] shrink-0 text-[#ef493d] w-[16px] h-[16px] lg:w-[0.833vw] lg:h-[0.833vw]" />
-              <span className="lg:w-[18.49vw]">
-                My Home Constructions Pvt. Ltd. H No 1-123, 8th Floor, 3rd Block, My Home Hub, HITEC City, Madhapur, Hyderabad — 500 081.
-              </span>
-            </li>
-            <li className="flex gap-3 lg:gap-[1.094vw]">
-              <Phone className="mt-1 lg:mt-[0.4vw] shrink-0 text-[#ef493d] w-[16px] h-[16px] lg:w-[0.833vw] lg:h-[0.833vw]" />
-              <span className="lg:w-[17.55vw]">
-                For Sales Enquiries:<br />
-                <a href="tel:+919989555777" className="hover:text-white transition-colors">
-                  +91 99895 55777 / +91 99895 55777
-                </a>
-              </span>
-            </li>
-            <li className="flex gap-3 lg:gap-[1.094vw]">
-              <Mail className="mt-1 lg:mt-[0.4vw] shrink-0 text-[#ef493d] w-[16px] h-[16px] lg:w-[0.833vw] lg:h-[0.833vw]" />
-              <span className="lg:w-[17.55vw]">
-                Mail Us:<br />
-                <a href="mailto:mktg@myhomeconstructions.com" className="hover:text-white transition-colors">
-                  mktg@myhomeconstructions.com
-                </a>
-              </span>
-            </li>
+            {CONTACT_ROWS.map((row, i) => {
+              const Icon = CONTACT_ICON_MAP[row.kind] || MapPin;
+              return (
+                <li key={`row-${i}`} className="flex gap-3 lg:gap-[1.094vw]">
+                  <Icon className="mt-1 lg:mt-[0.4vw] shrink-0 text-[#ef493d] w-[16px] h-[16px] lg:w-[0.833vw] lg:h-[0.833vw]" />
+                  <span className="lg:w-[18.49vw]">
+                    {row.label ? (
+                      <>
+                        {row.label}
+                        <br />
+                      </>
+                    ) : null}
+                    {row.href ? (
+                      <a href={row.href} className="hover:text-white transition-colors">
+                        {row.body}
+                      </a>
+                    ) : (
+                      <span>{row.body}</span>
+                    )}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -352,7 +426,7 @@ export default function MyHomeFooter() {
               fontWeight: 400,
             }}
           >
-            Quick links
+            {QUICK_LINKS_HEADING}
           </h3>
           <ul className="flex flex-col gap-[6px] lg:gap-[0.312vw] font-montserrat font-normal text-white/85
                          text-[14px] md:text-[15px] lg:text-[0.833vw]
@@ -362,6 +436,8 @@ export default function MyHomeFooter() {
               <li key={link.label}>
                 <Link
                   href={link.href}
+                  target={link.openInNewTab ? "_blank" : undefined}
+                  rel={link.openInNewTab ? "noopener noreferrer" : undefined}
                   className="relative inline-block hover:text-[#ef493d] transition-colors duration-300
                              after:content-[''] after:absolute after:left-0 after:-bottom-0.5
                              after:w-0 after:h-px after:bg-[#ef493d] after:transition-all
@@ -390,14 +466,14 @@ export default function MyHomeFooter() {
                        text-[11px] xs:text-[12px] md:text-[14px] lg:text-[0.938vw] tracking-[0.02em]"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            © 2026 My Home Group . All Rights Reserved
+            {COPYRIGHT}
           </p>
           <p
             className="font-montserrat font-normal text-white/75 whitespace-nowrap
                        text-[11px] xs:text-[12px] md:text-[14px] lg:text-[0.833vw]"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            Created by <span className="text-white font-medium">Realatte™</span>
+            {CREDIT}
           </p>
         </div>
       </div>

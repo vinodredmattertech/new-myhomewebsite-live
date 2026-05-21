@@ -5,8 +5,17 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronRight } from "lucide-react";
+import { mediaUrl } from "@/lib/strapi";
 
-export default function ProjectsBanner() {
+export default function ProjectsBanner({ banner }) {
+  const heading = banner?.heading || "A Collection of Signature Projects";
+  const breadcrumbLabel = banner?.breadcrumbLabel || "Explore Our Projects";
+  const desktopImage =
+    mediaUrl(banner?.desktopImage) || "/assets/myhome/about/banner-cityscape.jpg";
+  const mobileImage = mediaUrl(banner?.mobileImage) || desktopImage;
+  const imageAlt =
+    banner?.imageAlt || "My Home Group projects shaping Hyderabad's skyline";
+
   const rootRef = useRef(null);
   const imgRef = useRef(null);
   const headingRef = useRef(null);
@@ -62,12 +71,22 @@ export default function ProjectsBanner() {
     >
       <div ref={imgRef} className="absolute inset-0 will-change-transform">
         <Image
-          src="/assets/myhome/about/banner-cityscape.jpg"
-          alt="My Home Group projects shaping Hyderabad's skyline"
+          src={mobileImage}
+          alt={imageAlt}
           fill
           priority
+          unoptimized
           sizes="100vw"
-          className="object-cover object-center select-none"
+          className="lg:hidden object-cover object-center select-none"
+        />
+        <Image
+          src={desktopImage}
+          alt={imageAlt}
+          fill
+          priority
+          unoptimized
+          sizes="100vw"
+          className="hidden lg:block object-cover object-center select-none"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/80" />
       </div>
@@ -84,7 +103,7 @@ export default function ProjectsBanner() {
               fontWeight: 300,
             }}
           >
-            A Collection of Signature Projects
+            {heading}
           </h1>
 
           <div
@@ -110,7 +129,7 @@ export default function ProjectsBanner() {
               className="font-montserrat font-medium text-[13px] sm:text-[15px] lg:text-[1.042vw]"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Explore Our Projects
+              {breadcrumbLabel}
             </span>
           </nav>
         </div>

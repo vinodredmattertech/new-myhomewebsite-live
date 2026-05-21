@@ -8,6 +8,8 @@ import { Keyboard, A11y, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Why Hyderabad — Figma node 3189:4180.
@@ -37,63 +39,14 @@ import SectionLabel from "@/components/myhome/SectionLabel";
  * carousel for full responsiveness.
  */
 
-const CARDS = [
-  {
-    key: "long-term",
-    title: "Long-Term Value",
-    image: "/assets/myhome/nri/hyderabad-1.jpg",
-    // Desktop absolute fan position (centre in vw)
-    cx: "14.02vw",
-    cy: "48vw",
-    w: "21.22vw",
-    h: "24.52vw",
-    rotate: 0,
-    z: 2,
-  },
-  {
-    key: "infrastructure",
-    title: "Infrastructure Growth",
-    image: "/assets/myhome/nri/hyderabad-3.jpg",
-    cx: "30.42vw",
-    cy: "48vw",
-    w: "21.22vw",
-    h: "24.52vw",
-    rotate: -6.25,
-    z: 3,
-  },
-  {
-    key: "global-hub",
-    title: "Global Business Hub",
-    image: "/assets/myhome/nri/hyderabad-5.jpg",
-    cx: "50vw",
-    cy: "47vw",
-    w: "22.76vw",
-    h: "26.30vw",
-    rotate: 0,
-    z: 5, // highlighted centre, sits on top
-  },
-  {
-    key: "premium",
-    title: "Premium Residential Corridors",
-    image: "/assets/myhome/nri/hyderabad-4.jpg",
-    cx: "69.02vw",
-    cy: "48vw",
-    w: "21.22vw",
-    h: "24.52vw",
-    rotate: 3,
-    z: 3,
-  },
-  {
-    key: "lifestyle",
-    title: "Lifestyle & Community Living",
-    image: "/assets/myhome/nri/hyderabad-2.jpg",
-    cx: "86.60vw",
-    cy: "48vw",
-    w: "21.22vw",
-    h: "24.52vw",
-    rotate: 8.23,
-    z: 2,
-  },
+// Position metadata only — design-fixed per card index. Title + image come
+// from backend `cards` repeatable in display order.
+const CARD_LAYOUT = [
+  { cx: "14.02vw", cy: "48vw", w: "21.22vw", h: "24.52vw", rotate: 0, z: 2 },
+  { cx: "30.42vw", cy: "48vw", w: "21.22vw", h: "24.52vw", rotate: -6.25, z: 3 },
+  { cx: "50vw",    cy: "47vw", w: "22.76vw", h: "26.30vw", rotate: 0, z: 5 },
+  { cx: "69.02vw", cy: "48vw", w: "21.22vw", h: "24.52vw", rotate: 3, z: 3 },
+  { cx: "86.60vw", cy: "48vw", w: "21.22vw", h: "24.52vw", rotate: 8.23, z: 2 },
 ];
 
 function FanCard({ title, image }) {
@@ -102,13 +55,16 @@ function FanCard({ title, image }) {
       className="relative w-full h-full overflow-hidden rounded-[10px] lg:rounded-[0.625vw]
                  border-[1.5px] border-solid border-white shadow-[0_4px_60px_0_rgba(0,0,0,0.1)]"
     >
-      <Image
-        src={image}
-        alt={title}
-        fill
-        sizes="(min-width:1024px) 22vw, (min-width:640px) 50vw, 90vw"
-        className="object-cover object-center select-none"
-      />
+      {image && (
+        <Image
+          src={image}
+          alt={title}
+          fill
+          unoptimized
+          sizes="(min-width:1024px) 22vw, (min-width:640px) 50vw, 90vw"
+          className="object-cover object-center select-none"
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/45" />
       <p
         className="absolute left-1/2 -translate-x-1/2 bottom-[18px] lg:bottom-[1.667vw]
@@ -123,7 +79,19 @@ function FanCard({ title, image }) {
   );
 }
 
-export default function NriWhyHyderabad() {
+export default function NriWhyHyderabad({ data }) {
+  // Merge CMS card text + image onto design-fixed positions by index.
+  const CARDS = CARD_LAYOUT.map((pos, i) => {
+    const c = data?.cards?.[i];
+    if (!c) return null;
+    return {
+      key: `card-${i}`,
+      title: c.title || "",
+      image: mediaUrl(c.image),
+      ...pos,
+    };
+  }).filter(Boolean);
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const subRef = useRef(null);
@@ -188,6 +156,8 @@ export default function NriWhyHyderabad() {
     { scope: rootRef }
   );
 
+  if (!data || !CARDS.length) return null;
+
   return (
     <section
       ref={rootRef}
@@ -197,7 +167,7 @@ export default function NriWhyHyderabad() {
     >
       {/* Side label */}
       <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block z-[6]">
-        <SectionLabel>Why Hyderabad?</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       {/* ---------- Heading + subheading (desktop: absolute, mobile: flow) ---------- */}
@@ -215,7 +185,7 @@ export default function NriWhyHyderabad() {
             fontWeight: 300,
           }}
         >
-          A City Built for What Comes Next
+          {data.heading}
         </h2>
         <p
           ref={subRef}
@@ -226,7 +196,7 @@ export default function NriWhyHyderabad() {
                      max-w-[860px] lg:max-w-none"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          With a thriving business ecosystem, expanding infrastructure, and premium residential growth corridors, Hyderabad continues to attract global attention from homebuyers and investors.
+          <RichText>{data.subTitle}</RichText>
         </p>
       </div>
 

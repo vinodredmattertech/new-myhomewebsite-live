@@ -1,3 +1,4 @@
+import Seo from "@/components/Seo/Seo";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import PageBanner from "@/components/myhome/PageBanner";
 import AboutLegacy from "@/components/myhome/about/AboutLegacy";
@@ -5,31 +6,33 @@ import AboutVisionMission from "@/components/myhome/about/AboutVisionMission";
 import AboutLeadership from "@/components/myhome/about/AboutLeadership";
 import AboutJourney from "@/components/myhome/about/AboutJourney";
 import AboutValues from "@/components/myhome/about/AboutValues";
+import { getAboutData, mediaUrl } from "@/lib/strapi";
 
-export default function AboutUs() {
+export default function AboutUs({ about }) {
+  const banner = about?.banner;
   return (
     <>
+      <Seo seo={about?.seo} />
       <PageBanner
         sectionId="about-banner"
-        imageSrc="/assets/myhome/about/banner-cityscape.jpg"
-        imageAlt="My Home Group developments shape Hyderabad's skyline"
-        heading="Building Dreams That Last"
-        breadcrumbLabel="About Us"
+        desktopSrc={mediaUrl(banner?.desktopImage)}
+        mobileSrc={mediaUrl(banner?.mobileImage)}
+        imageAlt={banner?.imageAlt}
+        heading={banner?.heading}
+        breadcrumbLabel={banner?.breadcrumbLabel}
       />
-      <AboutLegacy />
-      <AboutVisionMission />
-      <AboutLeadership />
-      <AboutJourney />
-      <AboutValues />
+      <AboutLegacy data={about?.legacy} />
+      <AboutVisionMission data={about?.visionMission} />
+      <AboutLeadership data={about?.leadership} />
+      <AboutJourney data={about?.journey} />
+      <AboutValues data={about?.values} />
     </>
   );
 }
 
-AboutUs.getLayout = (page) => (
-  <MyHomeLayout
-    title="About Us | My Home Group"
-    description="Since 1981, My Home Group has shaped Hyderabad's skyline with 25+ landmark developments. Discover our legacy, vision, leadership, journey, and the principles that define us."
-  >
-    {page}
-  </MyHomeLayout>
-);
+AboutUs.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+
+export async function getServerSideProps() {
+  const about = await getAboutData();
+  return { props: { about: about ?? null } };
+}

@@ -1,11 +1,13 @@
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ChevronDown } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import { submitLead } from "@/lib/strapi";
 
 const CONFIG_OPTIONS = ["2 BHK", "2.5 BHK", "3 BHK", "Not Sure"];
 
@@ -55,7 +57,9 @@ export default function ProjectInquiry({
   reraUrl = "https://maharera.mahaonline.gov.in",
   qrSrc = "/assets/myhome/projects/akrida-qr.png",
   configOptions = CONFIG_OPTIONS,
+  projectName,
 }) {
+  const router = useRouter();
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const descRef = useRef(null);
@@ -124,14 +128,48 @@ export default function ProjectInquiry({
     { scope: rootRef }
   );
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (formValues) => {
     setSubmitting(true);
     setSuccess(false);
+    const payload = {
+      name: formValues.name,
+      email: formValues.email,
+      phone: formValues.phone,
+      // Tag the lead with the actual CMS project title when the parent
+      // page passes it; falls back to the section heading otherwise so
+      // local-dev rendering still gets a useful project label.
+      project: projectName || heading || "Project Inquiry",
+      message: [
+        formValues.configuration && `Configuration: ${formValues.configuration}`,
+        formValues.message,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+      formSource: "Project Inquiry",
+    };
     try {
-      // Hook up to API later. For now simulate success.
-      await new Promise((r) => setTimeout(r, 600));
-      setSuccess(true);
-      reset();
+      const [crmRes] = await Promise.all([
+        fetch("/api/pushToCRM", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            project_name: payload.project,
+            message: payload.message,
+            FormSource: payload.formSource,
+          }),
+        }),
+        submitLead(payload),
+      ]);
+      if (crmRes.ok) {
+        setSuccess(true);
+        reset();
+        router.push("/thank-you");
+      }
+    } catch (e) {
+      /* silent */
     } finally {
       setSubmitting(false);
       setTimeout(() => setSuccess(false), 4000);

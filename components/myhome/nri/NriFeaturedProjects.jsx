@@ -9,49 +9,27 @@ import { Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { ArrowUpRight, ArrowLeft, ArrowRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
-
-const PROJECTS = [
-  {
-    title: "My Home Krishe",
-    location: "Nallagandla, Hyderabad",
-    image: "/assets/myhome/nri/project-1.jpg",
-    href: "/projects/my-home-krishe",
-  },
-  {
-    title: "My Home 99",
-    location: "Nallagandla, Hyderabad",
-    image: "/assets/myhome/nri/hyderabad-1.jpg",
-    href: "/projects/my-home-99",
-  },
-  {
-    title: "My Home Avatar",
-    location: "Narsingi, Hyderabad",
-    image: "/assets/myhome/nri/hyderabad-5.jpg",
-    href: "/projects/my-home-avatar",
-  },
-  {
-    title: "My Home Vihanga",
-    location: "Gachibowli, Hyderabad",
-    image: "/assets/myhome/nri/hyderabad-2.jpg",
-    href: "/projects/my-home-vihanga",
-  },
-];
+import { mediaUrl, relationList } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 function ProjectCard({ title, location, image, href }) {
   return (
     <Link
-      href={href}
+      href={href || "#"}
       className="group relative block w-full overflow-hidden rounded-[10px] lg:rounded-[0.625vw]
                  bg-white border border-[rgba(43,43,43,0.14)]"
     >
       <div className="relative w-full aspect-[488/488] overflow-hidden">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          sizes="(min-width:1024px) 28vw, (min-width:640px) 50vw, 90vw"
-          className="object-cover object-center select-none transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
-        />
+        {image && (
+          <Image
+            src={image}
+            alt={title}
+            fill
+            unoptimized
+            sizes="(min-width:1024px) 28vw, (min-width:640px) 50vw, 90vw"
+            className="object-cover object-center select-none transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+          />
+        )}
       </div>
       <div className="flex items-center justify-between px-[18px] md:px-[24px] lg:px-[1.25vw] py-[20px] md:py-[24px] lg:py-[1.302vw]">
         <div className="flex flex-col gap-[6px] lg:gap-[0.312vw]">
@@ -89,7 +67,17 @@ function ProjectCard({ title, location, image, href }) {
   );
 }
 
-export default function NriFeaturedProjects() {
+export default function NriFeaturedProjects({ data }) {
+  const PROJECTS = relationList(data?.projects)
+    .slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((p) => ({
+      title: p.title || "",
+      location: p.subTitle || "",
+      image: mediaUrl(p.image),
+      href: p.ctaLink || (p.slug ? `/projects/${p.slug}` : "#"),
+    }));
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const subRef = useRef(null);
@@ -118,6 +106,8 @@ export default function NriFeaturedProjects() {
     { scope: rootRef }
   );
 
+  if (!data || !PROJECTS.length) return null;
+
   return (
     <section
       ref={rootRef}
@@ -126,7 +116,7 @@ export default function NriFeaturedProjects() {
       data-section="nri-featured-projects"
     >
       <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block">
-        <SectionLabel>Featured Projects</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       {/* Top: left heading + right (cards begin below on mobile) */}
@@ -145,7 +135,7 @@ export default function NriFeaturedProjects() {
               fontWeight: 300,
             }}
           >
-            Curated Addresses for Global Indians
+            {data.heading}
           </h2>
           <p
             ref={subRef}
@@ -156,7 +146,7 @@ export default function NriFeaturedProjects() {
                        max-w-[520px] lg:max-w-[26.197vw]"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            Explore landmark My Home communities crafted for modern living, long-term value, and a meaningful connection to Hyderabad.
+            <RichText>{data.subTitle}</RichText>
           </p>
         </div>
 

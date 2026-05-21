@@ -23,6 +23,7 @@ export default function ProjectConnectivity({
   sidebarLabel = "The Pulse Of Connectivity",
   heading = "Seamlessly Connected",
   categories = DEFAULT_CATEGORIES,
+  mapEmbedUrl = "https://www.google.com/maps?q=Hyderabad,+Telangana&z=12&output=embed",
   mapSrc = "/assets/myhome/projects/akrida-map.png",
   mapAlt = "My Home Akrida location map",
 }) {
@@ -195,18 +196,31 @@ export default function ProjectConnectivity({
             </ul>
           </div>
 
-          {/* Map card */}
+          {/* Map card — interactive Google Maps embed when mapEmbedUrl
+              is set, fallback to a static image otherwise. */}
           <div
             ref={mapRef}
-            className="relative w-full aspect-[849/635] lg:h-[33.073vw] lg:w-[44.219vw] rounded-[12px] overflow-hidden bg-white"
+            className="relative w-full aspect-[849/635] lg:h-[33.073vw] lg:w-[44.219vw] rounded-[12px] overflow-hidden bg-white border border-[#3333331a] shadow-[0_0_10px_rgba(0,0,0,0.05)]"
           >
-            <Image
-              src={mapSrc}
-              alt={mapAlt}
-              fill
-              sizes="(min-width: 1024px) 44vw, 100vw"
-              className="object-cover object-center select-none pointer-events-none"
-            />
+            {mapEmbedUrl ? (
+              <iframe
+                title={mapAlt || "Project location map"}
+                src={mapEmbedUrl}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
+              />
+            ) : mapSrc ? (
+              <Image
+                src={mapSrc}
+                alt={mapAlt}
+                fill
+                unoptimized
+                sizes="(min-width: 1024px) 44vw, 100vw"
+                className="object-cover object-center select-none pointer-events-none"
+              />
+            ) : null}
           </div>
         </div>
       </div>

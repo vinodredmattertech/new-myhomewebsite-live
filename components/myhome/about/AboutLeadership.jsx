@@ -4,8 +4,10 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Quote } from "lucide-react";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
-export default function AboutLeadership() {
+export default function AboutLeadership({ data }) {
   const rootRef = useRef(null);
   const nameRef = useRef(null);
   const cardRef = useRef(null);
@@ -32,6 +34,10 @@ export default function AboutLeadership() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const portrait = mediaUrl(data.portraitImage);
+
   return (
     <section
       ref={rootRef}
@@ -40,13 +46,16 @@ export default function AboutLeadership() {
     >
       {/* Background portrait */}
       <div className="absolute inset-0 pointer-events-none">
-        <Image
-          src="/assets/myhome/about/chairman.jpg"
-          alt="Mr. Rameswar Rao Jupally — Chairman, My Home Group"
-          fill
-          sizes="100vw"
-          className="object-cover object-center select-none"
-        />
+        {portrait && (
+          <Image
+            src={portrait}
+            alt={`${data.name || "Chairman"} — ${data.role || "Chairman, My Home Group"}`}
+            fill
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-center select-none"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/15 to-black/55 lg:from-black/25 lg:via-transparent lg:to-black/70" />
       </div>
 
@@ -64,7 +73,7 @@ export default function AboutLeadership() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Leadership
+          {data.label}
         </span>
       </div>
 
@@ -86,7 +95,7 @@ export default function AboutLeadership() {
                          text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.042vw]"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Chairman, My Home Group.
+              {data.role}
             </p>
             <h3
               ref={nameRef}
@@ -98,7 +107,7 @@ export default function AboutLeadership() {
                 fontWeight: 400,
               }}
             >
-              Mr. Rameswar Rao Jupally
+              {data.name}
             </h3>
             <div className="h-px w-full bg-[#33333322] my-[6px] lg:my-[0.312vw]" />
             <div
@@ -107,21 +116,7 @@ export default function AboutLeadership() {
                          leading-[22px] sm:leading-[24px] md:leading-[28px] lg:leading-[1.666vw]"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              <p>
-                Over three decades, we transformed his vision into reality.
-                {" "}
-                <span className="font-medium">My Home Construction</span> Properties
-                is now a trusted name in Hyderabad real estate, completing 25
-                projects spanning 40 million sq.ft. His commitment to purity,
-                credibility, and trust remains central to the company&apos;s values.
-              </p>
-              <p className="mt-[10px] lg:mt-[0.521vw]">
-                Under <span className="font-medium">Mr. Rameswar Rao Jupally&apos;s</span>
-                {" "}leadership, the company has reshaped Hyderabad&apos;s skyline,
-                delivering elegance and enduring trust — a philosophy of
-                <em> Trustism</em> that means quality, integrity, and exceeding
-                expectations every time.
-              </p>
+              <RichText>{data.body}</RichText>
             </div>
           </div>
 

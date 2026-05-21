@@ -3,6 +3,8 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap } from "@/lib/gsapSetup";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Vision & Mission — Figma node 3117:868 (Vission & mission, Default + alt states)
@@ -24,11 +26,6 @@ import { registerGsap } from "@/lib/gsapSetup";
  * Mobile / tablet stacks the panels vertically with the building image as a hero.
  */
 
-const VISION_BODY =
-  "To consistently deliver world-class developments through uncompromising quality, transparent practices, and forward-thinking innovation — building environments that inspire trust and pride for generations. To consistently deliver world-class developments through uncompromising quality, transparent practices, and forward-thinking innovation — building environments that inspire trust and pride for generations.";
-
-const MISSION_BODY = VISION_BODY;
-
 const headingStyle = {
   fontFamily:
     '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
@@ -36,7 +33,7 @@ const headingStyle = {
 };
 const bodyStyle = { fontFamily: "Montserrat, sans-serif" };
 
-export default function AboutVisionMission() {
+export default function AboutVisionMission({ data }) {
   const rootRef = useRef(null);
   const trackRef = useRef(null);
 
@@ -112,6 +109,10 @@ export default function AboutVisionMission() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const bgImage = mediaUrl(data.backgroundImage);
+
   return (
     <section
       ref={rootRef}
@@ -132,7 +133,7 @@ export default function AboutVisionMission() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Vision &amp; Mission
+          {data.label}
         </span>
       </div>
 
@@ -155,14 +156,17 @@ export default function AboutVisionMission() {
           }}
         >
           <div className="absolute inset-0 overflow-hidden opacity-90">
-            <Image
-              src="/assets/myhome/about/vision-mission-bg.jpg"
-              alt=""
-              fill
-              sizes="88vw"
-              priority
-              className="object-cover object-center select-none"
-            />
+            {bgImage && (
+              <Image
+                src={bgImage}
+                alt=""
+                fill
+                unoptimized
+                sizes="88vw"
+                priority
+                className="object-cover object-center select-none"
+              />
+            )}
           </div>
           {/* Figma gradient: to-left from #2a2828 0%, via transparent 50%, to #2a2828 90.547% */}
           <div
@@ -202,8 +206,7 @@ export default function AboutVisionMission() {
           className="absolute capitalize text-white leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
           style={{ ...headingStyle, left: "11.15vw", top: "12.04vh" }}
         >
-          <span className="block">Our</span>
-          <span className="block">Vision</span>
+          {data.visionHeading}
         </h2>
 
         {/* ----- Vision body at left:214 top:469 w:566 ----- */}
@@ -217,7 +220,7 @@ export default function AboutVisionMission() {
             width: "29.48vw",
           }}
         >
-          {VISION_BODY}
+          <RichText>{data.visionBody}</RichText>
         </p>
 
         {/* ----- Our Mission : title at left:1948 top:130 ----- */}
@@ -226,8 +229,7 @@ export default function AboutVisionMission() {
           className="absolute capitalize text-white leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
           style={{ ...headingStyle, left: "101.46vw", top: "12.04vh" }}
         >
-          <span className="block">Our</span>
-          <span className="block">Mission</span>
+          {data.missionHeading}
         </h2>
 
         {/* ----- Mission body at left:2138 top:469 w:566 ----- */}
@@ -241,7 +243,7 @@ export default function AboutVisionMission() {
             width: "29.48vw",
           }}
         >
-          {MISSION_BODY}
+          <RichText>{data.missionBody}</RichText>
         </p>
       </div>
 
@@ -250,20 +252,17 @@ export default function AboutVisionMission() {
          ======================================================= */}
       <div className="relative z-[2] lg:hidden px-5 md:px-10 py-[64px] md:py-[88px] flex flex-col gap-[48px] md:gap-[64px]">
         {[
-          { title: "Our Vision", body: VISION_BODY },
-          { title: "Our Mission", body: MISSION_BODY },
+          { title: data.visionHeading, body: data.visionBody },
+          { title: data.missionHeading, body: data.missionBody },
         ].map((p, idx) => (
-          <div key={p.title} className="flex flex-col gap-[20px] md:gap-[28px]">
+          <div key={p.title || `vm-${idx}`} className="flex flex-col gap-[20px] md:gap-[28px]">
             <h2
               data-vm-heading
               className="capitalize text-white leading-[0.95] tracking-[0.02em]
                          text-[44px] sm:text-[56px] md:text-[72px]"
               style={headingStyle}
             >
-              <span className="block">{p.title.split(" ")[0]}</span>
-              <span className="block">
-                {p.title.split(" ").slice(1).join(" ")}
-              </span>
+              {p.title}
             </h2>
             <p
               data-vm-body
@@ -272,14 +271,15 @@ export default function AboutVisionMission() {
                          leading-[24px] sm:leading-[26px] md:leading-[28px]"
               style={bodyStyle}
             >
-              {p.body}
+              <RichText>{p.body}</RichText>
             </p>
-            {idx === 0 && (
+            {idx === 0 && bgImage && (
               <div className="relative w-full aspect-[16/9] rounded-[8px] overflow-hidden mt-[10px] opacity-90">
                 <Image
-                  src="/assets/myhome/about/vision-mission-bg.jpg"
+                  src={bgImage}
                   alt=""
                   fill
+                  unoptimized
                   sizes="100vw"
                   className="object-cover object-center"
                 />

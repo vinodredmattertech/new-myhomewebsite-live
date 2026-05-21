@@ -7,36 +7,23 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import SectionLabel from "@/components/myhome/SectionLabel";
-
-const VALUES = [
-  {
-    title: "Commitment",
-    image: "/assets/myhome/about/value-commitment.jpg",
-    body: "To provide the highest quality construction and the best of amenities with on-time delivery to delight our customers.",
-  },
-  {
-    title: "Quality",
-    image: "/assets/myhome/about/value-quality.jpg",
-    body: "In creating elegant and perfect spaces, supported by flawless planning and matchless service.",
-  },
-  {
-    title: "Integrity",
-    image: "/assets/myhome/about/value-integrity.jpg",
-    body: "In uplifting domain standards with global best practices, backed by a legacy of benchmarks in real estate.",
-  },
-];
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 function ValueCard({ title, image, body }) {
   return (
     <div className="flex flex-col gap-[20px] md:gap-[28px] lg:gap-[1.875vw] h-full">
       <div className="relative w-full aspect-[500/529] rounded-[6px] lg:rounded-[0.625vw] overflow-hidden">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          sizes="(min-width: 1024px) 26vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover"
-        />
+        {image && (
+          <Image
+            src={image}
+            alt={title}
+            fill
+            unoptimized
+            sizes="(min-width: 1024px) 26vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+          />
+        )}
       </div>
       <div className="flex flex-col gap-[10px] md:gap-[14px] lg:gap-[0.781vw]">
         <h3
@@ -57,14 +44,21 @@ function ValueCard({ title, image, body }) {
                      max-w-[495px] lg:max-w-[25.78vw]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          {body}
+          <RichText>{body}</RichText>
         </p>
       </div>
     </div>
   );
 }
 
-export default function AboutValues() {
+export default function AboutValues({ data }) {
+  const VALUES = Array.isArray(data?.items)
+    ? data.items.map((v) => ({
+        title: v.title || "",
+        body: v.body || "",
+        image: mediaUrl(v.image),
+      }))
+    : [];
   const rootRef = useRef(null);
   const headingRef = useRef(null);
 
@@ -83,6 +77,8 @@ export default function AboutValues() {
     { scope: rootRef }
   );
 
+  if (!data || !VALUES.length) return null;
+
   return (
     <section
       ref={rootRef}
@@ -90,7 +86,7 @@ export default function AboutValues() {
                  py-[60px] md:py-[80px] lg:pt-[4.166vw] lg:pb-[6.51vw]"
     >
       <div className="absolute left-[4.16vw] top-[4.166vw] hidden lg:block">
-        <SectionLabel>Values of the Brand</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       <h2
@@ -104,7 +100,7 @@ export default function AboutValues() {
           fontWeight: 300,
         }}
       >
-        The Principles That Define Us
+        {data.heading}
       </h2>
 
       {/* Desktop: static three-column. Tablet/mobile: Swiper carousel. */}

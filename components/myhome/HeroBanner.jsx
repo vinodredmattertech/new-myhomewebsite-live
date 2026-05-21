@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
+import { mediaUrl } from "@/lib/strapi";
 
 /**
  * Hero banner — opens with a cinematic "Welcome HOME" loader on a #2a2828
@@ -12,7 +13,7 @@ import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
  *
  * Animation states (replicated from Figma 2609:2746 → 2609:2774 → 2609:2808).
  */
-export default function HeroBanner() {
+export default function HeroBanner({ data }) {
   const rootRef = useRef(null);
   const bgRef = useRef(null);
   const loaderRef = useRef(null);
@@ -169,23 +170,45 @@ export default function HeroBanner() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const desktopImage = mediaUrl(data.desktopImage);
+  // Fall back to the desktop image if a mobile-specific upload isn't set.
+  const mobileImage = mediaUrl(data.mobileImage) || desktopImage;
+
   return (
     <section
       ref={rootRef}
       className="relative w-full overflow-hidden bg-[#2a2828] h-[100svh] min-h-[640px]"
       data-section="hero"
     >
-      {/* ---------- Hero image (revealed under the loader) ---------- */}
+      {/* ---------- Hero image (revealed under the loader) ----------
+          Render two <Image>s — mobile-only crop swaps to desktop crop at lg. */}
       <div ref={bgRef} className="absolute inset-0 will-change-transform">
-        <Image
-          src="/assets/myhome/hero-tower.jpg"
-          alt="My Home Group flagship tower at twilight"
-          fill
-          priority
-          quality={92}
-          sizes="100vw"
-          className="object-cover object-bottom"
-        />
+        {mobileImage && (
+          <Image
+            src={mobileImage}
+            alt="My Home Group flagship tower at twilight"
+            fill
+            priority
+            quality={92}
+            sizes="100vw"
+            unoptimized
+            className="lg:hidden object-cover object-bottom"
+          />
+        )}
+        {desktopImage && (
+          <Image
+            src={desktopImage}
+            alt="My Home Group flagship tower at twilight"
+            fill
+            priority
+            quality={92}
+            sizes="100vw"
+            unoptimized
+            className="hidden lg:block object-cover object-bottom"
+          />
+        )}
         {/* gradient washes for depth */}
         <div className="absolute inset-0 bg-black/25" />
         <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-black/55 via-black/20 to-transparent" />
@@ -205,11 +228,11 @@ export default function HeroBanner() {
               style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
             >
               <span className="Tartuffo_Trial_Regular block text-[18px] xs:text-[20px] sm:text-[24px] md:text-[30px] lg:text-[2.083vw] tracking-[0.044em] font-[300] leading-[1.4]">
-                Elevate to Exquisite Living
+                {data.headingLine1}
               </span>
               <span className="Tartuffo_Trial_Regular block italic mt-[2px] sm:mt-1.5 md:mt-2 text-[30px] xs:text-[34px] sm:text-[40px] md:text-[48px] lg:text-[3.125vw] font-[300] leading-[1.4]">
                 <i className="Tartuffo_Trial_Regular font-[300]">
-                  Hyderabad&apos;s Pinnacle of Gated Elegance
+                  {data.headingLine2}
                 </i>
               </span>
             </h1>
@@ -217,22 +240,21 @@ export default function HeroBanner() {
               ref={copyBodyRef}
               className="font-montserrat font-medium mt-3 sm:mt-4 md:mt-5 lg:mt-[1.25vw] text-[12px] xs:text-[13px] md:text-[15px] lg:text-[0.938vw] leading-[22px] sm:leading-[1.65] lg:leading-[1.667vw] text-white/95 max-w-[309px] sm:max-w-[36ch] lg:max-w-none"
             >
-              Discover 25 iconic sanctuaries crafted since 1981. Award-winning
-              sustainable opulence awaits.
+              {data.description}
             </p>
           </div>
 
           {/* Enquire button */}
           <a
             ref={btnRef}
-            href="#footer"
+            href={data.ctaLink || "#"}
             className="group self-start lg:self-end shrink-0 inline-flex items-center justify-center lg:justify-between gap-0 lg:gap-[1.041vw] w-[152px] sm:w-[180px] lg:w-[15.354vw] xl:w-[15.354vw] h-[42px] sm:h-[50px] lg:h-[3.125vw] px-4 sm:px-5 lg:px-[1.5vw] bg-white text-[#2a2828] hover:bg-mh-red hover:text-white transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden whitespace-nowrap"
           >
             <span
               className="font-montserrat font-medium uppercase text-[12px] sm:text-[13px] lg:text-[0.833vw] tracking-[0.08em] whitespace-nowrap"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Enquire now
+              {data.ctaText}
             </span>
             <svg
               viewBox="0 0 36 14"
@@ -279,13 +301,7 @@ export default function HeroBanner() {
             className="Tartuffo_Trial_Regular capitalize text-white text-center leading-[1] tracking-[0.04em] text-[44px] xs:text-[56px] sm:text-[72px] md:text-[88px] lg:text-[5.286vw] font-[300] will-change-transform"
             style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
           >
-            Welcome{" "}
-            <span
-              className="Tartuffo_Trial_Regular whitespace-nowrap"
-              style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
-            >
-              HOME
-            </span>
+            {data.loaderTitle}
           </h2>
         </div>
 
@@ -296,7 +312,7 @@ export default function HeroBanner() {
             className="font-montserrat font-normal uppercase text-white/90 text-center text-[10px] xs:text-[11px] sm:text-[14px] md:text-[18px] lg:text-[1.458vw] tracking-[0.22em] sm:tracking-[0.28em] md:tracking-[0.32em] leading-[1.3] will-change-transform"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            Where life finds its rhythm
+            {data.loaderSubtitle}
           </p>
         </div>
 

@@ -3,6 +3,8 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger, splitToWords } from "@/lib/gsapSetup";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Statistics — Figma node 2609:1725
@@ -22,56 +24,33 @@ import { registerGsap, ScrollTrigger, splitToWords } from "@/lib/gsapSetup";
  * stacked grid since the curve layout can't survive a 375 px viewport.
  */
 
-const STATS = [
+// Position metadata only — design-fixed per tile index. Value, suffix,
+// and label come from backend.
+const STAT_LAYOUT = [
   {
-    value: 40,
-    suffix: "+",
-    label: "Years Expertise",
-    // Desktop 2609:1619 — left:160 top:639 w:207 items-end (text-right)
     style: { left: "8.333vw", top: "33.28vw", width: "10.781vw" },
     align: "right",
-    // Mobile 3152:3765 — row 1, items-end, w:108.106
     mobileWidth: "108.106px",
   },
   {
-    value: 25,
-    suffix: "+",
-    label: "Iconic Addresses",
-    // Desktop 2609:1622 — left:[calc(16.67%+206px)] top:509 w:207 items-center
     style: { left: "calc(16.67% + 10.729vw)", top: "26.51vw", width: "10.781vw" },
     align: "center",
-    // Mobile 3152:3768 — row 1, items-center, w:108.106
     mobileWidth: "108.106px",
   },
   {
-    value: 37,
-    suffix: "+",
-    label: "Million Sq. Ft. Delivered",
-    // Desktop 2609:1625 — left:[calc(41.67%+6px)] top:263 w:207 items-center (peak)
     style: { left: "calc(41.67% + 0.312vw)", top: "13.69vw", width: "10.781vw" },
     align: "center",
-    // Mobile 3152:3771 — row 1, items-center, w:108.106, label w:138.167
     mobileWidth: "108.106px",
     mobileLabelWidth: "138.167px",
   },
   {
-    value: 40,
-    suffix: "+",
-    label: "Million Sq. Ft.\nUnder construction",
-    // Desktop 2609:1628 — left:[calc(58.33%+56px)] top:345 w:207 items-center
     style: { left: "calc(58.33% + 2.916vw)", top: "17.96vw", width: "10.781vw" },
     align: "center",
-    // Mobile 3152:3775 — row 2, items-center, w:108.106
     mobileWidth: "108.106px",
   },
   {
-    value: 50,
-    suffix: "+",
-    label: "Million Sq. Ft. in the planning stage",
-    // Desktop 2609:1631 — left:[calc(83.33%-95px)] top:449 w:255 items-center
     style: { left: "calc(83.33% - 4.948vw)", top: "23.38vw", width: "13.281vw" },
     align: "center",
-    // Mobile 3152:3778 — row 2, items-center, w:133.174, label w:109.151
     mobileWidth: "133.174px",
     mobileLabelWidth: "109.151px",
   },
@@ -203,7 +182,19 @@ function StatItem({ stat, index, mobile = false }) {
   );
 }
 
-export default function Statistics() {
+export default function Statistics({ data }) {
+  // Merge backend stat values onto design-fixed positions by index.
+  const STATS = STAT_LAYOUT.map((pos, i) => {
+    const s = data?.stats?.[i];
+    if (!s) return null;
+    return {
+      ...pos,
+      value: typeof s.value === "number" ? s.value : 0,
+      suffix: s.suffix || "",
+      label: s.label || "",
+    };
+  }).filter(Boolean);
+
   const rootRef = useRef(null);
   const labelRef = useRef(null);
   const headingRef = useRef(null);
@@ -342,6 +333,14 @@ export default function Statistics() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const cityImage = mediaUrl(data.cityImage);
+  // Decorative SVGs — managed in /public, not in the CMS.
+  const curveImage = "/assets/myhome/stats-curve.svg";
+  const birdsTopImage = "/assets/myhome/stats-birds-1.svg";
+  const birdsBottomImage = "/assets/myhome/stats-birds-2.svg";
+
   return (
     <section
       ref={rootRef}
@@ -357,12 +356,14 @@ export default function Statistics() {
         className="hidden lg:block absolute z-[3] pointer-events-none"
         style={{ top: "8.46%", right: "13.23%", width: "7.187vw", height: "3.75vw" }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/assets/myhome/stats-birds-1.svg"
-          alt=""
-          className="block w-full h-full select-none"
-        />
+        {birdsTopImage && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={birdsTopImage}
+            alt=""
+            className="block w-full h-full select-none"
+          />
+        )}
       </div>
 
       {/* ===== Bottom decorative birds (Figma group2199756 — desktop only)
@@ -378,12 +379,14 @@ export default function Statistics() {
           transform: "scaleX(-1)",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/assets/myhome/stats-birds-2.svg"
-          alt=""
-          className="block w-full h-full select-none"
-        />
+        {birdsBottomImage && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={birdsBottomImage}
+            alt=""
+            className="block w-full h-full select-none"
+          />
+        )}
       </div>
 
       {/* ===== Hand-drawn curve line — DESKTOP ONLY
@@ -407,12 +410,14 @@ export default function Statistics() {
             transformOrigin: "center",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/myhome/stats-curve.svg"
-            alt=""
-            className="block w-full h-full opacity-70 select-none"
-          />
+          {curveImage && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={curveImage}
+              alt=""
+              className="block w-full h-full opacity-70 select-none"
+            />
+          )}
         </div>
       </div>
 
@@ -424,14 +429,16 @@ export default function Statistics() {
         className="absolute z-[1] inset-x-0 bottom-0 will-change-transform pointer-events-none
                    h-[40vh] sm:h-[44vh] md:h-[48vh] lg:h-[68.31%]"
       >
-        <Image
-          src="/assets/myhome/stats-city.png"
-          alt=""
-          fill
-          unoptimized
-          sizes="100vw"
-          className="object-cover object-bottom select-none"
-        />
+        {cityImage && (
+          <Image
+            src={cityImage}
+            alt=""
+            fill
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-bottom select-none"
+          />
+        )}
         {/* soft top-fade so text reads above the photo */}
         <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-white via-white/60 to-transparent" />
       </div>
@@ -458,7 +465,7 @@ export default function Statistics() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Statistics
+          {data.label}
         </span>
       </div>
 
@@ -477,7 +484,7 @@ export default function Statistics() {
               '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
           }}
         >
-          Four Decades, Measured
+          {data.heading}
         </h2>
         <p
           ref={paraRef}
@@ -485,24 +492,26 @@ export default function Statistics() {
           className="mt-4 sm:mt-5 px-5 sm:px-8 pl-[52px] sm:pl-[72px] pr-5 sm:pr-8 font-montserrat font-normal text-[#333] text-justify text-[13px] xs:text-[14px] leading-[22px] xs:leading-[24px] max-w-[460px]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          For over forty years, the numbers have quietly spoken for themselves.
-          From our first delivery in 1981 to the skylines still rising across
-          Hyderabad today, every square foot is a promise kept — to families,
-          to the city, to legacy.
+          <RichText>{data.body}</RichText>
         </p>
 
-        {/* Stats Row 1 — 3 tiles, always fit viewport via grid */}
-        <div className="mt-10 sm:mt-14 grid grid-cols-3 gap-2 xs:gap-3 sm:gap-5 px-3 xs:px-4 sm:px-6">
-          <StatItem stat={STATS[0]} index={0} mobile />
-          <StatItem stat={STATS[1]} index={1} mobile />
-          <StatItem stat={STATS[2]} index={2} mobile />
-        </div>
+        {/* Stats Row 1 — first 3 tiles */}
+        {STATS.length > 0 && (
+          <div className="mt-10 sm:mt-14 grid grid-cols-3 gap-2 xs:gap-3 sm:gap-5 px-3 xs:px-4 sm:px-6">
+            {STATS.slice(0, 3).map((s, i) => (
+              <StatItem key={`m1-${i}`} stat={s} index={i} mobile />
+            ))}
+          </div>
+        )}
 
-        {/* Stats Row 2 — 2 tiles, centered */}
-        <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-4 xs:gap-6 sm:gap-10 max-w-[260px] xs:max-w-[300px] sm:max-w-[340px] mx-auto">
-          <StatItem stat={STATS[3]} index={3} mobile />
-          <StatItem stat={STATS[4]} index={4} mobile />
-        </div>
+        {/* Stats Row 2 — remaining tiles */}
+        {STATS.length > 3 && (
+          <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-4 xs:gap-6 sm:gap-10 max-w-[260px] xs:max-w-[300px] sm:max-w-[340px] mx-auto">
+            {STATS.slice(3).map((s, i) => (
+              <StatItem key={`m2-${i}`} stat={s} index={i + 3} mobile />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ============================================================
@@ -526,17 +535,14 @@ export default function Statistics() {
               '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
           }}
         >
-          Four Decades, Measured
+          {data.heading}
         </h2>
         <p
           data-body
           className="font-montserrat font-normal text-justify text-[#6d6d6d] w-[26.197vw] text-[0.938vw] leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          For over forty years, the numbers have quietly spoken for themselves.
-          From our first delivery in 1981 to the skylines still rising across
-          Hyderabad today, every square foot is a promise kept — to families,
-          to the city, to legacy.
+          <RichText>{data.body}</RichText>
         </p>
       </div>
 

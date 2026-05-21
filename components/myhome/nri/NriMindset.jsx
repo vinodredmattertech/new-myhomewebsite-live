@@ -4,6 +4,8 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * The NRI Mindset — Figma node 3189:4197 ("Distance Shouldn't Make Ownership Difficult").
@@ -22,7 +24,7 @@ import SectionLabel from "@/components/myhome/SectionLabel";
  * Mobile / tablet collapses to a vertical stack with the image hero-style under the copy.
  */
 
-export default function NriMindset() {
+export default function NriMindset({ data }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const bodyRef = useRef(null);
@@ -58,6 +60,10 @@ export default function NriMindset() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const image = mediaUrl(data.image);
+
   return (
     <section
       ref={rootRef}
@@ -67,7 +73,7 @@ export default function NriMindset() {
     >
       {/* ---------- Side label (desktop) ---------- */}
       <div className="absolute left-[4.17vw] top-[4.687vw] hidden lg:block z-[2]">
-        <SectionLabel color="#ffffff">From Miles Away</SectionLabel>
+        <SectionLabel color="#ffffff">{data.label}</SectionLabel>
       </div>
 
       {/* ============================================================
@@ -86,7 +92,7 @@ export default function NriMindset() {
           fontWeight: 300,
         }}
       >
-        Distance Shouldn&rsquo;t Make Ownership Difficult
+        {data.heading}
       </h2>
 
       {/* Body : left 214 / top 528 / w 492 / text 18 / line 30 / text-justify */}
@@ -97,7 +103,7 @@ export default function NriMindset() {
                    text-[0.938vw] leading-[1.563vw]"
         style={{ fontFamily: "Montserrat, sans-serif" }}
       >
-        Whether you are planning for family, future returns, or a homecoming, every step should feel clear, guided, and secure.
+        <RichText>{data.body}</RichText>
       </p>
 
       {/* Image : left 1031 / top 150 / w 789 / h 604 / rounded 12 */}
@@ -106,13 +112,16 @@ export default function NriMindset() {
         className="hidden lg:block absolute overflow-hidden rounded-[0.625vw]
                    left-[53.698vw] top-[7.812vw] w-[41.094vw] h-[31.458vw]"
       >
-        <Image
-          src="/assets/myhome/nri/family-call.jpg"
-          alt="A family video-calling their home in India"
-          fill
-          sizes="42vw"
-          className="object-cover object-center select-none"
-        />
+        {image && (
+          <Image
+            src={image}
+            alt="A family video-calling their home in India"
+            fill
+            unoptimized
+            sizes="42vw"
+            className="object-cover object-center select-none"
+          />
+        )}
       </div>
 
       {/* ============================================================
@@ -128,18 +137,21 @@ export default function NriMindset() {
             fontWeight: 300,
           }}
         >
-          Distance Shouldn&rsquo;t Make Ownership Difficult
+          {data.heading}
         </h2>
 
-        <div className="relative w-full aspect-[789/604] rounded-[10px] overflow-hidden">
-          <Image
-            src="/assets/myhome/nri/family-call.jpg"
-            alt="A family video-calling their home in India"
-            fill
-            sizes="100vw"
-            className="object-cover object-center select-none"
-          />
-        </div>
+        {image && (
+          <div className="relative w-full aspect-[789/604] rounded-[10px] overflow-hidden">
+            <Image
+              src={image}
+              alt="A family video-calling their home in India"
+              fill
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-center select-none"
+            />
+          </div>
+        )}
 
         <p
           className="font-montserrat font-normal text-white text-justify
@@ -148,7 +160,7 @@ export default function NriMindset() {
                      max-w-[560px]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          Whether you are planning for family, future returns, or a homecoming, every step should feel clear, guided, and secure.
+          <RichText>{data.body}</RichText>
         </p>
       </div>
     </section>

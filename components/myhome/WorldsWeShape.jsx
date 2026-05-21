@@ -3,6 +3,8 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import { mediaUrl, relationList } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
 /**
  * Worlds We Shape — Figma node 3152:3436
@@ -12,30 +14,6 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
  * title, body and prev/next arrows. On nav, both the card stack and the
  * right copy crossfade to the next slide via one synchronized GSAP timeline.
  */
-const SLIDES = [
-  {
-    id: "01",
-    title: "Real Estate & Developments",
-    body:
-      "Beyond homes, we build the foundations Hyderabad stands on — from residential landmarks to commercial icons, from cement that strengthens a city to power that keeps it moving. Three verticals. One promise. Uncompromising craft throughout.",
-    image: "/assets/myhome/whymyhome-slide-1b.jpg",
-  },
-  {
-    id: "02",
-    title: "Cement & Building Materials",
-    body:
-      "From foundations to finishes, our integrated cement and building-material operations supply the precise grades our towers demand — strengthening every home we hand over and every skyline we help shape.",
-    image: "/assets/myhome/whymyhome-slide-2.jpg",
-  },
-  {
-    id: "03",
-    title: "Power & Infrastructure",
-    body:
-      "Reliable infrastructure is the silent partner of luxury living. From thermal generation to township-scale utilities, our infrastructure arm keeps Hyderabad moving and our communities thriving.",
-    image: "/assets/myhome/whymyhome-slide-1.jpg",
-  },
-];
-
 /**
  * 3 stacked card positions in vw, derived from Figma:
  *   front (active):  left:0 top:358 w:1044 h:626
@@ -49,7 +27,19 @@ const CARD_LAYOUT = [
   { left: "11.581vw", top: "19.369vw", width: "46.823vw", height: "31.959vw", rotate: 8, tint: 0.37 },
 ];
 
-export default function WorldsWeShape() {
+export default function WorldsWeShape({ data }) {
+  // Source is the `verticals` relation (collection type) — flatten the
+  // v4 envelope and map to the shape the rest of the section expects.
+  const rawVerticals = relationList(data?.verticals);
+  // Sort by `order` if provided so the admin can rearrange without code.
+  rawVerticals.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const SLIDES = rawVerticals.map((v, i) => ({
+    id: v.number || String(i + 1).padStart(2, "0"),
+    title: v.title || "",
+    body: v.body || "",
+    image: mediaUrl(v.image),
+  }));
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const introBodyRef = useRef(null);
@@ -154,6 +144,8 @@ export default function WorldsWeShape() {
   const cardSlide = (offset) =>
     SLIDES[(active + offset) % SLIDES.length];
 
+  if (!data || !SLIDES.length) return null;
+
   return (
     <section
       ref={rootRef}
@@ -184,7 +176,7 @@ export default function WorldsWeShape() {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          Our Verticals
+          {data.label}
         </span>
       </div>
 
@@ -203,7 +195,7 @@ export default function WorldsWeShape() {
             '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
         }}
       >
-        Worlds We Shape
+        {data.heading}
       </h2>
 
       {/* ===== Intro body (Figma 3152:3787 mobile / 3152:3442 desktop)
@@ -218,9 +210,7 @@ export default function WorldsWeShape() {
                    lg:w-[36.979vw] lg:max-w-none lg:text-[0.938vw] lg:leading-[1.563vw]"
         style={{ fontFamily: "Montserrat, sans-serif" }}
       >
-        Each of our projects carries its own story — of families who chose
-        us, of skylines we helped define, of mornings that begin quietly in
-        spaces.
+        <RichText>{data.body}</RichText>
       </p>
 
       {/* ===== DESKTOP — 3 stacked rotated cards (Figma 3152:3443–3445)
@@ -250,14 +240,16 @@ export default function WorldsWeShape() {
                   transformOrigin: "center",
                 }}
               >
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  unoptimized
-                  sizes="55vw"
-                  className="object-cover object-center"
-                />
+                {slide.image && (
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    unoptimized
+                    sizes="55vw"
+                    className="object-cover object-center"
+                  />
+                )}
                 {pos.tint > 0 && (
                   <div
                     className="absolute inset-0"
@@ -291,14 +283,16 @@ export default function WorldsWeShape() {
             }}
           >
             <div className="relative w-full aspect-[341.97/205.05] overflow-hidden rounded-[4px]">
-              <Image
-                src={cardSlide(2).image}
-                alt={cardSlide(2).title}
-                fill
-                unoptimized
-                sizes="(max-width:500px) 80vw, 340px"
-                className="object-cover object-center"
-              />
+              {cardSlide(2).image && (
+                <Image
+                  src={cardSlide(2).image}
+                  alt={cardSlide(2).title}
+                  fill
+                  unoptimized
+                  sizes="(max-width:500px) 80vw, 340px"
+                  className="object-cover object-center"
+                />
+              )}
               <div className="absolute inset-0 bg-white/[0.37]" />
             </div>
           </div>
@@ -316,14 +310,16 @@ export default function WorldsWeShape() {
             }}
           >
             <div className="relative w-full aspect-[379.96/227.83] overflow-hidden rounded-[4px]">
-              <Image
-                src={cardSlide(1).image}
-                alt={cardSlide(1).title}
-                fill
-                unoptimized
-                sizes="(max-width:500px) 89vw, 380px"
-                className="object-cover object-center"
-              />
+              {cardSlide(1).image && (
+                <Image
+                  src={cardSlide(1).image}
+                  alt={cardSlide(1).title}
+                  fill
+                  unoptimized
+                  sizes="(max-width:500px) 89vw, 380px"
+                  className="object-cover object-center"
+                />
+              )}
               <div className="absolute inset-0 bg-white/[0.37]" />
             </div>
           </div>
@@ -334,14 +330,16 @@ export default function WorldsWeShape() {
             className="relative w-full aspect-[426.643/256.556] rounded-[4px] overflow-hidden
                        will-change-transform shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] z-[3]"
           >
-            <Image
-              src={cardSlide(0).image}
-              alt={cardSlide(0).title}
-              fill
-              unoptimized
-              sizes="(max-width:500px) 90vw, 426px"
-              className="object-cover object-center"
-            />
+            {cardSlide(0).image && (
+              <Image
+                src={cardSlide(0).image}
+                alt={cardSlide(0).title}
+                fill
+                unoptimized
+                sizes="(max-width:500px) 90vw, 426px"
+                className="object-cover object-center"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -388,7 +386,7 @@ export default function WorldsWeShape() {
                      lg:capitalize lg:text-[0.938vw] lg:leading-[1.667vw]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          {SLIDES[active].body}
+          <RichText>{SLIDES[active].body}</RichText>
         </p>
       </div>
 

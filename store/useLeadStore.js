@@ -1,5 +1,12 @@
 import { create } from "zustand";
+import { submitLead } from "@/lib/strapi";
 
+/**
+ * Central submit pipeline for every website lead form that uses the store
+ * (enquire modal, project inquiry, NRI flow). Pushes to the CRM and to
+ * Strapi's Lead collection in parallel — UI success still keys off the CRM
+ * response so behaviour matches the pre-Strapi state.
+ */
 export const useLeadStore = create((set) => ({
   loading: false,
   error: null,
@@ -7,12 +14,15 @@ export const useLeadStore = create((set) => ({
   postWebsiteLead: async (payload) => {
     set({ loading: true, error: null, success: false });
     try {
-      const res = await fetch("/api/pushToCRM", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const ok = res.ok;
+      const [crmRes] = await Promise.all([
+        fetch("/api/pushToCRM", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }),
+        submitLead(payload),
+      ]);
+      const ok = crmRes.ok;
       set({ loading: false, success: ok, error: ok ? null : "Failed" });
       return ok;
     } catch (e) {

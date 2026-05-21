@@ -8,12 +8,18 @@ import { ChevronRight } from "lucide-react";
 
 export default function PageBanner({
   imageSrc,
+  desktopSrc,
+  mobileSrc,
   imageAlt,
   heading,
   breadcrumbLabel,
   gradientClass = "bg-gradient-to-b from-black/20 via-black/10 to-black/80",
   sectionId,
 }) {
+  // Backward compat: pages that still pass a single `imageSrc` use it for
+  // both breakpoints. New callers pass desktopSrc + mobileSrc separately.
+  const resolvedDesktop = desktopSrc || imageSrc;
+  const resolvedMobile = mobileSrc || imageSrc || desktopSrc;
   const rootRef = useRef(null);
   const imgRef = useRef(null);
   const headingRef = useRef(null);
@@ -61,6 +67,8 @@ export default function PageBanner({
     { scope: rootRef }
   );
 
+  if (!resolvedDesktop && !resolvedMobile && !heading) return null;
+
   return (
     <section
       ref={rootRef}
@@ -68,14 +76,28 @@ export default function PageBanner({
       data-section={sectionId}
     >
       <div ref={imgRef} className="absolute inset-0 will-change-transform">
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center select-none"
-        />
+        {resolvedMobile && (
+          <Image
+            src={resolvedMobile}
+            alt={imageAlt || ""}
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className="lg:hidden object-cover object-center select-none"
+          />
+        )}
+        {resolvedDesktop && (
+          <Image
+            src={resolvedDesktop}
+            alt={imageAlt || ""}
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className="hidden lg:block object-cover object-center select-none"
+          />
+        )}
         <div className={`absolute inset-0 ${gradientClass}`} />
       </div>
 

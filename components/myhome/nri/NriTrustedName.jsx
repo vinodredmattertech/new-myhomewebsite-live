@@ -4,23 +4,14 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
+import { mediaUrl } from "@/lib/strapi";
+import RichText from "@/components/common/RichText";
 
-const FEATURES = [
-  {
-    title: "Dedicated NRI Assistance",
-    body: "Personalised guidance for overseas buyers, from first enquiry to final booking.",
-  },
-  {
-    title: "Documentation Guidance",
-    body: "Support with KYC, POA, payment steps, and required ownership documentation.",
-  },
-  {
-    title: "Transparent Project Details",
-    body: "Clear access to project information, RERA details, availability, timelines, and next steps.",
-  },
-];
+export default function NriTrustedName({ data }) {
+  const FEATURES = Array.isArray(data?.features)
+    ? data.features.map((f) => ({ title: f.title || "", body: f.body || "" }))
+    : [];
 
-export default function NriTrustedName() {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const subRef = useRef(null);
@@ -68,6 +59,10 @@ export default function NriTrustedName() {
     { scope: rootRef }
   );
 
+  if (!data) return null;
+
+  const image = mediaUrl(data.image);
+
   return (
     <section
       ref={rootRef}
@@ -76,7 +71,7 @@ export default function NriTrustedName() {
       data-section="nri-trusted-name"
     >
       <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block">
-        <SectionLabel>Why My Home</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       {/* Top centered heading */}
@@ -91,7 +86,7 @@ export default function NriTrustedName() {
             fontWeight: 300,
           }}
         >
-          A Trusted Name. A Guided Journey.
+          {data.heading}
         </h2>
         <p
           ref={subRef}
@@ -101,7 +96,7 @@ export default function NriTrustedName() {
                      max-w-[860px] lg:max-w-[53.281vw]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          My Home Constructions brings decades of trust, landmark developments, and transparent guidance for overseas buyers looking to own in Hyderabad with confidence.
+          <RichText>{data.subTitle}</RichText>
         </p>
       </div>
 
@@ -141,7 +136,7 @@ export default function NriTrustedName() {
                            max-w-[640px] lg:max-w-[31vw]"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                {f.body}
+                <RichText>{f.body}</RichText>
               </p>
             </div>
           ))}
@@ -153,13 +148,16 @@ export default function NriTrustedName() {
             ref={imgRef}
             className="relative w-full aspect-[524/559] rounded-[10px] lg:rounded-[0.625vw] overflow-hidden"
           >
-            <Image
-              src="/assets/myhome/nri/trusted-name.jpg"
-              alt="My Home — guided NRI experience"
-              fill
-              sizes="(min-width:1024px) 30vw, 100vw"
-              className="object-cover object-center select-none"
-            />
+            {image && (
+              <Image
+                src={image}
+                alt="My Home — guided NRI experience"
+                fill
+                unoptimized
+                sizes="(min-width:1024px) 30vw, 100vw"
+                className="object-cover object-center select-none"
+              />
+            )}
           </div>
         </div>
       </div>

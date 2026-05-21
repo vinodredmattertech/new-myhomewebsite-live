@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import RichText from "@/components/common/RichText";
 
 const DEFAULT_IMAGE = "/assets/myhome/projects/luxury-design.jpg";
 
@@ -85,8 +85,10 @@ export default function ProjectSpecifications({
         scrollTrigger: trigger,
       });
 
+      // Only animate y on entrance — no autoAlpha. The image wrapper was
+      // sometimes stuck at opacity:0 because of a race between the
+      // scrollTrigger and the tab-change fade tween below.
       gsap.from(imageRef.current, {
-        autoAlpha: 0,
         y: 50,
         duration: 1.1,
         ease: "expo.out",
@@ -169,7 +171,7 @@ export default function ProjectSpecifications({
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
         >
-          {description}
+          <RichText>{description}</RichText>
         </p>
 
         {/* Content row */}
@@ -179,14 +181,28 @@ export default function ProjectSpecifications({
             ref={imageRef}
             className="relative w-full aspect-[826/656] lg:h-[34.167vw] lg:w-[43.021vw] overflow-hidden rounded-[12px] bg-[#eee]"
           >
-            <Image
-              src={activeSpec.image}
-              alt={activeSpec.title}
-              fill
-              sizes="(min-width:1024px) 43vw, 100vw"
-              className="object-cover object-center select-none"
-              priority={activeIndex === 0}
-            />
+            {activeSpec?.image ? (
+              // Plain <img> — `next/image` with `fill` + a Strapi-hosted
+              // remote URL was rendering blank for several specs even with
+              // `unoptimized`. A raw <img> is fine here since we're
+              // displaying CMS media that's already sized appropriately.
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={activeSpec.image}
+                alt={activeSpec.title || ""}
+                loading={activeIndex === 0 ? "eager" : "lazy"}
+                className="absolute inset-0 w-full h-full object-cover object-center select-none"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-[#aaa]">
+                <span
+                  className="font-montserrat text-[13px] lg:text-[0.833vw] tracking-[0.06em] uppercase"
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
+                  Image coming soon
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Right column: 2x3 category grid + controls */}

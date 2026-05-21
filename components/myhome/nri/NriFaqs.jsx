@@ -3,29 +3,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
-
-const FAQS = [
-  {
-    q: "Can NRIs buy property in Hyderabad without RBI approval?",
-    a: "NRIs can purchase residential and commercial properties in India without RBI approval. Agricultural land, plantation property, and farmhouses are restricted. Our team can guide you through the required documentation.",
-  },
-  {
-    q: "What payment options for overseas remittances?",
-    a: "Payments can be made through NRE, NRO, or FCNR accounts using normal banking channels. Funds must be remitted via inward remittance or routed through bank accounts maintained in India under FEMA guidelines.",
-  },
-  {
-    q: "What about home loans for NRIs?",
-    a: "Most leading Indian banks offer home loans to NRIs against the property being purchased. EMIs are typically repaid from NRE / NRO accounts or through inward remittances. Our team will help connect you with the right banking partner.",
-  },
-  {
-    q: "Are My Home projects RERA registered?",
-    a: "Yes — every My Home project is registered with the Telangana Real Estate Regulatory Authority (TS-RERA). RERA numbers, approved plans, and project timelines are shared transparently with every buyer.",
-  },
-  {
-    q: "Repatriation limits on sale proceeds?",
-    a: "NRIs can repatriate up to USD 1 million per financial year from sale proceeds, subject to applicable taxes and submission of the prescribed CA certificate (Form 15CA/15CB) under FEMA rules.",
-  },
-];
+import RichText from "@/components/common/RichText";
 
 function FaqItem({ item, isOpen, onToggle, index }) {
   const contentRef = useRef(null);
@@ -115,14 +93,18 @@ function FaqItem({ item, isOpen, onToggle, index }) {
                      max-w-[1200px] lg:max-w-[65.26vw]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          {item.a}
+          <RichText>{item.a}</RichText>
         </p>
       </div>
     </div>
   );
 }
 
-export default function NriFaqs() {
+export default function NriFaqs({ data }) {
+  const FAQS = Array.isArray(data?.items)
+    ? data.items.map((it) => ({ q: it.question || "", a: it.answer || "" }))
+    : [];
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const [openIndex, setOpenIndex] = useState(0);
@@ -144,6 +126,8 @@ export default function NriFaqs() {
 
   const handleToggle = (i) => setOpenIndex(openIndex === i ? -1 : i);
 
+  if (!data || !FAQS.length) return null;
+
   return (
     <section
       ref={rootRef}
@@ -152,7 +136,7 @@ export default function NriFaqs() {
       data-section="nri-faqs"
     >
       <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block">
-        <SectionLabel>FAQs</SectionLabel>
+        <SectionLabel>{data.label}</SectionLabel>
       </div>
 
       <div className="px-5 md:px-10 lg:px-[11.146vw] flex flex-col items-center">
@@ -166,7 +150,7 @@ export default function NriFaqs() {
             fontWeight: 300,
           }}
         >
-          Clarity Before You Decide
+          {data.heading}
         </h2>
 
         <div className="w-full mt-[40px] md:mt-[56px] lg:mt-[3.125vw] max-w-[1480px] lg:max-w-[77.03vw] border-t border-[rgba(85,85,85,0.2)]">
