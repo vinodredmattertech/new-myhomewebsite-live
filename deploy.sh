@@ -1,4 +1,4 @@
-sudo git pull
-sudo npm run build
-sudo pm2 stop frontend-myhomegroup
-sudo pm2 start frontend-myhomegroup
+git pull
+npm run build
+pm2 stop frontend-myhomegroup
+pm2 start frontend-myhomegroup
