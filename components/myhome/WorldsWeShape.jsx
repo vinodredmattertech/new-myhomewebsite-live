@@ -55,26 +55,32 @@ export default function WorldsWeShape({ data }) {
 
   useGSAP(
     () => {
+      if (!rootRef.current) return;
       registerGsap();
 
       const titleWords = splitToWords(headingRef.current);
-      gsap.set(titleWords, { yPercent: 110, rotate: 4 });
-      gsap.to(titleWords, {
-        yPercent: 0,
-        rotate: 0,
-        duration: 1.15,
-        stagger: 0.075,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
-      });
-      gsap.from([introBodyRef.current, labelRef.current], {
-        y: 30,
-        autoAlpha: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
-      });
+      if (titleWords.length) {
+        gsap.set(titleWords, { yPercent: 110, rotate: 4 });
+        gsap.to(titleWords, {
+          yPercent: 0,
+          rotate: 0,
+          duration: 1.15,
+          stagger: 0.075,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
+        });
+      }
+      const introTargets = [introBodyRef.current, labelRef.current].filter(Boolean);
+      if (introTargets.length) {
+        gsap.from(introTargets, {
+          y: 30,
+          autoAlpha: 0,
+          duration: 0.9,
+          stagger: 0.1,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
+        });
+      }
       // Entrance: cards rise into stack
       cardsRef.current.filter(Boolean).forEach((card, i) => {
         gsap.from(card, {
@@ -87,17 +93,17 @@ export default function WorldsWeShape({ data }) {
         });
       });
       // Right column entrance
-      gsap.from(
-        [numberRef.current, titleRef.current, descRef.current],
-        {
+      const copyTargets = [numberRef.current, titleRef.current, descRef.current].filter(Boolean);
+      if (copyTargets.length) {
+        gsap.from(copyTargets, {
           y: 40,
           autoAlpha: 0,
           duration: 1.0,
           stagger: 0.1,
           ease: "expo.out",
           scrollTrigger: { trigger: rootRef.current, start: "top 55%" },
-        }
-      );
+        });
+      }
     },
     { scope: rootRef }
   );

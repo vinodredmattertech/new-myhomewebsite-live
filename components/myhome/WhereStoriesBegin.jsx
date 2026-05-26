@@ -52,25 +52,31 @@ export default function WhereStoriesBegin({ data }) {
 
   useGSAP(
     () => {
+      if (!rootRef.current) return;
       registerGsap();
       const words = splitToWords(headingRef.current);
-      gsap.set(words, { yPercent: 110, rotate: 4 });
-      gsap.to(words, {
-        yPercent: 0,
-        rotate: 0,
-        duration: 1.15,
-        stagger: 0.075,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
-      });
-      gsap.from([paraRef.current, labelRef.current], {
-        y: 30,
-        autoAlpha: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
-      });
+      if (words.length) {
+        gsap.set(words, { yPercent: 110, rotate: 4 });
+        gsap.to(words, {
+          yPercent: 0,
+          rotate: 0,
+          duration: 1.15,
+          stagger: 0.075,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
+        });
+      }
+      const introTargets = [paraRef.current, labelRef.current].filter(Boolean);
+      if (introTargets.length) {
+        gsap.from(introTargets, {
+          y: 30,
+          autoAlpha: 0,
+          duration: 0.9,
+          stagger: 0.1,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
+        });
+      }
     },
     { scope: rootRef }
   );
