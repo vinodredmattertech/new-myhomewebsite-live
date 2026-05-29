@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, A11y } from "swiper/modules";
+import { Navigation, A11y, Autoplay} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { mediaUrl } from "@/lib/strapi";
@@ -234,11 +234,12 @@ export default function Testimonials({ data }) {
          ============================================================ */}
       <div className="relative z-[2] mt-[36px] lg:mt-[7.812vw]">
         <Swiper
-          modules={[Navigation, A11y]}
+          modules={[Navigation, A11y, Autoplay]}
           slidesPerView={1}
           spaceBetween={24}
           speed={700}
-          loop
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop={true}
           breakpoints={{
             640: { slidesPerView: 1.1, spaceBetween: 32 },
             1024: { slidesPerView: 1.5, spaceBetween: 60 },

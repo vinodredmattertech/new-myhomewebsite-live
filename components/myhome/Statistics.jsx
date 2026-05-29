@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { registerGsap, ScrollTrigger, splitToWords } from "@/lib/gsapSetup";
+import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
 
@@ -60,23 +60,18 @@ const STAT_LAYOUT = [
  * Single stat tile — runs its own GSAP count-up the first time it enters
  * the viewport. The parent timeline reveals (opacity) the tiles in order.
  */
-function StatItem({ stat, index, mobile = false }) {
+function StatItem({ stat, index, shouldAnimate, mobile = false }) {
   const numRef = useRef(null);
   const wrapRef = useRef(null);
 
   useGSAP(
     () => {
+      if (!shouldAnimate) return;
       registerGsap();
 
       // The parent <section> timeline starts fading stats in at t=1.05s and
       // staggers each tile by 0.18s. We delay the count-up just slightly
       // after that so the digits start ticking exactly as a tile resolves.
-      //
-      //   stat i is visible at:   1.05 + 0.18 * i   (parent timeline)
-      //   counter starts at:      1.20 + 0.18 * i   (this tween)
-      //
-      // Both share the SAME ScrollTrigger anchor (the section root with
-      // start "top 78%") so the offsets line up frame-for-frame.
       const STAT_FADE_OFFSET = 1.05;
       const STAT_STAGGER = 0.18;
       const startDelay = STAT_FADE_OFFSET + 0.15 + index * STAT_STAGGER;
@@ -88,11 +83,6 @@ function StatItem({ stat, index, mobile = false }) {
         delay: startDelay,
         ease: "power2.out",
         snap: { v: 1 },
-        scrollTrigger: {
-          trigger: "#statistics",
-          start: "top 78%",
-          once: true,
-        },
         onUpdate: () => {
           if (numRef.current) {
             numRef.current.textContent = Math.round(obj.v) + stat.suffix;
@@ -110,15 +100,10 @@ function StatItem({ stat, index, mobile = false }) {
           duration: 0.55,
           ease: "back.out(2.2)",
           delay: startDelay + 2.5,
-          scrollTrigger: {
-            trigger: "#statistics",
-            start: "top 78%",
-            once: true,
-          },
         }
       );
     },
-    { scope: wrapRef }
+    { scope: wrapRef, dependencies: [shouldAnimate] }
   );
 
   const alignCls =
@@ -163,13 +148,13 @@ function StatItem({ stat, index, mobile = false }) {
       style={stat.style}
     >
       <span
-        ref={numRef}
-        className="font-tartuffo-reg capitalize text-[3.65vw] leading-[5.21vw] tracking-[0.109vw]"
-        style={{
-          fontFamily:
-            '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-        }}
-      >
+          ref={numRef}
+          className="font-tartuffo-reg capitalize text-[3.65vw] leading-[5.21vw] tracking-[0.109vw]"
+          style={{
+            fontFamily:
+              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+          }}
+        >
         0{stat.suffix}
       </span>
       <span
@@ -183,6 +168,7 @@ function StatItem({ stat, index, mobile = false }) {
 }
 
 export default function Statistics({ data }) {
+  const [statsInView, setStatsInView] = useState(false);
   // Merge backend stat values onto design-fixed positions by index.
   const STATS = STAT_LAYOUT.map((pos, i) => {
     const s = data?.stats?.[i];
@@ -196,6 +182,30 @@ export default function Statistics({ data }) {
   }).filter(Boolean);
 
   const rootRef = useRef(null);
+
+  useEffect(() => {
+    // Reset when data changes / when the user navigates back.
+    setStatsInView(false);
+
+    if (!rootRef.current) return;
+
+    const el = rootRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setStatsInView(true);
+          observer.disconnect();
+        }
+      },
+      {
+        // Start a bit before the section is fully in view for better UX.
+        threshold: 0.15,
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const labelRef = useRef(null);
   const headingRef = useRef(null);
   const paraRef = useRef(null);
@@ -217,12 +227,12 @@ export default function Statistics({ data }) {
       gsap.set("[data-body]", { y: 40, autoAlpha: 0 });
       gsap.set(cityRef.current, { yPercent: 32, autoAlpha: 0 });
       gsap.set(curveRef.current, { yPercent: 28, autoAlpha: 0 });
-      gsap.set("[data-stat]", {
-        y: 56,
-        autoAlpha: 0,
-        scale: 0.94,
-        filter: "blur(6px)",
-      });
+      // gsap.set("[data-stat]", {
+      //   y: 56,
+      //   autoAlpha: 0,
+      //   scale: 0.94,
+      //   filter: "blur(6px)",
+      // });
       gsap.set([birdsTopRef.current, birdsBottomRef.current], {
         autoAlpha: 0,
         scale: 0.82,
@@ -283,19 +293,19 @@ export default function Statistics({ data }) {
         )
         // Phase 2 (frame 877) — stats reveal: blur clears, scale settles,
         // numbers count up via each tile's own once-only ScrollTrigger.
-        .to(
-          "[data-stat]",
-          {
-            y: 0,
-            autoAlpha: 1,
-            scale: 1,
-            filter: "blur(0px)",
-            duration: 1.3,
-            stagger: 0.18,
-            ease: "expo.out",
-          },
-          1.05
-        )
+        // .to(
+        //   "[data-stat]",
+        //   {
+        //     y: 0,
+        //     autoAlpha: 1,
+        //     scale: 1,
+        //     filter: "blur(0px)",
+        //     duration: 1.3,
+        //     stagger: 0.18,
+        //     ease: "expo.out",
+        //   },
+        //   1.05
+        // )
         // Birds drift in last as a quiet accent.
         .to(
           [birdsTopRef.current, birdsBottomRef.current],
@@ -440,7 +450,7 @@ export default function Statistics({ data }) {
           />
         )}
         {/* soft top-fade so text reads above the photo */}
-        <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-white via-white/60 to-transparent" />
+        {/* <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-white via-white/60 to-transparent" /> */}
       </div>
 
       {/* ===== Side label (Figma 3152:3759 mobile / 2609:1679 desktop)
@@ -499,16 +509,16 @@ export default function Statistics({ data }) {
         {STATS.length > 0 && (
           <div className="mt-10 sm:mt-14 grid grid-cols-3 gap-2 xs:gap-3 sm:gap-5 px-3 xs:px-4 sm:px-6">
             {STATS.slice(0, 3).map((s, i) => (
-              <StatItem key={`m1-${i}`} stat={s} index={i} mobile />
+              <StatItem key={`m1-${i}`} stat={s} index={i} shouldAnimate={statsInView} mobile />
             ))}
           </div>
         )}
 
         {/* Stats Row 2 — remaining tiles */}
         {STATS.length > 3 && (
-          <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-4 xs:gap-6 sm:gap-10 max-w-[260px] xs:max-w-[300px] sm:max-w-[340px] mx-auto">
+          <div className="mt-8 max-sm:mb-[35px] sm:mt-10 grid grid-cols-2 gap-4 xs:gap-6 sm:gap-10 max-w-[260px] xs:max-w-[300px] sm:max-w-[340px] mx-auto">
             {STATS.slice(3).map((s, i) => (
-              <StatItem key={`m2-${i}`} stat={s} index={i + 3} mobile />
+              <StatItem key={`m2-${i}`} stat={s} index={i + 3} shouldAnimate={statsInView} mobile />
             ))}
           </div>
         )}
@@ -552,7 +562,12 @@ export default function Statistics({ data }) {
         className="hidden lg:block absolute inset-x-0 top-0 h-full pointer-events-none z-[4]"
       >
         {STATS.map((s, i) => (
-          <StatItem key={s.label} stat={s} index={i} />
+          <StatItem
+            key={s.label}
+            stat={s}
+            index={i}
+            shouldAnimate={statsInView}
+          />
         ))}
       </div>
     </section>

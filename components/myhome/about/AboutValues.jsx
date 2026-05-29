@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Keyboard, A11y } from "swiper/modules";
+import { Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
@@ -85,15 +85,14 @@ export default function AboutValues({ data }) {
       className="relative w-full bg-white overflow-hidden
                  py-[60px] md:py-[80px] lg:pt-[4.166vw] lg:pb-[6.51vw]"
     >
-      <div className="absolute left-[4.16vw] top-[4.166vw] hidden lg:block">
+      <div className="absolute left-[4.16vw] top-[4.166vw]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 
+
       <h2
         ref={headingRef}
-        className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
-                   text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]
-                   px-5 md:px-10 lg:px-[11.146vw] max-w-[1100px] lg:max-w-[57.291vw]"
+        className="text-center text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em] text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw] px-5 md:px-10 lg:px-[8.333vw]"
         style={{
           fontFamily:
             '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
@@ -104,7 +103,7 @@ export default function AboutValues({ data }) {
       </h2>
 
       {/* Desktop: static three-column. Tablet/mobile: Swiper carousel. */}
-      <div className="mt-[40px] md:mt-[56px] lg:mt-[3.645vw] px-5 md:px-10 lg:px-[11.146vw]">
+      <div className="mt-[60px] md:mt-[56px] lg:mt-[3.645vw] px-5 md:px-10 lg:px-[11.146vw]">
         {/* Desktop grid */}
         <div className="hidden lg:grid grid-cols-3 gap-[2.604vw]">
           {VALUES.map((v) => (
@@ -115,7 +114,9 @@ export default function AboutValues({ data }) {
         {/* Mobile / tablet swiper */}
         <div className="lg:hidden">
           <Swiper
-            modules={[Keyboard, A11y]}
+            modules={[Keyboard, A11y, Autoplay]}
+            autoplay={{ delay: 2000, disableOnInteraction: false }}
+            loop={true}
             spaceBetween={20}
             slidesPerView={1.05}
             keyboard={{ enabled: true }}

@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Keyboard, A11y, Pagination } from "swiper/modules";
+import { Keyboard, A11y, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import SectionLabel from "@/components/myhome/SectionLabel";
@@ -70,7 +70,7 @@ function FanCard({ title, image }) {
         className="absolute left-1/2 -translate-x-1/2 bottom-[18px] lg:bottom-[1.667vw]
                    w-[85%] text-center text-white font-montserrat font-normal
                    text-[16px] sm:text-[18px] lg:text-[1.042vw]
-                   leading-[1.4] lg:leading-[1.563vw]"
+                   leading-[1.4] lg:leading-[1.563vw] px-[2.5vw]"
         style={{ fontFamily: "Montserrat, sans-serif" }}
       >
         {title}
@@ -231,10 +231,12 @@ export default function NriWhyHyderabad({ data }) {
       {/* ---------- Mobile / tablet — Swiper carousel ---------- */}
       <div className="lg:hidden mt-[40px] md:mt-[56px] px-5 md:px-10">
         <Swiper
-          modules={[Keyboard, A11y, Pagination]}
+          modules={[Keyboard, A11y, Pagination, Autoplay]}
           spaceBetween={20}
           slidesPerView={1.1}
           centeredSlides
+          autoplay={{ delay: 2000, disableOnInteraction: false }}
+          loop={true}
           keyboard={{ enabled: true }}
           pagination={{ clickable: true }}
           breakpoints={{

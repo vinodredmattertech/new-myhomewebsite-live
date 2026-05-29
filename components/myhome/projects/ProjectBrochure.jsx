@@ -42,7 +42,7 @@ export default function ProjectBrochure({
   highlights = DEFAULT_HIGHLIGHTS,
   imageSrc = "/assets/myhome/projects/brochure-clubhouse.jpg",
   imageAlt = "My Home Akrida clubhouse",
-  brochureHref = "#",
+  brochureHref = "/images/pdf-sample_0.pdf",
   buttonLabel = "Download Brochure",
   projectName = "Project Brochure",
 }) {
@@ -75,7 +75,7 @@ export default function ProjectBrochure({
     e.preventDefault();
     // Brochure file missing in CMS → don't open the modal; just show a no-op
     // (the button is also disabled visually below).
-    if (!brochureHref || brochureHref === "#") return;
+    if (!brochureHref || brochureHref === "/images/pdf-sample_0.pdf") return;
     if (unlocked) {
       triggerBrochureDownload(brochureHref);
     } else {
@@ -187,7 +187,7 @@ export default function ProjectBrochure({
     { scope: rootRef }
   );
 
-  const noFile = !brochureHref || brochureHref === "#";
+  const noFile = !brochureHref || brochureHref === "/images/pdf-sample_0.pdf";
 
   return (
     <section
@@ -198,21 +198,23 @@ export default function ProjectBrochure({
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[4.167vw] top-[4.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="flex absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
         aria-hidden="true"
       >
-        <span className="block h-[3.125vw] w-px bg-white/70" />
-        <span className="flex items-center justify-center h-[15.781vw] w-[1.51vw]">
-          <span
-            className="-rotate-90 whitespace-nowrap capitalize text-white text-[1.25vw]"
-            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-          >
-            {sidebarLabel}
-          </span>
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-white/70" />
+        <span
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-white text-[12px] md:text-[14px] lg:text-[1.25vw]"
+          style={{
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            fontFamily: "Montserrat, sans-serif",
+          }}
+        >
+          {sidebarLabel}
         </span>
       </div>
 
-      <div className="px-5 md:px-12 lg:pl-[9.375vw] lg:pr-[9.531vw]">
+      <div className="px-5 md:px-12 lg:pl-[9.375vw] lg:pr-[9.531vw] max-sm:pl-[40px]">
         <div className="grid grid-cols-1 lg:grid-cols-[32.5vw_1fr] gap-[36px] lg:gap-[5.573vw] items-center">
           {/* Image */}
           <div

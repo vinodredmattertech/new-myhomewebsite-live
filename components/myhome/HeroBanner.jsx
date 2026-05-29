@@ -30,6 +30,88 @@ export default function HeroBanner({ data }) {
     () => {
       registerGsap();
 
+      const lockScroll = () => {
+        if (typeof window === "undefined" || typeof document === "undefined") return;
+
+        // Store scroll position + preserve styles
+        const docEl = document.documentElement;
+        const body = document.body;
+
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+
+        // Avoid double-locking
+        if (body?.dataset?.mhScrollLocked === "true") return;
+        if (!body || !docEl) return;
+
+        body.dataset.mhScrollLocked = "true";
+        body.dataset.mhScrollY = String(scrollY);
+
+        body.style.overflow = "hidden";
+        docEl.style.overflow = "hidden";
+
+        // Prevent viewport jump by fixing body in place
+        body.style.position = "fixed";
+        body.style.top = `-${scrollY}px`;
+        body.style.left = "0";
+        body.style.right = "0";
+        body.style.width = "100%";
+      };
+
+      const unlockScroll = () => {
+        if (typeof window === "undefined" || typeof document === "undefined") return;
+
+        const docEl = document.documentElement;
+        const body = document.body;
+        if (!body || !docEl) return;
+
+        if (body?.dataset?.mhScrollLocked !== "true") return;
+
+        const scrollY = Number(body.dataset.mhScrollY || "0");
+
+        body.dataset.mhScrollLocked = "false";
+
+        body.style.overflow = "";
+        docEl.style.overflow = "";
+
+        body.style.position = "";
+        body.style.top = "";
+        body.style.left = "";
+        body.style.right = "";
+        body.style.width = "";
+
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
+
+      const preventScroll = (e) => {
+        // wheel / trackpad
+        e.preventDefault();
+      };
+
+      const preventTouch = (e) => {
+        // touch drag
+        if (e.cancelable) e.preventDefault();
+      };
+
+      const preventKeys = (e) => {
+        const keysToBlock = [
+          "ArrowDown",
+          "ArrowUp",
+          "ArrowLeft",
+          "ArrowRight",
+          "PageDown",
+          "PageUp",
+          "Home",
+          "End",
+          " ", // Space
+          "Spacebar",
+        ];
+
+        if (keysToBlock.includes(e.key)) {
+          e.preventDefault();
+        }
+      };
+
       // Initial visual state
       gsap.set(bgRef.current, { scale: 1.18, autoAlpha: 0.7, filter: "blur(8px)" });
       gsap.set(welcomeRef.current, { yPercent: 105, autoAlpha: 0 });
@@ -40,19 +122,31 @@ export default function HeroBanner({ data }) {
       });
 
       // Lock scroll while loader plays
-      if (typeof document !== "undefined") {
-        document.body.style.overflow = "hidden";
+      lockScroll();
+
+      if (typeof window !== "undefined") {
+        // Passive must be false so preventDefault works
+        window.addEventListener("wheel", preventScroll, { passive: false });
+        window.addEventListener("touchmove", preventTouch, { passive: false });
+        window.addEventListener("keydown", preventKeys);
       }
+
       window.dispatchEvent(new CustomEvent("mh:loader-start"));
 
       const tl = gsap.timeline({
         defaults: { ease: "expo.out" },
         onComplete: () => {
-          if (typeof document !== "undefined") {
-            document.body.style.overflow = "";
+          // Remove scroll lock only after the final frame is revealed
+          if (typeof window !== "undefined") {
+            window.removeEventListener("wheel", preventScroll);
+            window.removeEventListener("touchmove", preventTouch);
+            window.removeEventListener("keydown", preventKeys);
           }
+          unlockScroll();
         },
       });
+
+
 
       // Phase 1 — "Welcome HOME" rises into its mask + fades in
       tl.to(
@@ -162,10 +256,15 @@ export default function HeroBanner({ data }) {
       });
 
       return () => {
-        if (typeof document !== "undefined") {
-          document.body.style.overflow = "";
+        // Always clean up in case the component unmounts mid-animation
+        if (typeof window !== "undefined") {
+          window.removeEventListener("wheel", preventScroll);
+          window.removeEventListener("touchmove", preventTouch);
+          window.removeEventListener("keydown", preventKeys);
         }
+        unlockScroll();
       };
+
     },
     { scope: rootRef }
   );

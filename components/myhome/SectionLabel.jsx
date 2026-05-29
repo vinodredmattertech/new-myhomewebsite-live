@@ -7,16 +7,17 @@ import React from "react";
 export default function SectionLabel({ children, color = "#ef493d", className = "" }) {
   return (
     <div
-      className={`hidden lg:flex flex-col items-center gap-[21px] shrink-0 select-none ${className}`}
+      className={`flex flex-col items-center gap-[21px] shrink-0 select-none ${className}`}
+
       style={{ color }}
       aria-hidden="true"
     >
       <span
-        className="block w-px h-[60px]"
+        className="block w-px h-[31px] lg:h-[3.125vw]"
         style={{ background: "currentColor" }}
       />
       <span
-        className="font-montserrat font-medium text-[20px] xl:text-[22px] 2xl:text-[24px] tracking-wide whitespace-nowrap capitalize"
+        className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
         style={{
           writingMode: "vertical-rl",
           transform: "rotate(180deg)",

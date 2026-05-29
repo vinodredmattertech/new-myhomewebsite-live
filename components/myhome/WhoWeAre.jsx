@@ -141,7 +141,7 @@ export default function WhoWeAre({ data }) {
     <section
       ref={rootRef}
       id="who-we-are"
-      className="relative w-full bg-white lg:bg-white overflow-hidden h-[100svh] min-h-[720px] sm:h-[100vh] lg:min-h-[1024px]"
+      className="relative w-full bg-white lg:bg-white overflow-hidden h-[100svh] min-h-[720px] sm:h-full lg:min-h-[1024px]"
     >
       {/* ===== Layer 1: hand-drawn sketch — DESKTOP ONLY ===== */}
       <div
@@ -176,7 +176,7 @@ export default function WhoWeAre({ data }) {
             fill
             unoptimized
             sizes="100vw"
-            className="object-cover object-bottom lg:object-center select-none"
+            className="object-fill object-bottom lg:object-center select-none"
           />
         )}
         {/* Desktop dim gradient for white text readability after reveal */}
@@ -214,11 +214,11 @@ export default function WhoWeAre({ data }) {
           Mobile  — top-anchored, right-aligned heading, full-width body, button below.
           Desktop — right-anchored column at top 6.25vw, right-aligned content. */}
       <div className="absolute inset-x-0 top-[56px] sm:top-[64px] lg:top-[6.25vw] px-5 md:px-12 lg:px-0 lg:left-auto lg:right-[10.4vw] xl:right-[10.4vw] w-full lg:w-[28.33vw] z-[5]">
-        <div className="flex flex-col items-end lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
+        <div className="max-sm:ml-[20px] flex flex-col items-end max-sm:items-left lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
           {/* Heading */}
           <h2
             ref={headingRef}
-            className="Tartuffo_Trial_Regular capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-right will-change-transform text-white lg:text-[#333333]"
+            className="w-full Tartuffo_Trial_Regular capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform text-white lg:text-[#333333]"
             style={{
               fontFamily:
                 '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
@@ -230,7 +230,7 @@ export default function WhoWeAre({ data }) {
           {/* Body */}
           <p
             ref={paraRef}
-            className="font-montserrat font-normal text-[14px] md:text-[15px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw] text-justify w-full max-w-[318px] sm:max-w-[420px] md:max-w-[544px] lg:w-[28.33vw] lg:max-w-none text-white lg:text-[#6d6d6d]"
+            className="font-montserrat font-normal text-[14px] md:text-[15px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw] text-justify w-full max-w-[318px]  md:max-w-[544px] lg:w-[28.33vw] lg:max-w-none text-white lg:text-[#6d6d6d]"
             style={{
               fontFamily: "Montserrat, sans-serif",
             }}

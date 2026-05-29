@@ -7,6 +7,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import useFancybox from "@/components/common/useFancybox";
+
+
 
 const DEFAULT_METRICS = [
   {
@@ -154,26 +157,37 @@ export default function ProjectProgress({
     { scope: rootRef }
   );
 
+    const [fancyboxRoot] = useFancybox();
+  const attachFancy = (el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  };
+
   return (
     <section
-      ref={rootRef}
+      ref={(el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  }}
       className="relative w-full bg-white pt-[80px] pb-[80px] lg:pt-[4.688vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-progress"
     >
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[4.167vw] top-[4.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="flex absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
         aria-hidden="true"
       >
-        <span className="block h-[3.125vw] w-px bg-[#ef493d]" />
-        <span className="flex items-center justify-center h-[13.229vw] w-[1.51vw]">
-          <span
-            className="-rotate-90 whitespace-nowrap capitalize text-[#ef493d] text-[1.25vw]"
-            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-          >
-            {sidebarLabel}
-          </span>
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-[#ef493d]" />
+        <span
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[#ef493d] text-[12px] md:text-[14px] lg:text-[1.25vw]"
+          style={{
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            fontFamily: "Montserrat, sans-serif",
+          }}
+        >
+          {sidebarLabel}
         </span>
       </div>
 
@@ -266,13 +280,20 @@ export default function ProjectProgress({
               {images.map((img, idx) => (
                 <SwiperSlide key={`${img.src}-${idx}`} className="!h-auto">
                   <div className="relative w-full aspect-[657/639] lg:aspect-auto lg:h-[33.281vw] rounded-[12px] overflow-hidden bg-[#eee]">
-                    <Image
-                      src={img.src}
-                      alt={img.alt || ""}
-                      fill
-                      sizes="(min-width:1024px) 40vw, 100vw"
-                      className="object-cover object-center select-none"
-                    />
+                   <a
+  href={img.src}
+  data-fancybox="progress-gallery"
+  data-caption={img.alt || ""}
+  className="block w-full h-full"
+>
+  <Image
+    src={img.src}
+    alt={img.alt || ""}
+    fill
+    sizes="(min-width:1024px) 40vw, 100vw"
+    className="object-cover object-center select-none"
+  />
+</a>
                   </div>
                 </SwiperSlide>
               ))}

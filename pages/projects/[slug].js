@@ -11,6 +11,7 @@ import ProjectBrochure from "@/components/myhome/projects/ProjectBrochure";
 import ProjectTestimonials from "@/components/myhome/projects/ProjectTestimonials";
 import ProjectInquiry from "@/components/myhome/projects/ProjectInquiry";
 import ProjectConnectivity from "@/components/myhome/projects/ProjectConnectivity";
+import ProjectFloatingActions from "@/components/myhome/projects/ProjectFloatingActions";
 import { getProjectBySlug, mediaUrl, STRAPI_URL } from "@/lib/strapi";
 
 /** Split a newline-separated text field into a trimmed string array. */
@@ -159,6 +160,14 @@ export default function ProjectDetailPage({ project }) {
         description={ov.description}
         stats={overviewStats.length ? overviewStats : undefined}
       />
+        <ProjectConnectivity
+        sidebarLabel={co.sidebarLabel}
+        heading={co.heading}
+        categories={connectivityCategories.length ? connectivityCategories : undefined}
+        mapEmbedUrl={co.mapEmbedUrl}
+        mapSrc={mediaUrl(co.mapImage)}
+        mapAlt={co.mapAlt}
+      />
       <ProjectAmenities
         sidebarLabel={am.sidebarLabel}
         heading={am.heading}
@@ -191,14 +200,7 @@ export default function ProjectDetailPage({ project }) {
         metrics={progressMetrics.length ? progressMetrics : undefined}
         images={progressImages.length ? progressImages : undefined}
       />
-      <ProjectConnectivity
-        sidebarLabel={co.sidebarLabel}
-        heading={co.heading}
-        categories={connectivityCategories.length ? connectivityCategories : undefined}
-        mapEmbedUrl={co.mapEmbedUrl}
-        mapSrc={mediaUrl(co.mapImage)}
-        mapAlt={co.mapAlt}
-      />
+    
       <ProjectBrochure
         sidebarLabel={br.sidebarLabel}
         heading={br.heading}
@@ -224,6 +226,10 @@ export default function ProjectDetailPage({ project }) {
         reraNumber={iq.reraNumber}
         reraUrl={iq.reraUrl}
         qrSrc={mediaUrl(iq.qrImage)}
+        projectName={project.title}
+      />
+      <ProjectFloatingActions
+        phone={project.phone || "+917996006262"}
         projectName={project.title}
       />
     </>

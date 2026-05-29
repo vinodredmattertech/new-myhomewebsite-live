@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import useFancybox from "@/components/common/useFancybox";
 
 const DEFAULT_AMENITIES = [
   {
@@ -89,31 +90,40 @@ export default function ProjectAmenities({
     },
     { scope: rootRef }
   );
-
+  const [fancyboxRoot] = useFancybox();
+  const attachFancy = (el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  };
   return (
     <section
-      ref={rootRef}
+      ref={(el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  }}
       className="relative w-full bg-white pt-[80px] pb-[80px] lg:pt-[4.688vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-amenities"
     >
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[4.167vw] top-[0.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="flex absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[0.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
         aria-hidden="true"
       >
-        <span className="block h-[3.125vw] w-px bg-[#ef493d]" />
-        <span className="flex items-center justify-center h-[13.594vw] w-[1.51vw]">
-          <span
-            className="-rotate-90 whitespace-nowrap capitalize text-[#ef493d] text-[1.25vw]"
-            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-          >
-            {sidebarLabel}
-          </span>
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-[#ef493d]" />
+        <span
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[#ef493d] text-[12px] md:text-[14px] lg:text-[1.25vw]"
+          style={{
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            fontFamily: "Montserrat, sans-serif",
+          }}
+        >
+          {sidebarLabel}
         </span>
       </div>
 
-      <div className="px-5 md:px-12 lg:px-[9.375vw]">
+      <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[35px]">
         <h2
           ref={headingRef}
           className="capitalize text-[#333] leading-[1.08] tracking-[0.022em] text-center
@@ -169,13 +179,20 @@ export default function ProjectAmenities({
                               transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
                               ${isActive ? "scale-100" : "scale-[0.9]"}`}
                 >
-                  <Image
-                    src={a.image}
-                    alt={a.title}
-                    fill
-                    sizes="(min-width:1024px) 42vw, (min-width:640px) 60vw, 90vw"
-                    className="object-cover object-center select-none"
-                  />
+                  <a
+  href={a.image}
+  data-fancybox="amenities-gallery"
+  data-caption={a.title}
+  className="block w-full h-full"
+>
+  <Image
+    src={a.image}
+    alt={a.title}
+    fill
+    sizes="(min-width:1024px) 42vw, (min-width:640px) 60vw, 90vw"
+    className="object-cover object-center select-none"
+  />
+</a>
                   <div
                     className={`absolute bottom-[16px] sm:bottom-[24px] lg:bottom-[1.979vw]
                                 left-[16px] sm:left-[24px] lg:left-[1.979vw]

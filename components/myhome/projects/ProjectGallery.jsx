@@ -140,21 +140,23 @@ export default function ProjectGallery({
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[4.167vw] top-[4.688vw] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="flex absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
         aria-hidden="true"
       >
-        <span className="block h-[3.125vw] w-px bg-white/70" />
-        <span className="flex items-center justify-center h-[10.677vw] w-[1.51vw]">
-          <span
-            className="-rotate-90 whitespace-nowrap capitalize text-white text-[1.25vw]"
-            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-          >
-            {sidebarLabel}
-          </span>
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-white/70" />
+        <span
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-white text-[12px] md:text-[14px] lg:text-[1.25vw]"
+          style={{
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            fontFamily: "Montserrat, sans-serif",
+          }}
+        >
+          {sidebarLabel}
         </span>
       </div>
 
-      <div className="px-5 md:px-12 lg:px-[9.375vw]">
+      <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[40px]">
         <h2
           ref={headingRef}
           className="capitalize text-white leading-[1.08] tracking-[0.022em] text-center

@@ -197,11 +197,11 @@ export default function MyHomeFooter() {
            Left col w:700 gap:30 — heading 70 Tartuffo + body 16/32
            Right col w:754 gap:30 — heading 70 + inputs + submit
          ============================================================ */}
-      <div
+      {/* <div
         className="grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] lg:gap-x-[7.604vw]
                    px-5 sm:px-8 lg:px-[8.333vw]"
       >
-        {/* Left column */}
+     
         <div className="flex flex-col gap-[20px] lg:gap-[1.563vw] capitalize">
           <h2
             ref={headingARef}
@@ -228,7 +228,7 @@ export default function MyHomeFooter() {
           </p>
         </div>
 
-        {/* Right column — Form */}
+        
         <div className="flex flex-col gap-[20px] lg:gap-[1.563vw]">
           <h2
             ref={headingBRef}
@@ -251,7 +251,7 @@ export default function MyHomeFooter() {
             noValidate
           >
             <div className="flex flex-col gap-[36.605px] lg:gap-[3.125vw]">
-              {/* Row 1: name + email */}
+             
               <div className="grid grid-cols-2 gap-[18px] sm:gap-[24px] lg:gap-[4.375vw]">
                 <FieldInput
                   placeholder={NAME_PLACEHOLDER}
@@ -278,7 +278,7 @@ export default function MyHomeFooter() {
                 />
               </div>
 
-              {/* Row 2: phone (full width) */}
+             
               <FieldInput
                 placeholder={PHONE_PLACEHOLDER}
                 type="tel"
@@ -294,9 +294,7 @@ export default function MyHomeFooter() {
               />
             </div>
 
-            {/* Submit button
-                Mobile (Figma 3189:5402): 165×51 outlined #ef493d, 18px Montserrat Medium white
-                Desktop (Figma 3189:5398): 224×58 — lg:w-[11.667vw] lg:h-[3.02vw] */}
+            
             <button
               type="submit"
               disabled={submitting}
@@ -325,13 +323,13 @@ export default function MyHomeFooter() {
             </button>
           </form>
         </div>
-      </div>
+      </div> */}
 
       {/* ============================================================
            BOTTOM — Logo + socials (left) | Address + Quick Links (right)
            Figma 3152:3578 / 3152:3592 / 3152:3633
          ============================================================ */}
-      <div className="mt-[60px] lg:mt-[7.812vw] grid grid-cols-1 lg:grid-cols-12 gap-y-[40px] gap-x-[40px] px-5 sm:px-8 lg:px-[8.854vw]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-[40px] gap-x-[40px] px-5 sm:px-8 lg:px-[8.854vw]">
         {/* Logo + socials */}
         <div className="lg:col-span-4 flex flex-col gap-[28px] lg:gap-[2.343vw]">
           {/* Logo (Figma 3152:3579) — 276.743 × 146.039 = 14.413vw × 7.606vw */}
@@ -455,7 +453,7 @@ export default function MyHomeFooter() {
            Footer bar — divider + copyright row (Figma 3152:3657)
            top:1103.35 — w:1640 divider centered, h:64 content gap:40
          ============================================================ */}
-      <div className="mt-[60px] lg:mt-[6.25vw] px-5 sm:px-8 lg:px-[8.854vw]">
+      <div className="mt-[60px] lg:mt-[4.25vw] px-5 sm:px-8 lg:px-[8.854vw]">
         <div className="h-px w-full bg-white/15" />
         {/* Copyright row — Figma 3152:3969 + 3152:3970
             Mobile: copyright left, "Created by Realatte™" right, both 12 Montserrat

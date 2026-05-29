@@ -194,21 +194,23 @@ export default function ProjectFloorPlans({
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="hidden lg:flex absolute left-[1.167vw] top-[0] flex-col items-center gap-[1.094vw] w-[2.813vw]"
+        className="flex absolute left-[12px] top-0 lg:left-[1.167vw] lg:top-[0] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
         aria-hidden="true"
       >
-        <span className="block h-[2.125vw] w-px bg-[#ef493d]" />
-        <span className="flex items-center justify-center h-[13.917vw] w-[1.51vw]">
-          <span
-            className="-rotate-90 whitespace-nowrap capitalize text-[#ef493d] text-[1vw]"
-            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-          >
-            {sidebarLabel}
-          </span>
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[2.125vw] bg-[#ef493d]" />
+        <span
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[#ef493d] text-[12px] md:text-[14px] lg:text-[1vw]"
+          style={{
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            fontFamily: "Montserrat, sans-serif",
+          }}
+        >
+          {sidebarLabel}
         </span>
       </div>
 
-      <div className="px-5 md:px-12 lg:px-[9.375vw]">
+      <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[40px]">
         <h2
           ref={headingRef}
           className="capitalize text-[#333] leading-[1.08] tracking-[0.022em] text-center

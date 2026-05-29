@@ -120,13 +120,14 @@ export default function AboutVisionMission({ data }) {
     >
       {/* ===== Side label "Vission & mission" — Figma left:80 top:90 ===== */}
       <div
-        className="hidden lg:flex absolute z-[3] flex-col items-center gap-[1.094vw] text-white pointer-events-none"
+        className="absolute z-[5] flex flex-col items-center left-[12px] top-[24px] gap-[11px] w-[28px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-white pointer-events-none"
+
         style={{ left: "4.16vw", top: "8.33vh" }}
         aria-hidden="true"
       >
-        <span className="block w-px h-[5.55vh] bg-white" />
+        <span className="block w-px h-[31px] lg:h-[3.125vw] bg-white" />
         <span
-          className="font-montserrat font-medium capitalize text-[1.25vw] whitespace-nowrap"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
@@ -227,7 +228,7 @@ export default function AboutVisionMission({ data }) {
         <h2
           data-vm-heading="mission"
           className="absolute capitalize text-white leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
-          style={{ ...headingStyle, left: "101.46vw", top: "12.04vh" }}
+          style={{ ...headingStyle, left: "111.35vw", top: "12.04vh" }}
         >
           {data.missionHeading}
         </h2>
@@ -258,7 +259,7 @@ export default function AboutVisionMission({ data }) {
           <div key={p.title || `vm-${idx}`} className="flex flex-col gap-[20px] md:gap-[28px]">
             <h2
               data-vm-heading
-              className="capitalize text-white leading-[0.95] tracking-[0.02em]
+              className="max-sm:pl-[80px] capitalize text-white leading-[0.95] tracking-[0.02em]
                          text-[44px] sm:text-[56px] md:text-[72px]"
               style={headingStyle}
             >
@@ -266,7 +267,7 @@ export default function AboutVisionMission({ data }) {
             </h2>
             <p
               data-vm-body
-              className="font-montserrat font-normal text-white/85 text-justify
+              className="max-sm:pl-[80px] font-montserrat font-normal text-white/85 text-justify
                          text-[14px] sm:text-[15px] md:text-[16px]
                          leading-[24px] sm:leading-[26px] md:leading-[28px]"
               style={bodyStyle}

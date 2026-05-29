@@ -56,17 +56,18 @@ export default function AboutLeadership({ data }) {
             className="object-cover object-center select-none"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/15 to-black/55 lg:from-black/25 lg:via-transparent lg:to-black/70" />
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/15 to-black/55 lg:from-black/25 lg:via-transparent lg:to-black/70" /> */}
       </div>
 
       {/* Side label */}
       <div
-        className="hidden lg:flex absolute left-[4.16vw] top-[4.687vw] z-[2] flex-col items-center gap-[21px] text-white"
+        className="absolute z-[5] flex flex-col items-center left-[12px] top-[30px] w-[28px] gap-[11px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-white"
+
         aria-hidden="true"
       >
         <span className="block w-px h-[60px] bg-white" />
         <span
-          className="font-montserrat font-medium capitalize text-[1.25vw] whitespace-nowrap"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
@@ -80,7 +81,7 @@ export default function AboutLeadership({ data }) {
       {/* Right card */}
       <div className="relative z-[2] h-full min-h-[640px] lg:min-h-0 lg:h-[48.7vw]
                       flex items-center justify-center lg:justify-end
-                      px-5 md:px-10 lg:pr-[8.75vw] py-[60px] md:py-[80px] lg:py-0">
+                      px-5 md:px-10 lg:pr-[8.75vw] py-[60px] md:py-[80px] lg:py-0 max-sm:pl-[80px]">
         <div
           ref={cardRef}
           className="relative bg-white rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
@@ -104,7 +105,7 @@ export default function AboutLeadership({ data }) {
               style={{
                 fontFamily:
                   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                fontWeight: 400,
+                fontWeight: 300,
               }}
             >
               {data.name}

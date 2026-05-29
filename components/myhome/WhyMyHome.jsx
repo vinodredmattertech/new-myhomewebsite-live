@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade } from "swiper/modules";
+import { EffectFade, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import { mediaUrl } from "@/lib/strapi";
@@ -129,7 +129,7 @@ export default function WhyMyHome({ data }) {
   if (!data || !SLIDES.length) return null;
 
   // Decorative bottom-left bloom — managed in /public, not in the CMS.
-  const floralImage = "/assets/myhome/whymyhome-floral.png";
+  // const floralImage = "/assets/myhome/whymyhome-floral.png";
 
   return (
     <section
@@ -187,13 +187,13 @@ export default function WhyMyHome({ data }) {
           image) lands at the section's bottom-left corner. overflow-hidden
           clips the oversized image to the 179×338 window without cropping
           the bloom itself. */}
-      {floralImage && (
+      {/* {floralImage && (
         <div className="hidden lg:block absolute left-0 bottom-0 z-[2] pointer-events-none overflow-hidden w-[9.323vw] max-w-[200px] aspect-[179/338]">
           <div
             className="absolute inset-0"
             style={{ transform: "scaleY(-1)" }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+           
             <img
               src={floralImage}
               alt=""
@@ -202,7 +202,7 @@ export default function WhyMyHome({ data }) {
             />
           </div>
         </div>
-      )}
+      )} */}
 
       {/* ---------- Slide progress bar (vertical red-fill between text + image, desktop only) ---------- */}
       <div
@@ -217,12 +217,13 @@ export default function WhyMyHome({ data }) {
 
       {/* ---------- Right image + left text (Swiper, EffectFade) ---------- */}
       <Swiper
-        modules={[EffectFade]}
+        modules={[EffectFade, Autoplay]}
         effect="fade"
         fadeEffect={{ crossFade: true }}
         speed={900}
         allowTouchMove={false}
-        loop={false}
+        autoplay={{ delay: 2000, disableOnInteraction: false }}
+        loop={true}
         onSwiper={(s) => (swiperRef.current = s)}
         onSlideChange={(s) => {
           setActive(s.activeIndex);

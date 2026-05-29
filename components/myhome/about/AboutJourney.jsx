@@ -70,9 +70,10 @@ export default function AboutJourney({ data }) {
       className="relative w-full bg-white overflow-hidden
                  py-[60px] md:py-[80px] lg:pt-[4.166vw] lg:pb-[4.166vw]"
     >
-      <div className="absolute left-[4.16vw] top-[4.166vw] hidden lg:block">
+      <div className="absolute left-[4.16vw] top-[4.166vw]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
+
 
       <h2
         ref={headingRef}

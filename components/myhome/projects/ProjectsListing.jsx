@@ -192,7 +192,16 @@ const FALLBACK_PROJECTS = [
   },
 ];
 
-function FilterPanel({ title, children, className = "" }) {
+function FilterPanel({ title, children, className = "", collapsible = false }) {
+  // On mobile, collapsible panels start closed and toggle open on tap.
+  // On lg+ screens they are always expanded (toggling is disabled).
+  const [open, setOpen] = useState(false);
+
+  const headingFont = {
+    fontFamily:
+      '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+  };
+
   return (
     <div
       className={`relative border border-[#e7e7e7]
@@ -201,17 +210,47 @@ function FilterPanel({ title, children, className = "" }) {
                   pb-[20px] md:pb-[24px] lg:pb-[1.562vw]
                   ${className}`}
     >
+      {collapsible ? (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="flex lg:hidden w-full items-center justify-between text-left"
+        >
+          <h3
+            className="text-[#333] text-[16px] md:text-[17px] leading-[32px]"
+            style={headingFont}
+          >
+            {title}
+          </h3>
+          <ChevronDown
+            className={`w-[16px] h-[16px] text-[#333] shrink-0 transition-transform duration-300 ${
+              open ? "rotate-180" : ""
+            }`}
+            strokeWidth={1.6}
+          />
+        </button>
+      ) : null}
+
+      {/* Desktop heading (always shown) — hidden on mobile when collapsible */}
       <h3
-        className="text-[#333] text-[16px] md:text-[17px] lg:text-[0.938vw]
-                   leading-[32px] mb-[10px] lg:mb-[0.625vw]"
-        style={{
-          fontFamily:
-            '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-        }}
+        className={`text-[#333] text-[16px] md:text-[17px] lg:text-[0.938vw]
+                   leading-[32px] mb-[10px] lg:mb-[0.625vw]
+                   ${collapsible ? "hidden lg:block" : ""}`}
+        style={headingFont}
       >
         {title}
       </h3>
-      {children}
+
+      <div
+        className={
+          collapsible
+            ? `${open ? "block mt-[10px]" : "hidden"} lg:block lg:mt-0`
+            : ""
+        }
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -597,7 +636,8 @@ export default function ProjectsListing({ projects = [], heading }) {
                      mx-auto max-w-[1149px] lg:max-w-[59.84vw]
                      border-[0.5px] border-[#e7e7e7]
                      px-[12px] lg:px-[0.781vw] py-[8px] lg:py-[0.417vw]
-                     flex flex-wrap lg:flex-nowrap items-center gap-[8px] lg:gap-[0.521vw] whitespace-nowrap"
+                     grid grid-cols-2 lg:flex lg:flex-nowrap items-stretch lg:items-center
+                     gap-[8px] lg:gap-[0.521vw] whitespace-nowrap"
         >
           {STATUSES.map(({ key, label, Icon }) => {
             const isActive = status === key;
@@ -606,7 +646,8 @@ export default function ProjectsListing({ projects = [], heading }) {
                 key={key}
                 type="button"
                 onClick={() => onStatusChange(key)}
-                className={`inline-flex items-center gap-[10px] lg:gap-[0.625vw]
+                className={`inline-flex items-center justify-center lg:justify-start
+                            gap-[10px] lg:gap-[0.625vw]
                             font-montserrat font-normal capitalize
                             transition-all duration-300
                             px-[16px] py-[10px] md:px-[20px] md:py-[14px]
@@ -630,11 +671,12 @@ export default function ProjectsListing({ projects = [], heading }) {
             );
           })}
 
-          <div ref={locationDropdownRef} className="relative">
+          <div ref={locationDropdownRef} className="relative w-full lg:w-auto">
             <button
               type="button"
               onClick={() => setLocationMenuOpen((v) => !v)}
-              className={`inline-flex items-center gap-[12px] lg:gap-[0.625vw]
+              className={`inline-flex w-full lg:w-auto items-center justify-center lg:justify-start
+                         gap-[12px] lg:gap-[0.625vw]
                          font-montserrat font-normal capitalize
                          px-[16px] py-[10px] md:px-[20px] md:py-[14px]
                          lg:px-[1.302vw] lg:py-[0.781vw]
@@ -694,7 +736,8 @@ export default function ProjectsListing({ projects = [], heading }) {
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-[12px] lg:gap-[0.625vw]
+            className="inline-flex items-center justify-center lg:justify-start
+                       gap-[12px] lg:gap-[0.625vw]
                        font-montserrat font-normal capitalize
                        px-[16px] py-[10px] md:px-[20px] md:py-[14px]
                        lg:px-[1.302vw] lg:py-[0.781vw]
@@ -713,7 +756,7 @@ export default function ProjectsListing({ projects = [], heading }) {
                      grid grid-cols-1 lg:grid-cols-[23.7vw_1fr] gap-x-[2.083vw] gap-y-[30px]"
         >
           {/* === Sidebar === */}
-          <aside className="hidden lg:flex flex-col gap-[20px] lg:gap-[1.094vw]">
+          <aside className="flex flex-col gap-[20px] lg:gap-[1.094vw]">
             {/* Sort */}
             <div className="relative border border-[#e7e7e7] h-[55px] lg:h-[2.864vw] flex items-center px-[24px] lg:px-[1.562vw]">
               <span
@@ -763,7 +806,7 @@ export default function ProjectsListing({ projects = [], heading }) {
               )}
             </div>
 
-            <FilterPanel title="LOCATION:">
+            <FilterPanel title="LOCATION:" collapsible>
               <div className="flex flex-col">
                 {LOCATIONS.map((loc) => (
                   <CheckRow
@@ -776,7 +819,7 @@ export default function ProjectsListing({ projects = [], heading }) {
               </div>
             </FilterPanel>
 
-            <FilterPanel title="Configuration:">
+            <FilterPanel title="Configuration:" collapsible>
               <div className="flex flex-col">
                 {CONFIGURATIONS.map((cfg) => (
                   <CheckRow
