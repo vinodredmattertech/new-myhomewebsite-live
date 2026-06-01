@@ -28,6 +28,7 @@ const CARD_LAYOUT = [
 ];
 
 export default function WorldsWeShape({ data }) {
+  console.log("feature data", data)
   // Source is the `verticals` relation (collection type) — flatten the
   // v4 envelope and map to the shape the rest of the section expects.
   const rawVerticals = relationList(data?.verticals);
@@ -157,7 +158,7 @@ export default function WorldsWeShape({ data }) {
       ref={rootRef}
       id="verticals"
       data-section="verticals"
-      className="relative w-full bg-[#2a2828] text-white overflow-hidden
+      className="relative w-full bg-[#fff] text-[#333] overflow-hidden
                  min-h-[960px]
                  lg:h-[56.25vw] lg:min-h-[700px] lg:max-h-[1080px]"
     >
@@ -168,7 +169,7 @@ export default function WorldsWeShape({ data }) {
         className="absolute z-[5] flex flex-col items-center
                    left-[12px] top-[24px] gap-[11px] w-[28px]
                    lg:left-[4.166vw] lg:top-[3.125vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
-        style={{ color: "#ffffff" }}
+        style={{ color: "#333" }}
       >
         <span
           className="block w-px h-[31px] lg:h-[3.125vw]"
@@ -191,7 +192,7 @@ export default function WorldsWeShape({ data }) {
           Desktop (Figma 3152:3441) — top:[3.125vw] centered, w:[40.833vw], text:[5vw] */}
       <h2
         ref={headingRef}
-        className="absolute z-[5] capitalize text-white will-change-transform
+        className="absolute z-[5] capitalize text-[#333] will-change-transform
                    left-[max(52px,calc(50%-180px))] top-[56px] w-[337px] max-w-[calc(100vw-64px)]
                    text-[35px] tracking-[2px] leading-[1.2]
                    lg:left-[calc(50%-18.437vw)] lg:translate-x-[-50%] lg:top-[3.125vw]
@@ -209,7 +210,7 @@ export default function WorldsWeShape({ data }) {
           Desktop — under heading at calc(50% - 18.437vw), w:[36.979vw], text:[0.938vw]/leading:[1.563vw] */}
       <p
         ref={introBodyRef}
-        className="absolute z-[5] font-montserrat font-normal text-white text-justify
+        className="absolute z-[5] font-montserrat font-normal text-[#333] text-justify
                    left-[max(52px,calc(50%-180px))] top-[123px] w-[365px] max-w-[calc(100vw-64px)]
                    text-[14px] leading-[24px]
                    lg:left-[calc(50%-18.437vw)] lg:translate-x-[-50%] lg:top-[10.687vw]
@@ -374,7 +375,7 @@ export default function WorldsWeShape({ data }) {
         </span>
         <h3
           ref={titleRef}
-          className="capitalize text-white
+          className="capitalize text-[#333]
                      text-[26px] tracking-[0.52px] leading-[36px]
                      lg:text-[3.125vw] lg:tracking-[0.02em] lg:leading-[4.167vw]
                      "
@@ -387,7 +388,7 @@ export default function WorldsWeShape({ data }) {
         </h3>
         <p
           ref={descRef}
-          className="font-montserrat font-normal text-white text-justify
+          className="font-montserrat font-normal text-[#333] text-justify
                      text-[14px] leading-[24px]
                      lg:capitalize lg:text-[0.938vw] lg:leading-[1.667vw]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
@@ -403,13 +404,13 @@ export default function WorldsWeShape({ data }) {
         className="absolute z-[5]
                    left-1/2 -translate-x-1/2 top-[872px]
                    flex items-center gap-[13px]
-                   lg:left-[66.614vw] lg:translate-x-0 lg:top-[46.93vw] lg:gap-[1.042vw]"
+                   lg:left-[66.614vw] lg:translate-x-0 lg:top-[46.93vw] lg:gap-[1.042vw] max-sm:mt-[25px]"
       >
         <button
           type="button"
           aria-label="Previous slide"
           onClick={() => navigate(-1)}
-          className="group inline-flex items-center justify-center rounded-full border border-white/35 text-white
+          className="group inline-flex items-center justify-center rounded-full border border-[#333]/35 text-[#333]
                      w-[46px] h-[46px] lg:w-[3.646vw] lg:h-[3.646vw]
                      transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
                      hover:bg-[#ef493d] hover:border-[#ef493d]"
@@ -425,7 +426,7 @@ export default function WorldsWeShape({ data }) {
           type="button"
           aria-label="Next slide"
           onClick={() => navigate(1)}
-          className="group inline-flex items-center justify-center rounded-full border border-white/35 text-white
+          className="group inline-flex items-center justify-center rounded-full border border-[#333]/35 text-[#333]
                      w-[46px] h-[46px] lg:w-[3.646vw] lg:h-[3.646vw]
                      transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
                      hover:bg-[#ef493d] hover:border-[#ef493d]"
