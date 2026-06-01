@@ -37,6 +37,7 @@ export default function AboutLeadership({ data }) {
   if (!data) return null;
 
   const portrait = mediaUrl(data.portraitImage);
+  const leaderImg = mediaUrl(data.LeaderImg);
 
   return (
     <section
@@ -78,13 +79,32 @@ export default function AboutLeadership({ data }) {
         </span>
       </div>
 
-      {/* Right card */}
+      {/* Content: LeaderImg (left on desktop / bottom on mobile) + card (right on desktop / top on mobile) */}
       <div className="relative z-[2] h-full min-h-[640px] lg:min-h-0 lg:h-[48.7vw]
-                      flex items-center justify-center lg:justify-end
-                      px-5 md:px-10 lg:pr-[8.75vw] py-[60px] md:py-[80px] lg:py-0 max-sm:pl-[80px]">
+                      flex flex-col lg:flex-row items-center lg:justify-between
+                      gap-10 md:gap-12 lg:gap-[3vw]
+                      px-5 md:px-10 lg:px-[8.75vw] py-[60px] md:py-[80px] lg:py-0 max-sm:pl-[80px]">
+        {/* LeaderImg */}
+        {leaderImg && (
+          <div className="order-2 lg:order-1 relative shrink-0
+                          w-full max-w-[420px] sm:max-w-[480px] lg:w-[26vw] lg:max-w-none
+                          aspect-[4/5] lg:aspect-auto lg:h-[34vw]
+                          rounded-[10px] lg:rounded-[0.625vw] overflow-hidden">
+            <Image
+              src={leaderImg}
+              alt={`${data.name || "Chairman"} — ${data.role || "Chairman, My Home Group"}`}
+              fill
+              unoptimized
+              sizes="(max-width: 1024px) 90vw, 26vw"
+              className="object-cover object-center select-none"
+            />
+          </div>
+        )}
+
+        {/* Card */}
         <div
           ref={cardRef}
-          className="relative bg-white rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
+          className="order-1 lg:order-2 relative bg-white rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
                      w-full max-w-[640px] lg:w-[41.66vw] lg:max-w-none
                      px-5 sm:px-8 md:px-12 lg:px-[3.333vw]
                      pt-[40px] md:pt-[56px] lg:pt-[4.687vw]
