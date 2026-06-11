@@ -106,7 +106,6 @@ export default function ProjectAmenities({
       className="relative w-full bg-white pt-[80px] pb-[80px] lg:pt-[4.688vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-amenities"
     >
-      rumman
       {/* Sidebar */}
       <div
         ref={sidebarRef}
