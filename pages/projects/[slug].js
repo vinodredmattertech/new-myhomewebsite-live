@@ -24,6 +24,8 @@ function lines(text) {
 }
 
 export default function ProjectDetailPage({ project }) {
+  console.log(project, "jjj");
+
   if (!project) {
     return (
       <section className="min-h-[60vh] flex items-center justify-center px-5 text-center">
@@ -54,7 +56,10 @@ export default function ProjectDetailPage({ project }) {
   const bannerLogo = mediaUrl(db.logo);
 
   const ov = project.overview || {};
-  const overviewStats = (ov.stats || []).map((s) => ({ value: s.value, label: s.label }));
+  const overviewStats = (ov.stats || []).map((s) => ({
+    value: s.value,
+    label: s.label,
+  }));
 
   const am = project.amenities || {};
   const amenities = (am.items || []).map((it) => ({
@@ -97,7 +102,7 @@ export default function ProjectDetailPage({ project }) {
       });
       return { key: t.key, label: t.label, kind: "videos", items: videos };
     }
-    const items = ((t.items?.data) || []).map((m) => ({
+    const items = (t.items?.data || []).map((m) => ({
       image: mediaUrl({ data: m }),
       alt: m.attributes?.alternativeText || "",
     }));
@@ -118,7 +123,7 @@ export default function ProjectDetailPage({ project }) {
     sublabel: m.sublabel,
     value: typeof m.value === "number" ? m.value : Number(m.value) || 0,
   }));
-  const progressImages = ((pr.images?.data) || []).map((m) => ({
+  const progressImages = (pr.images?.data || []).map((m) => ({
     src: mediaUrl({ data: m }),
     alt: m.attributes?.alternativeText || project.title,
   }));
@@ -145,89 +150,126 @@ export default function ProjectDetailPage({ project }) {
   return (
     <>
       <Seo seo={project.seo} />
-      <ProjectDetailBanner
-        imageSrc={bannerImg}
-        imageAlt={db.imageAlt || project.title}
-        title={project.title}
-        location={project.location || project.subTitle}
-        logoSrc={bannerLogo}
-      />
-      <ProjectOverview
-        imageSrc={mediaUrl(ov.image)}
-        imageAlt={`${project.title} overview`}
-        sidebarLabel={ov.sidebarLabel}
-        heading={ov.heading}
-        description={ov.description}
-        stats={overviewStats.length ? overviewStats : undefined}
-      />
+
+      {(project.detailBanner || project.image) && (
+        <ProjectDetailBanner
+          imageSrc={bannerImg}
+          imageAlt={db.imageAlt || project.title}
+          title={project.title}
+          location={project.location || project.subTitle}
+          logoSrc={bannerLogo}
+        />
+      )}
+
+      {project.overview && (
+        <ProjectOverview
+          imageSrc={mediaUrl(ov?.image)}
+          imageAlt={`${project.title} overview`}
+          sidebarLabel={ov.sidebarLabel}
+          heading={ov.heading}
+          description={ov.description}
+          stats={overviewStats.length ? overviewStats : undefined}
+        />
+      )}
+
+      {project.connectivity && (
         <ProjectConnectivity
-        sidebarLabel={co.sidebarLabel}
-        heading={co.heading}
-        categories={connectivityCategories.length ? connectivityCategories : undefined}
-        mapEmbedUrl={co.mapEmbedUrl}
-        mapSrc={mediaUrl(co.mapImage)}
-        mapAlt={co.mapAlt}
-      />
-      <ProjectAmenities
-        sidebarLabel={am.sidebarLabel}
-        heading={am.heading}
-        description={am.description}
-        amenities={amenities.length ? amenities : undefined}
-      />
-      <ProjectFloorPlans
-        sidebarLabel={fp.sidebarLabel}
-        heading={fp.heading}
-        description={fp.description}
-        tabs={floorPlanTabs.length ? floorPlanTabs : undefined}
-        projectName={project.title}
-      />
-      <ProjectGallery
-        sidebarLabel={ga.sidebarLabel}
-        heading={ga.heading}
-        description={ga.description}
-        tabs={galleryTabs.length ? galleryTabs : undefined}
-      />
-      <ProjectSpecifications
-        sidebarLabel={sp.sidebarLabel}
-        heading={sp.heading}
-        description={sp.description}
-        specs={specs.length ? specs : undefined}
-      />
-      <ProjectProgress
-        sidebarLabel={pr.sidebarLabel}
-        heading={pr.heading}
-        description={pr.description}
-        metrics={progressMetrics.length ? progressMetrics : undefined}
-        images={progressImages.length ? progressImages : undefined}
-      />
-    
-      <ProjectBrochure
-        sidebarLabel={br.sidebarLabel}
-        heading={br.heading}
-        highlights={lines(br.highlights).length ? lines(br.highlights) : undefined}
-        imageSrc={mediaUrl(br.image)}
-        imageAlt={br.imageAlt}
-        brochureHref={brochureFileUrl}
-        buttonLabel={br.buttonLabel}
-        projectName={project.title}
-      />
-      <ProjectTestimonials
-        sidebarLabel={tm.sidebarLabel}
-        heading={tm.heading}
-        description={tm.description}
-        testimonials={testimonials.length ? testimonials : undefined}
-      />
-      <ProjectInquiry
-        sidebarLabel={iq.sidebarLabel}
-        heading={iq.heading || `Secure Your Future At ${project.title}`}
-        description={iq.description}
-        address={iq.address}
-        disclaimer={iq.disclaimer}
-        reraNumber={iq.reraNumber}
-        reraUrl={iq.reraUrl}
-        qrSrc={mediaUrl(iq.qrImage)}
-        projectName={project.title}
-      />
+          sidebarLabel={co.sidebarLabel}
+          heading={co.heading}
+          categories={
+            connectivityCategories.length ? connectivityCategories : undefined
+          }
+          mapEmbedUrl={co.mapEmbedUrl}
+          mapSrc={mediaUrl(co?.mapImage)}
+          mapAlt={co.mapAlt}
+        />
+      )}
+
+      {/* {project.amenities && (
+        <ProjectAmenities
+          sidebarLabel={am.sidebarLabel}
+          heading={am.heading}
+          description={am.description}
+          amenities={amenities.length ? amenities : undefined}
+        />
+      )} */}
+      {project.amenities && <ProjectAmenities data={project?.amenities} />}
+      {project.floorPlans && (
+        <ProjectFloorPlans
+          sidebarLabel={fp.sidebarLabel}
+          heading={fp.heading}
+          description={fp.description}
+          tabs={floorPlanTabs.length ? floorPlanTabs : undefined}
+          projectName={project.title}
+        />
+      )}
+
+      {project.gallery && (
+        <ProjectGallery
+          sidebarLabel={ga.sidebarLabel}
+          heading={ga.heading}
+          description={ga.description}
+          tabs={galleryTabs.length ? galleryTabs : undefined}
+        />
+      )}
+
+      {project.specifications && (
+        <ProjectSpecifications
+          sidebarLabel={sp.sidebarLabel}
+          heading={sp.heading}
+          description={sp.description}
+          specs={specs.length ? specs : undefined}
+        />
+      )}
+
+      {project.progress && (
+        <ProjectProgress
+          sidebarLabel={pr.sidebarLabel}
+          heading={pr.heading}
+          description={pr.description}
+          metrics={progressMetrics.length ? progressMetrics : undefined}
+          images={progressImages.length ? progressImages : undefined}
+        />
+      )}
+
+      {project.brochure && (
+        <ProjectBrochure
+          sidebarLabel={br.sidebarLabel}
+          heading={br.heading}
+          highlights={
+            lines(br.highlights).length ? lines(br.highlights) : undefined
+          }
+          imageSrc={mediaUrl(br?.image)}
+          imageAlt={br.imageAlt}
+          brochureHref={brochureFileUrl}
+          buttonLabel={br.buttonLabel}
+          projectName={project.title}
+        />
+      )}
+
+      {project.testimonials && (
+        <ProjectTestimonials
+          sidebarLabel={tm.sidebarLabel}
+          heading={tm.heading}
+          description={tm.description}
+          testimonials={testimonials.length ? testimonials : undefined}
+        />
+      )}
+
+      {project.inquiry && (
+        <ProjectInquiry
+          sidebarLabel={iq.sidebarLabel}
+          heading={iq.heading || `Secure Your Future At ${project.title}`}
+          description={iq.description}
+          address={iq.address}
+          disclaimer={iq.disclaimer}
+          reraNumber={iq.reraNumber}
+          reraUrl={iq.reraUrl}
+          qrSrc={mediaUrl(iq?.qrImage)}
+          projectName={project.title}
+        />
+      )}
+
       <ProjectFloatingActions
         phone={project.phone || "+917996006262"}
         projectName={project.title}
@@ -244,5 +286,7 @@ export async function getServerSideProps({ params, res }) {
     if (res) res.statusCode = 404;
     return { props: { project: null } };
   }
+
+  console.log(project, "leo");
   return { props: { project } };
 }

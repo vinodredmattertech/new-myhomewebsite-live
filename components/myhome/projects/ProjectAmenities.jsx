@@ -8,6 +8,7 @@ import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
+import { cleanImage } from "@/components/ImageHandle";
 
 const DEFAULT_AMENITIES = [
   {
@@ -41,6 +42,7 @@ export default function ProjectAmenities({
   heading = "Modern Living, Elevated",
   description = "To ensure a seamless experience for over 3,000 families, the amenities are divided into two distinct world-class clubhouses Cotta and Terra comprising over 100,000 sq. ft. of curated leisure space.",
   amenities = DEFAULT_AMENITIES,
+  data,
 }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -88,7 +90,7 @@ export default function ProjectAmenities({
         scrollTrigger: trigger,
       });
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
   const [fancyboxRoot] = useFancybox();
   const attachFancy = (el) => {
@@ -98,12 +100,13 @@ export default function ProjectAmenities({
   return (
     <section
       ref={(el) => {
-    rootRef.current = el;
-    fancyboxRoot(el);
-  }}
+        rootRef.current = el;
+        fancyboxRoot(el);
+      }}
       className="relative w-full bg-white pt-[80px] pb-[80px] lg:pt-[4.688vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-amenities"
     >
+      rumman
       {/* Sidebar */}
       <div
         ref={sidebarRef}
@@ -122,7 +125,6 @@ export default function ProjectAmenities({
           {sidebarLabel}
         </span>
       </div>
-
       <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[35px]">
         <h2
           ref={headingRef}
@@ -134,7 +136,7 @@ export default function ProjectAmenities({
             fontWeight: 300,
           }}
         >
-          {heading}
+          {data?.heading}
         </h2>
         <p
           ref={descRef}
@@ -145,10 +147,9 @@ export default function ProjectAmenities({
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
         >
-          {description}
+          {data?.description}
         </p>
       </div>
-
       <div ref={sliderRef} className="mt-[40px] lg:mt-[3.802vw] w-full">
         <Swiper
           modules={[Navigation, Keyboard, A11y]}
@@ -180,19 +181,19 @@ export default function ProjectAmenities({
                               ${isActive ? "scale-100" : "scale-[0.9]"}`}
                 >
                   <a
-  href={a.image}
-  data-fancybox="amenities-gallery"
-  data-caption={a.title}
-  className="block w-full h-full"
->
-  <Image
-    src={a.image}
-    alt={a.title}
-    fill
-    sizes="(min-width:1024px) 42vw, (min-width:640px) 60vw, 90vw"
-    className="object-cover object-center select-none"
-  />
-</a>
+                    href={a.image}
+                    data-fancybox="amenities-gallery"
+                    data-caption={a.title}
+                    className="block w-full h-full"
+                  >
+                    <Image
+                      src={cleanImage(a?.items?.image?.data?.attributes?.url)}
+                      alt={a?.items?.image?.data?.attributes?.alternativeText}
+                      fill
+                      sizes="(min-width:1024px) 42vw, (min-width:640px) 60vw, 90vw"
+                      className="object-cover object-center select-none"
+                    />
+                  </a>
                   <div
                     className={`absolute bottom-[16px] sm:bottom-[24px] lg:bottom-[1.979vw]
                                 left-[16px] sm:left-[24px] lg:left-[1.979vw]
@@ -209,7 +210,10 @@ export default function ProjectAmenities({
                     <span
                       className="capitalize text-[#333] whitespace-nowrap
                                  text-[13px] sm:text-[15px] lg:text-[0.911vw]"
-                      style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+                      style={{
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 400,
+                      }}
                     >
                       {a.title}
                     </span>
