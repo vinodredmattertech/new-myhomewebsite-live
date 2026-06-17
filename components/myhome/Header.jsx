@@ -10,11 +10,12 @@ const FALLBACK_NAV_ITEMS = [
   { label: "About Us", href: "/about-us" },
   { label: "Our Projects", href: "/projects" },
   { label: "Verticals", href: "#verticals" },
-  { label: "Testimonials", href: "#testimonials" },
+  { label: "Testimonials", href: "/testimonials" },
   { label: "Career", href: "#footer" },
   { label: "CSR", href: "#footer" },
   { label: "NRI", href: "/nri" },
-  { label: "Blogs", href: "#footer" },
+  { label: "Blogs", href: "/blogs" },
+  { label: "News & Media", href: "/news" },
 ];
 
 const FALLBACK_LOGO = "/assets/myhome/logo.svg";
