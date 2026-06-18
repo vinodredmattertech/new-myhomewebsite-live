@@ -72,7 +72,7 @@ export default function NriMindset({ data }) {
       data-section="nri-mindset"
     >
       {/* ---------- Side label (desktop) ---------- */}
-      <div className="absolute left-[4.17vw] top-[4.687vw] hidden lg:block z-[2]">
+      <div className="absolute left-[4.17vw] top-[4.687vw] block z-[2]">
         <SectionLabel color="#ffffff">{data.label}</SectionLabel>
       </div>
 
@@ -130,7 +130,7 @@ export default function NriMindset({ data }) {
       <div className="lg:hidden px-5 md:px-10 flex flex-col gap-[32px] md:gap-[40px]">
         <h2
           className="text-white capitalize tracking-[0.02em] leading-[1.15]
-                     text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px]"
+                     text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] max-sm:pl-[35px]"
           style={{
             fontFamily:
               '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',

@@ -171,7 +171,7 @@ export default function ContactForm({ data }) {
           {data.heading}
         </h2>
 
-        <div className="mt-[40px] md:mt-[56px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[10.208vw] items-center">
+        <div className="mt-[60px] md:mt-[56px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[10.208vw] items-center">
           {/* left: image */}
           <div className="relative w-full rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
                           aspect-[734/653] lg:aspect-auto lg:h-[34vw]">

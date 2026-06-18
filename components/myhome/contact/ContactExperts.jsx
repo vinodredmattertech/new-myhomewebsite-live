@@ -54,7 +54,7 @@ export default function ContactExperts({ data }) {
         {/* Large heading */}
         <h2
           ref={headingRef}
-          className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
+          className="text-[#333] text-center capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[34px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
           style={{
             fontFamily:
@@ -71,7 +71,7 @@ export default function ContactExperts({ data }) {
             {/* --- Direct Communication Channels --- */}
             <div className="flex flex-col gap-[18px] md:gap-[22px] lg:gap-[1.302vw]">
               <h3
-                className="text-[#333] leading-[1.2]
+                className="text-[#333] leading-[1.2] max-sm:text-center
                            text-[22px] sm:text-[26px] md:text-[30px] lg:text-[1.875vw]"
                 style={{
                   fontFamily:

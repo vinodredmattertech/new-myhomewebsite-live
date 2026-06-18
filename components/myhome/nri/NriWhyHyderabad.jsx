@@ -166,7 +166,7 @@ export default function NriWhyHyderabad({ data }) {
       data-section="nri-why-hyderabad"
     >
       {/* Side label */}
-      <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block z-[6]">
+      <div className="absolute left-[4.16vw] top-[4.687vw] block z-[6]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 

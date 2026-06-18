@@ -70,7 +70,7 @@ export default function NriTrustedName({ data }) {
                  py-[60px] md:py-[80px] lg:pt-[5.208vw] lg:pb-[5.208vw]"
       data-section="nri-trusted-name"
     >
-      <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block">
+      <div className="absolute left-[4.16vw] top-[4.687vw] block">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 

@@ -115,7 +115,7 @@ export default function NriFeaturedProjects({ data }) {
                  py-[60px] md:py-[80px] lg:pt-[4.687vw] lg:pb-[5.208vw]"
       data-section="nri-featured-projects"
     >
-      <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block">
+      <div className="absolute left-[4.16vw] top-[4.687vw] z-[10] block">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 
@@ -128,7 +128,7 @@ export default function NriFeaturedProjects({ data }) {
           <h2
             ref={headingRef}
             className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
-                       text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
+                       text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw] max-sm:pl-[35px]"
             style={{
               fontFamily:
                 '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
@@ -140,7 +140,7 @@ export default function NriFeaturedProjects({ data }) {
           <p
             ref={subRef}
             className="font-montserrat font-normal text-[#6d6d6d] text-justify
-                       mt-[20px] md:mt-[28px] lg:mt-[1.875vw]
+                       mt-[40px] md:mt-[28px] lg:mt-[1.875vw]
                        text-[14px] sm:text-[15px] md:text-[16px] lg:text-[0.938vw]
                        leading-[24px] sm:leading-[26px] md:leading-[28px] lg:leading-[1.563vw]
                        max-w-[520px] lg:max-w-[26.197vw]"

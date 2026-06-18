@@ -196,7 +196,7 @@ export default function AboutVisionMission({ data }) {
               alt=""
               fill
               unoptimized
-              className="object-contain"
+              className="object-contain !top-[-175px] !left-[30px]"
             />
           </div>
         </div>

@@ -19,12 +19,16 @@ import {
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
 
-const STATUSES = [
+// Top pill-bar: project type (single-select)
+const PROJECT_TYPES = [
   { key: "All", label: "All", Icon: Check },
   { key: "Residential", label: "Residential", Icon: Building },
   { key: "Commercial", label: "Commercial", Icon: Building2 },
   { key: "Completed", label: "Completed", Icon: Warehouse },
 ];
+
+// Sidebar: project status / phase (multi-select)
+const PROJECT_STATUSES = ["Ongoing", "Upcoming", "Completed"];
 
 const LOCATIONS = [
   "Ameerpet",
@@ -56,6 +60,26 @@ const SORT_OPTIONS = [
   "Price: High to Low",
   "Name: A — Z",
 ];
+
+// Derived project facets. The CMS exposes `status` (Residential / Commercial /
+// Residential & Commercial) and a free-text `badge`; the project *phase* is
+// mapped from those per the agreed product decision (no dedicated schema field).
+function projectType(p) {
+  if (p.status === "Commercial") return "Commercial";
+  return "Residential"; // default, incl. legacy "Completed" status rows
+}
+
+function projectStatus(p) {
+  if (p.status === "Completed" || p.badge === "Completed") return "Completed";
+  if ((p.badge || "").toLowerCase() === "upcoming") return "Upcoming";
+  return "Ongoing";
+}
+
+// Phase ordering for the listing: ongoing first, then upcoming, then completed.
+const PHASE_ORDER = { Ongoing: 0, Upcoming: 1, Completed: 2 };
+function phaseRank(p) {
+  return PHASE_ORDER[projectStatus(p)] ?? 0;
+}
 
 const PRICE_MIN = 1000000;
 const PRICE_MAX = 4000000;
@@ -169,7 +193,7 @@ const FALLBACK_PROJECTS = [
     acres: "8.60 Acres",
     image: "/assets/myhome/project-1.jpg",
     status: "Residential",
-    badge: null,
+    badge: "Upcoming",
     price: 1900000,
     year: 2026,
     href: "/projects/my-home-sayuk",
@@ -189,6 +213,21 @@ const FALLBACK_PROJECTS = [
     price: 2600000,
     year: 2025,
     href: "/projects/my-home-mangala",
+  },
+  {
+    title: "My Home Grava",
+    locationKey: "HITEC City",
+    location: "Kokapet, Hyderabad",
+    description:
+      "A mixed-use landmark pairing sky residences with Grade A retail and office floors in one address.",
+    bhks: ["3 BHK", "4 BHK"],
+    bhkLabel: "3 & 4 BHK + Offices",
+    acres: "14.30 Acres",
+    image: "/assets/myhome/nri/hyderabad-2.jpg",
+    badge: "Upcoming",
+    price: 3500000,
+    year: 2027,
+    href: "/projects/my-home-grava",
   },
 ];
 
@@ -286,6 +325,85 @@ function CheckRow({ checked, onChange, label }) {
       >
         {label}
       </span>
+    </button>
+  );
+}
+
+// Self-contained dropdown used in the top filter bar. Manages its own open
+// state and closes on outside click. `count` shows an active-selection badge.
+function FilterDropdown({ icon: Icon, label, count = 0, active = false, children }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative w-full lg:w-auto">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={`inline-flex w-full lg:w-auto items-center justify-center lg:justify-start
+                   gap-[12px] lg:gap-[0.625vw]
+                   font-montserrat font-normal capitalize
+                   px-[16px] py-[10px] md:px-[20px] md:py-[14px]
+                   lg:px-[1.302vw] lg:py-[0.781vw]
+                   text-[14px] sm:text-[16px] lg:text-[1.042vw]
+                   transition-colors duration-300
+                   ${active ? "text-[#ef493d]" : "text-[#454545] hover:text-[#ef493d]"}`}
+        style={{ fontFamily: "Montserrat, sans-serif" }}
+      >
+        {Icon && (
+          <Icon
+            className="w-[14px] h-[14px] lg:w-[0.833vw] lg:h-[0.833vw] shrink-0"
+            strokeWidth={1.4}
+          />
+        )}
+        {label}
+        {count > 0 && (
+          <span className="inline-flex items-center justify-center bg-[#ef493d] text-white rounded-full text-[11px] lg:text-[0.625vw] w-[18px] h-[18px] lg:w-[1.042vw] lg:h-[1.042vw]">
+            {count}
+          </span>
+        )}
+        <ChevronDown
+          className={`w-[12px] h-[12px] lg:w-[0.677vw] lg:h-[0.677vw] transition-transform duration-300 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {open && (
+        <div
+          className="absolute z-20 top-full left-0 mt-[6px] min-w-[200px] lg:min-w-[12vw]
+                     bg-white border border-[#e7e7e7] rounded-[6px] shadow-lg
+                     p-[10px] flex flex-col max-h-[320px] overflow-y-auto"
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DropdownOption({ label, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-left px-[12px] py-[6px] font-montserrat text-[14px]
+                  hover:bg-[#fef2f1] rounded-[4px] flex items-center justify-between ${
+                    selected ? "text-[#ef493d] font-medium" : "text-[#333]"
+                  }`}
+      style={{ fontFamily: "Montserrat, sans-serif" }}
+    >
+      {label}
+      {selected && <Check className="w-[12px] h-[12px] text-[#ef493d]" strokeWidth={3} />}
     </button>
   );
 }
@@ -437,15 +555,14 @@ export default function ProjectsListing({ projects = [], heading }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const gridRef = useRef(null);
-  const locationDropdownRef = useRef(null);
 
-  const [status, setStatus] = useState("All");
+  const [selectedType, setSelectedType] = useState("All");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedConfigs, setSelectedConfigs] = useState(["ALL"]);
   const [priceMax, setPriceMax] = useState(PRICE_MAX);
   const [sort, setSort] = useState(SORT_OPTIONS[0]);
   const [sortOpen, setSortOpen] = useState(false);
-  const [locationMenuOpen, setLocationMenuOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useGSAP(
@@ -463,27 +580,15 @@ export default function ProjectsListing({ projects = [], heading }) {
     { scope: rootRef }
   );
 
-  useEffect(() => {
-    if (!locationMenuOpen) return;
-    const onClickOutside = (e) => {
-      if (
-        locationDropdownRef.current &&
-        !locationDropdownRef.current.contains(e.target)
-      ) {
-        setLocationMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, [locationMenuOpen]);
-
   const filteredAll = useMemo(() => {
     let list = PROJECTS;
 
-    if (status === "Completed") {
-      list = list.filter((p) => p.badge === "Completed");
-    } else if (status !== "All") {
-      list = list.filter((p) => p.status === status);
+    if (selectedType !== "All") {
+      list = list.filter((p) => projectType(p) === selectedType);
+    }
+
+    if (selectedStatuses.length > 0) {
+      list = list.filter((p) => selectedStatuses.includes(projectStatus(p)));
     }
 
     if (selectedLocations.length > 0) {
@@ -517,12 +622,16 @@ export default function ProjectsListing({ projects = [], heading }) {
         break;
     }
 
+    // Always group by phase (ongoing → upcoming → completed); the chosen
+    // sort above acts as the tiebreaker within each group.
+    list = [...list].sort((a, b) => phaseRank(a) - phaseRank(b));
+
     return list;
-  }, [status, selectedLocations, selectedConfigs, priceMax, sort]);
+  }, [selectedType, selectedStatuses, selectedLocations, selectedConfigs, priceMax, sort]);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [status, selectedLocations, selectedConfigs, priceMax, sort]);
+  }, [selectedType, selectedStatuses, selectedLocations, selectedConfigs, priceMax, sort]);
 
   const visible = filteredAll.slice(0, visibleCount);
   const hasMore = visibleCount < filteredAll.length;
@@ -548,9 +657,17 @@ export default function ProjectsListing({ projects = [], heading }) {
     });
   };
 
-  const onStatusChange = (key) => {
-    if (key === status) return;
-    animateGrid(() => setStatus(key));
+  const onTypeChange = (key) => {
+    if (key === selectedType) return;
+    animateGrid(() => setSelectedType(key));
+  };
+
+  const toggleStatus = (st) => {
+    animateGrid(() =>
+      setSelectedStatuses((prev) =>
+        prev.includes(st) ? prev.filter((x) => x !== st) : [...prev, st]
+      )
+    );
   };
 
   const toggleLocation = (loc) => {
@@ -584,7 +701,8 @@ export default function ProjectsListing({ projects = [], heading }) {
 
   const handleReset = () => {
     animateGrid(() => {
-      setStatus("All");
+      setSelectedType("All");
+      setSelectedStatuses([]);
       setSelectedLocations([]);
       setSelectedConfigs(["ALL"]);
       setPriceMax(PRICE_MAX);
@@ -639,97 +757,72 @@ export default function ProjectsListing({ projects = [], heading }) {
                      grid grid-cols-2 lg:flex lg:flex-nowrap items-stretch lg:items-center
                      gap-[8px] lg:gap-[0.521vw] whitespace-nowrap"
         >
-          {STATUSES.map(({ key, label, Icon }) => {
-            const isActive = status === key;
-            return (
-              <button
+          {/* Project Type — single-select */}
+          <FilterDropdown
+            icon={Building}
+            label={selectedType !== "All" ? selectedType : "Project Type"}
+            active={selectedType !== "All"}
+          >
+            {PROJECT_TYPES.map(({ key, label }) => (
+              <DropdownOption
                 key={key}
-                type="button"
-                onClick={() => onStatusChange(key)}
-                className={`inline-flex items-center justify-center lg:justify-start
-                            gap-[10px] lg:gap-[0.625vw]
-                            font-montserrat font-normal capitalize
-                            transition-all duration-300
-                            px-[16px] py-[10px] md:px-[20px] md:py-[14px]
-                            lg:px-[1.302vw] lg:py-[0.781vw]
-                            text-[14px] sm:text-[16px] lg:text-[1.042vw]
-                            rounded-full
-                            ${
-                              isActive
-                                ? "bg-[#ef493d] text-white"
-                                : "bg-transparent text-[#454545] hover:text-[#ef493d]"
-                            }`}
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-                aria-pressed={isActive}
-              >
-                <Icon
-                  className="w-[16px] h-[16px] lg:w-[1.094vw] lg:h-[1.094vw]"
-                  strokeWidth={isActive ? 2.4 : 1.4}
-                />
-                {label}
-              </button>
-            );
-          })}
-
-          <div ref={locationDropdownRef} className="relative w-full lg:w-auto">
-            <button
-              type="button"
-              onClick={() => setLocationMenuOpen((v) => !v)}
-              className={`inline-flex w-full lg:w-auto items-center justify-center lg:justify-start
-                         gap-[12px] lg:gap-[0.625vw]
-                         font-montserrat font-normal capitalize
-                         px-[16px] py-[10px] md:px-[20px] md:py-[14px]
-                         lg:px-[1.302vw] lg:py-[0.781vw]
-                         text-[14px] sm:text-[16px] lg:text-[1.042vw]
-                         transition-colors duration-300
-                         ${
-                           selectedLocations.length > 0
-                             ? "text-[#ef493d]"
-                             : "text-[#454545] hover:text-[#ef493d]"
-                         }`}
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              <MapPin className="w-[14px] h-[14px] lg:w-[0.833vw] lg:h-[0.833vw]" strokeWidth={1.4} />
-              Location
-              {selectedLocations.length > 0 && (
-                <span className="inline-flex items-center justify-center bg-[#ef493d] text-white rounded-full text-[11px] lg:text-[0.625vw] w-[18px] h-[18px] lg:w-[1.042vw] lg:h-[1.042vw]">
-                  {selectedLocations.length}
-                </span>
-              )}
-              <ChevronDown
-                className={`w-[12px] h-[12px] lg:w-[0.677vw] lg:h-[0.677vw] transition-transform duration-300 ${
-                  locationMenuOpen ? "rotate-180" : ""
-                }`}
+                label={label}
+                selected={selectedType === key}
+                onClick={() => onTypeChange(key)}
               />
-            </button>
-            {locationMenuOpen && (
-              <div
-                className="absolute z-20 top-full left-0 mt-[6px] min-w-[200px] lg:min-w-[12vw]
-                           bg-white border border-[#e7e7e7] rounded-[6px] shadow-lg
-                           p-[10px] flex flex-col max-h-[320px] overflow-y-auto"
-              >
-                {LOCATIONS.map((loc) => (
-                  <button
-                    key={loc}
-                    type="button"
-                    onClick={() => toggleLocation(loc)}
-                    className={`text-left px-[12px] py-[6px] font-montserrat text-[14px]
-                                hover:bg-[#fef2f1] rounded-[4px] flex items-center justify-between ${
-                                  selectedLocations.includes(loc)
-                                    ? "text-[#ef493d] font-medium"
-                                    : "text-[#333]"
-                                }`}
-                    style={{ fontFamily: "Montserrat, sans-serif" }}
-                  >
-                    {loc}
-                    {selectedLocations.includes(loc) && (
-                      <Check className="w-[12px] h-[12px] text-[#ef493d]" strokeWidth={3} />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+            ))}
+          </FilterDropdown>
+
+          {/* Project Status — multi-select */}
+          <FilterDropdown
+            icon={Warehouse}
+            label="Project Status"
+            count={selectedStatuses.length}
+            active={selectedStatuses.length > 0}
+          >
+            {PROJECT_STATUSES.map((st) => (
+              <DropdownOption
+                key={st}
+                label={st}
+                selected={selectedStatuses.includes(st)}
+                onClick={() => toggleStatus(st)}
+              />
+            ))}
+          </FilterDropdown>
+
+          {/* Flat Type — multi-select (BHK configuration) */}
+          <FilterDropdown
+            icon={BedDouble}
+            label="Flat Type"
+            count={selectedConfigs.filter((c) => c !== "ALL").length}
+            active={selectedConfigs.some((c) => c !== "ALL")}
+          >
+            {CONFIGURATIONS.map((cfg) => (
+              <DropdownOption
+                key={cfg}
+                label={cfg === "ALL" ? "All" : cfg}
+                selected={selectedConfigs.includes(cfg)}
+                onClick={() => toggleConfig(cfg)}
+              />
+            ))}
+          </FilterDropdown>
+
+          {/* Location — multi-select */}
+          <FilterDropdown
+            icon={MapPin}
+            label="Location"
+            count={selectedLocations.length}
+            active={selectedLocations.length > 0}
+          >
+            {LOCATIONS.map((loc) => (
+              <DropdownOption
+                key={loc}
+                label={loc}
+                selected={selectedLocations.includes(loc)}
+                onClick={() => toggleLocation(loc)}
+              />
+            ))}
+          </FilterDropdown>
 
           <span className="hidden lg:block h-[36px] lg:h-[2.812vw] w-px bg-[#e7e7e7] mx-[10px] lg:mx-[0.521vw]" />
 
@@ -806,6 +899,19 @@ export default function ProjectsListing({ projects = [], heading }) {
               )}
             </div>
 
+            <FilterPanel title="PROJECT STATUS:" collapsible>
+              <div className="flex flex-col">
+                {PROJECT_STATUSES.map((st) => (
+                  <CheckRow
+                    key={st}
+                    label={st}
+                    checked={selectedStatuses.includes(st)}
+                    onChange={() => toggleStatus(st)}
+                  />
+                ))}
+              </div>
+            </FilterPanel>
+
             <FilterPanel title="LOCATION:" collapsible>
               <div className="flex flex-col">
                 {LOCATIONS.map((loc) => (
@@ -819,7 +925,7 @@ export default function ProjectsListing({ projects = [], heading }) {
               </div>
             </FilterPanel>
 
-            <FilterPanel title="Configuration:" collapsible>
+            <FilterPanel title="FLAT TYPE:" collapsible>
               <div className="flex flex-col">
                 {CONFIGURATIONS.map((cfg) => (
                   <CheckRow
@@ -890,12 +996,10 @@ export default function ProjectsListing({ projects = [], heading }) {
                 {filteredAll.length === 1 ? "" : "s"}
               </p>
             )}
-          </div>
-        </div>
 
-        {/* View More / Show Less */}
-        {filteredAll.length > PAGE_SIZE && (
-          <div className="mt-[36px] md:mt-[48px] lg:mt-[3.645vw] flex justify-center">
+            {/* View More / Show Less — centred over the cards column */}
+            {filteredAll.length > PAGE_SIZE && (
+              <div className="mt-[36px] md:mt-[48px] lg:mt-[3.645vw] flex justify-center">
             <button
               type="button"
               onClick={hasMore ? handleViewMore : handleShowLess}
@@ -910,8 +1014,10 @@ export default function ProjectsListing({ projects = [], heading }) {
             >
               {hasMore ? "View More" : "Show Less"}
             </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

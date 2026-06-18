@@ -126,8 +126,8 @@ export default function Testimonials({ data }) {
       id="testimonials"
       data-section="testimonials"
       className="relative w-full bg-white overflow-hidden
-                 pt-[64px] pb-[64px]
-                 lg:pt-[4.166vw] lg:pb-[4.166vw]"
+                 pt-[10px] pb-[64px]
+                 lg:pt-[1vw] lg:pb-[4.166vw]"
     >
       {/* ============================================================
            HEADER (Figma 3152:3508 + 3152:3511 + 3152:3541)
@@ -232,7 +232,7 @@ export default function Testimonials({ data }) {
       {/* ============================================================
            SWIPER — 2 testimonials per view on desktop, 1 on mobile
          ============================================================ */}
-      <div className="relative z-[2] mt-[36px] lg:mt-[7.812vw]">
+      <div className="relative z-[2] mt-[36px] lg:mt-[5vw]">
         <Swiper
           modules={[Navigation, A11y, Autoplay]}
           slidesPerView={1}

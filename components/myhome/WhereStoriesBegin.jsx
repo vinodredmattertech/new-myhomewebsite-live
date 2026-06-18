@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, A11y } from "swiper/modules";
+import { Navigation, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { mediaUrl, relationList } from "@/lib/strapi";
@@ -202,10 +202,14 @@ export default function WhereStoriesBegin({ data }) {
          ============================================================ */}
       <div className="relative z-[2] mt-[60px] lg:mt-[3.125vw]">
         <Swiper
-          modules={[Navigation, A11y]}
+          modules={[Navigation, A11y, Autoplay]}
           slidesPerView={1}
           centeredSlides
           loop
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+          }}
           speed={800}
           spaceBetween={24}
           breakpoints={{

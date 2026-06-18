@@ -23,6 +23,11 @@ function lines(text) {
     .filter(Boolean);
 }
 
+/** True when a value is a non-empty (non-whitespace) string. */
+function hasText(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export default function ProjectDetailPage({ project }) {
   console.log(project, "jjj");
 
@@ -147,11 +152,44 @@ export default function ProjectDetailPage({ project }) {
 
   const iq = project.inquiry || {};
 
+  // Each section renders only when it actually has content. A CMS component
+  // that exists but was left empty must NOT produce an empty section, so we
+  // check the real fields/media/collections rather than mere object presence.
+  const hasBanner = Boolean(bannerImg);
+  const hasOverview = Boolean(
+    hasText(ov.heading) ||
+      hasText(ov.description) ||
+      overviewStats.length ||
+      mediaUrl(ov?.image)
+  );
+  const hasConnectivity = Boolean(
+    connectivityCategories.length ||
+      hasText(co.mapEmbedUrl) ||
+      mediaUrl(co?.mapImage)
+  );
+  const hasAmenities = Boolean(
+    hasText(am.heading) || hasText(am.description) || amenities.length
+  );
+  const hasFloorPlans = floorPlanTabs.some((t) => t.plans.length > 0);
+  const hasGallery = galleryTabs.some((t) => t.items.length > 0);
+  const hasSpecifications = specs.length > 0;
+  const hasProgress = progressMetrics.length > 0 || progressImages.length > 0;
+  const hasBrochure = Boolean(
+    hasText(br.heading) ||
+      lines(br.highlights).length ||
+      mediaUrl(br?.image) ||
+      brochureFileUrl !== "#"
+  );
+  const hasTestimonials = testimonials.some((t) => hasText(t.quote));
+  // Inquiry is a functional lead-capture form (works with a default heading),
+  // so it shows whenever the CMS component is present — not gated on text.
+  const hasInquiry = Boolean(project.inquiry);
+
   return (
     <>
       <Seo seo={project.seo} />
 
-      {(project.detailBanner || project.image) && (
+      {hasBanner && (
         <ProjectDetailBanner
           imageSrc={bannerImg}
           imageAlt={db.imageAlt || project.title}
@@ -161,7 +199,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.overview && (
+      {hasOverview && (
         <ProjectOverview
           imageSrc={mediaUrl(ov?.image)}
           imageAlt={`${project.title} overview`}
@@ -172,7 +210,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.connectivity && (
+      {hasConnectivity && (
         <ProjectConnectivity
           sidebarLabel={co.sidebarLabel}
           heading={co.heading}
@@ -193,8 +231,8 @@ export default function ProjectDetailPage({ project }) {
           amenities={amenities.length ? amenities : undefined}
         />
       )} */}
-      {project.amenities && <ProjectAmenities data={project?.amenities} />}
-      {project.floorPlans && (
+      {hasAmenities && <ProjectAmenities data={project?.amenities} />}
+      {hasFloorPlans && (
         <ProjectFloorPlans
           sidebarLabel={fp.sidebarLabel}
           heading={fp.heading}
@@ -204,7 +242,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.gallery && (
+      {hasGallery && (
         <ProjectGallery
           sidebarLabel={ga.sidebarLabel}
           heading={ga.heading}
@@ -213,7 +251,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.specifications && (
+      {hasSpecifications && (
         <ProjectSpecifications
           sidebarLabel={sp.sidebarLabel}
           heading={sp.heading}
@@ -222,7 +260,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.progress && (
+      {hasProgress && (
         <ProjectProgress
           sidebarLabel={pr.sidebarLabel}
           heading={pr.heading}
@@ -232,7 +270,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.brochure && (
+      {hasBrochure && (
         <ProjectBrochure
           sidebarLabel={br.sidebarLabel}
           heading={br.heading}
@@ -247,7 +285,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.testimonials && (
+      {hasTestimonials && (
         <ProjectTestimonials
           sidebarLabel={tm.sidebarLabel}
           heading={tm.heading}
@@ -256,7 +294,7 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
-      {project.inquiry && (
+      {hasInquiry && (
         <ProjectInquiry
           sidebarLabel={iq.sidebarLabel}
           heading={iq.heading || `Secure Your Future At ${project.title}`}
