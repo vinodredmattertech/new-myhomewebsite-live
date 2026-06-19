@@ -153,7 +153,7 @@ export default function NriFaqs({ data }) {
           {data.heading}
         </h2>
 
-        <div className="w-full mt-[40px] md:mt-[56px] lg:mt-[3.125vw] max-w-[1480px] lg:max-w-[77.03vw] border-t border-[rgba(85,85,85,0.2)]">
+        <div className="w-full mt-[50px] md:mt-[56px] lg:mt-[3.125vw] max-w-[1480px] lg:max-w-[77.03vw] border-t border-[rgba(85,85,85,0.2)]">
           {FAQS.map((item, idx) => (
             <FaqItem
               key={item.q}

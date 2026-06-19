@@ -60,6 +60,7 @@ export default function ContactForm({ data }) {
       .filter(Boolean) ||
     DEFAULT_PROJECT_OPTIONS;
   const formImage = mediaUrl(data?.image);
+  const backgroundImage = mediaUrl(data?.backgroundImage);
 
   const router = useRouter();
   const rootRef = useRef(null);
@@ -149,6 +150,20 @@ export default function ContactForm({ data }) {
       className="relative w-full bg-white overflow-hidden
                  py-[60px] md:py-[80px] lg:pt-[2.343vw] lg:pb-[4.583vw]"
     >
+      {/* full-section background image */}
+      {backgroundImage && (
+        <div className="absolute inset-0 -z-[1] pointer-events-none">
+          <Image
+            src={backgroundImage}
+            alt=""
+            fill
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-center select-none"
+          />
+        </div>
+      )}
+
       {/* top divider — Figma 3511:3639 */}
       <div className="mx-auto h-px w-[calc(100%-40px)] sm:w-[calc(100%-64px)] lg:w-[89.896vw] bg-[#33333322]" />
 
