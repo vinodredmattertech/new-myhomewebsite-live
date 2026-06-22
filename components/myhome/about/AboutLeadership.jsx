@@ -81,7 +81,7 @@ export default function AboutLeadership({ data }) {
 
       {/* Content: LeaderImg (left on desktop / bottom on mobile) + card (right on desktop / top on mobile) */}
       <div className="relative z-[2] h-full min-h-[640px] lg:min-h-0 lg:h-[48.7vw]
-                      flex flex-col lg:flex-row items-center lg:justify-between
+                      flex flex-col lg:flex-row items-center lg:justify-end
                       gap-10 md:gap-12 lg:gap-[3vw]
                       px-5 md:px-10 lg:px-[8.75vw] py-[60px] md:py-[80px] lg:py-0 max-sm:pl-[80px]">
         {/* LeaderImg */}
