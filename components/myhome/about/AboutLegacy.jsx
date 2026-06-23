@@ -47,6 +47,7 @@ export default function AboutLegacy({ data }) {
   const image = mediaUrl(data.image);
 
   return (
+  <>
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden
@@ -60,7 +61,7 @@ export default function AboutLegacy({ data }) {
       <div className="max-sm:pl-[80px] pr-5 md:px-10 lg:px-[11.146vw] grid grid-cols-1 lg:grid-cols-12 gap-y-[24px] gap-x-[40px] lg:gap-x-[4.166vw] items-start">
         <h2
           ref={headingRef}
-          className="lg:col-span-6 text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
+          className=" lg:pb-[10vw] lg:col-span-6 text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[34px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
           style={{
             fontFamily:
@@ -72,7 +73,7 @@ export default function AboutLegacy({ data }) {
         </h2>
         <p
           ref={paraRef}
-          className="lg:col-span-6 font-montserrat font-normal text-[#6d6d6d] text-justify
+          className="lg:col-span-6 font-montserrat font-normal text-[#6d6d6d] text-justify lg:mt-[6vw]
                      text-[14px] sm:text-[15px] md:text-[16px] lg:text-[0.938vw]
                      leading-[24px] sm:leading-[26px] md:leading-[28px] lg:leading-[1.77vw]
                      lg:pt-[6vw]"
@@ -84,7 +85,7 @@ export default function AboutLegacy({ data }) {
 
       <div
         ref={imgWrapRef}
-        className="mx-auto mt-[40px] md:mt-[56px] lg:mt-[3.125vw]
+        className="mx-auto mt-[40px] md:mt-[56px] lg:mt-[1.125vw]
                    w-[calc(100%-40px)] sm:w-[calc(100%-80px)] lg:w-[80.208vw]
                    aspect-[1540/725] rounded-[6px] lg:rounded-[0.625vw] overflow-hidden relative"
       >
@@ -98,7 +99,10 @@ export default function AboutLegacy({ data }) {
             className="object-cover object-center"
           />
         )}
-      </div>
+      </div><svg className="absolute md:top-[6vw] top-10" xmlns="http://www.w3.org/2000/svg" width="1920" height="346" viewBox="0 0 1920 346" fill="none">
+<path opacity="0.2" d="M-61.1929 312.294C-61.1929 312.294 243.512 368.25 433.346 333.522C643.553 295.067 741.486 206.104 922.421 107.092C1103.36 8.08001 1281.66 -25.8746 1505.36 21.844C1710.43 65.5886 1951.32 293.112 1951.32 293.112" stroke="#EF493D"/>
+</svg>
     </section>
+    </>
   );
 }

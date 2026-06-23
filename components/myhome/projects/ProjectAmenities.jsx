@@ -10,39 +10,39 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
 import { cleanImage } from "@/components/ImageHandle";
 
-const DEFAULT_AMENITIES = [
-  {
-    title: "Infinity Pool & Deck",
-    image: "/assets/myhome/projects/amenity-pool.jpg",
-  },
-  {
-    title: "Open-Air Amphitheatre",
-    image: "/assets/myhome/projects/amenity-amphitheatre.jpg",
-  },
-  {
-    title: "Sports Zone Multipurpose Court",
-    image: "/assets/myhome/projects/amenity-sports.jpg",
-  },
-  {
-    title: "Infinity Pool & Deck",
-    image: "/assets/myhome/projects/amenity-pool.jpg",
-  },
-  {
-    title: "Open-Air Amphitheatre",
-    image: "/assets/myhome/projects/amenity-amphitheatre.jpg",
-  },
-  {
-    title: "Sports Zone Multipurpose Court",
-    image: "/assets/myhome/projects/amenity-sports.jpg",
-  },
-];
+// const DEFAULT_AMENITIES = [
+//   {
+//     title: "Infinity Pool & Deck",
+//     image: "/assets/myhome/projects/amenity-pool.jpg",
+//   },
+//   {
+//     title: "Open-Air Amphitheatre",
+//     image: "/assets/myhome/projects/amenity-amphitheatre.jpg",
+//   },
+//   {
+//     title: "Sports Zone Multipurpose Court",
+//     image: "/assets/myhome/projects/amenity-sports.jpg",
+//   },
+//   {
+//     title: "Infinity Pool & Deck",
+//     image: "/assets/myhome/projects/amenity-pool.jpg",
+//   },
+//   {
+//     title: "Open-Air Amphitheatre",
+//     image: "/assets/myhome/projects/amenity-amphitheatre.jpg",
+//   },
+//   {
+//     title: "Sports Zone Multipurpose Court",
+//     image: "/assets/myhome/projects/amenity-sports.jpg",
+//   },
+// ];
 
 export default function ProjectAmenities({
   sidebarLabel = "The Luxury Of Choice",
   heading = "Modern Living, Elevated",
   description = "To ensure a seamless experience for over 3,000 families, the amenities are divided into two distinct world-class clubhouses Cotta and Terra comprising over 100,000 sq. ft. of curated leisure space.",
-  amenities = DEFAULT_AMENITIES,
   data,
+  amenities = data.items,
 }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -51,7 +51,7 @@ export default function ProjectAmenities({
   const sliderRef = useRef(null);
   const prevRef = useRef(null);
   const nextRef = useRef(null);
-
+console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
   useGSAP(
     () => {
       registerGsap();
@@ -145,9 +145,8 @@ export default function ProjectAmenities({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-        >
-          {data?.description}
-        </p>
+          dangerouslySetInnerHTML={{ __html: data?.description }}
+        />
       </div>
       <div ref={sliderRef} className="mt-[40px] lg:mt-[3.802vw] w-full">
         <Swiper
@@ -180,15 +179,16 @@ export default function ProjectAmenities({
                               ${isActive ? "scale-100" : "scale-[0.9]"}`}
                 >
                   <a
-                    href={a.image}
+                    href={cleanImage(a?.image?.data?.attributes?.url)}
                     data-fancybox="amenities-gallery"
                     data-caption={a.title}
                     className="block w-full h-full"
                   >
                     <Image
-                      src={cleanImage(a?.items?.image?.data?.attributes?.url)}
-                      alt={a?.items?.image?.data?.attributes?.alternativeText}
+                      src={cleanImage(a?.image?.data?.attributes?.url)}
+                      alt={a?.image?.data?.attributes?.alternativeText}
                       fill
+                      unoptimized
                       sizes="(min-width:1024px) 42vw, (min-width:640px) 60vw, 90vw"
                       className="object-cover object-center select-none"
                     />

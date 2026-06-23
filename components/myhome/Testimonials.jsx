@@ -62,8 +62,10 @@ export default function Testimonials({ data }) {
           // isVideo=true → play the uploaded videoFile; else → use videoUrl
           const videoSrc = t.isVideo ? videoFileUrl : t.videoUrl || "";
           // Decide which Fancybox content type to use. Uploaded files and
-          // direct .mp4/.webm/.mov URLs play as <video>; YouTube/Vimeo and
-          // anything else open as iframe.
+          // direct .mp4/.webm/.mov URLs play as html5video. For YouTube/Vimeo
+          // we leave the type undefined so Fancybox v5 auto-detects the
+          // provider and builds the correct embed (forcing "iframe" would load
+          // the raw watch page, which YouTube refuses to frame).
           const isDirectVideo =
             t.isVideo ||
             /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(videoSrc || "");
@@ -73,7 +75,7 @@ export default function Testimonials({ data }) {
             image: mediaUrl(t.image),
             badge: BADGE_COLORS[t.badgeColor] || BADGE_COLORS.red,
             videoSrc,
-            videoType: isDirectVideo ? "video" : "iframe",
+            videoType: isDirectVideo ? "html5video" : undefined,
           };
         })
       : [];
@@ -234,22 +236,22 @@ export default function Testimonials({ data }) {
          ============================================================ */}
       <div className="relative z-[2] mt-[36px] lg:mt-[5vw]">
         <Swiper
-          modules={[Navigation, A11y, Autoplay]}
-          slidesPerView={1}
+              modules={[Navigation, A11y, Autoplay]}
+          slidesPerView="auto"
           spaceBetween={24}
           speed={700}
           autoplay={{ delay: 3000, disableOnInteraction: false }}
           loop={true}
           breakpoints={{
-            640: { slidesPerView: 1.1, spaceBetween: 32 },
-            1024: { slidesPerView: 1.5, spaceBetween: 60 },
+            640: { spaceBetween: 32 },
+            1024: { spaceBetween: 60 },
           }}
           onSwiper={(s) => (swiperRef.current = s)}
           onSlideChange={(s) => setActiveIdx(s.realIndex)}
           className="!px-5 md:!px-8 lg:!px-[7.448vw] !overflow-visible"
         >
           {TESTIMONIALS.map((t, i) => (
-            <SwiperSlide key={`${t.name}-${i}`} className="!h-auto">
+            <SwiperSlide key={`${t.name}-${i}`}      className="!h-auto !w-[calc(100vw-40px)] md:!w-[calc(100vw-64px)] lg:!w-[45.052vw]">
               {/* Per-testimonial layout (Figma 3152:3515 / 3152:3528):
                   Mobile — stack: image then text below
                   Desktop — flex row, text left (385 wide), image right (360x541) */}
@@ -329,7 +331,7 @@ export default function Testimonials({ data }) {
                     <a
                       href={t.videoSrc}
                       data-fancybox={`testimonial-${i}`}
-                      data-type={t.videoType}
+                      {...(t.videoType ? { "data-type": t.videoType } : {})}
                       aria-label={`Play video testimonial — ${t.name}`}
                       className="absolute inset-0 m-auto inline-flex items-center justify-center
                                  w-[60px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw]

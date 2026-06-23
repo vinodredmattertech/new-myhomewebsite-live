@@ -10,6 +10,7 @@ import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
+import useFancybox from "@/components/common/useFancybox";
 
 const FLOOR_PLAN_IMG = "/assets/myhome/projects/floor-plan.png";
 
@@ -66,8 +67,17 @@ export default function ProjectFloorPlans({
   const nextRef = useRef(null);
   const swiperRef = useRef(null);
 
+  // Bind Fancybox to the section so every unlocked [data-fancybox] plan
+  // opens its image in a lightbox modal.
+  const [fancyboxRoot] = useFancybox();
+  const attachFancy = (el) => {
+    rootRef.current = el;
+    fancyboxRoot(el);
+  };
+
   const [activeTab, setActiveTab] = useState(tabs[0]?.key);
   const activePlans = tabs.find((t) => t.key === activeTab)?.plans || [];
+  const isSingle = activePlans.length <= 1;
 
   // ===== Unlock state =====
   const storageKey = `${STORAGE_PREFIX}${projectName}`;
@@ -175,19 +185,80 @@ export default function ProjectFloorPlans({
 
   // When tab changes, jump slider back to start
   useEffect(() => {
-    if (swiperRef.current) {
+    if (!isSingle && swiperRef.current && !swiperRef.current.destroyed) {
       swiperRef.current.slideTo(0, 500);
     }
-  }, [activeTab]);
+  }, [activeTab, isSingle]);
 
   const handleTabChange = (key) => {
     if (key === activeTab) return;
     setActiveTab(key);
   };
 
+  const renderCard = (plan, idx) => {
+    const card = (
+      <div
+        className="relative w-full aspect-[785/620] rounded-[12px] bg-[#f2f2f2]
+                   border border-[rgba(51,51,51,0.1)] overflow-hidden
+                   px-[16px] py-[16px] sm:px-[24px] sm:py-[22px] lg:px-[1.927vw] lg:py-[1.771vw]"
+      >
+        <div className="flex items-center gap-[10px] sm:gap-[14px] lg:gap-[0.833vw]">
+          <span
+            className="inline-flex items-center justify-center rounded-full bg-white
+                       border-[1.068px] border-[#333] text-[#333]
+                       h-[34px] sm:h-[42px] lg:h-[2.656vw]
+                       px-[16px] sm:px-[20px] lg:px-[1.302vw]
+                       text-[13px] sm:text-[15px] lg:text-[1.001vw]"
+            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+          >
+            {plan.bhk}
+          </span>
+          <span
+            className="inline-flex items-center justify-center rounded-full bg-white
+                       border-[1.068px] border-[#333] text-[#333]
+                       h-[34px] sm:h-[42px] lg:h-[2.656vw]
+                       px-[16px] sm:px-[20px] lg:px-[1.302vw]
+                       text-[13px] sm:text-[15px] lg:text-[1.001vw]"
+            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+          >
+            {plan.label}
+          </span>
+        </div>
+        <div className="mt-[14px] sm:mt-[20px] lg:mt-[1.667vw] relative w-full h-[calc(100%-58px)] sm:h-[calc(100%-72px)] lg:h-[calc(100%-4.323vw)]">
+          <Image
+            src={plan.image}
+            alt={`${plan.bhk} ${plan.label}`}
+            fill
+            sizes="(min-width:1024px) 41vw, (min-width:640px) 70vw, 95vw"
+            className={`object-contain object-center select-none transition-[filter] duration-500 ease-out ${
+              unlocked ? "" : "blur-[14px] scale-[1.03]"
+            }`}
+          />
+        </div>
+      </div>
+    );
+
+    // Once unlocked, the whole card opens the plan in a Fancybox lightbox.
+    // Grouped by tab so multiple plans navigate together inside the lightbox.
+    if (unlocked) {
+      return (
+        <a
+          href={plan.image}
+          data-fancybox={`floor-plans-${activeTab}`}
+          data-caption={`${plan.bhk} — ${plan.label}`}
+          className="block cursor-zoom-in"
+          aria-label={`Open ${plan.bhk} ${plan.label} floor plan`}
+        >
+          {card}
+        </a>
+      );
+    }
+    return card;
+  };
+
   return (
     <section
-      ref={rootRef}
+      ref={attachFancy}
       className="relative w-full bg-white pt-[0px] pb-[80px] lg:pt-[1.667vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-floor-plans"
     >
@@ -231,9 +302,8 @@ export default function ProjectFloorPlans({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-        >
-          {description}
-        </p>
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
 
         {/* Tabs */}
         <div
@@ -276,74 +346,49 @@ export default function ProjectFloorPlans({
       {/* Slider with side nav arrows */}
       <div
         ref={sliderWrapRef}
-        className="relative mt-[36px] lg:mt-[2.969vw] w-full pl-5 md:pl-12 lg:pl-[5.208vw]"
+        className={`relative mt-[36px] lg:mt-[2.969vw] w-full ${
+          isSingle
+            ? "px-5 md:px-12 lg:px-[9.375vw]"
+            : "pl-5 md:pl-12 lg:pl-[5.208vw]"
+        }`}
       >
-        <Swiper
-          key={activeTab}
-          modules={[Navigation, Keyboard, A11y]}
-          slidesPerView={1.05}
-          spaceBetween={16}
-          speed={650}
-          keyboard={{ enabled: true }}
-          onSwiper={(s) => {
-            swiperRef.current = s;
-          }}
-          onBeforeInit={(swiper) => {
-            swiper.params.navigation.prevEl = prevRef.current;
-            swiper.params.navigation.nextEl = nextRef.current;
-          }}
-          navigation={{ prevEl: null, nextEl: null }}
-          breakpoints={{
-            640: { slidesPerView: 1.4, spaceBetween: 20 },
-            768: { slidesPerView: 1.8, spaceBetween: 28 },
-            1024: { slidesPerView: 2.15, spaceBetween: 40 },
-          }}
-          className="!overflow-visible"
-        >
-          {activePlans.map((plan, idx) => (
-            <SwiperSlide key={`${activeTab}-${idx}`} className="!h-auto">
-              <div
-                className="relative w-full aspect-[785/620] rounded-[12px] bg-[#f2f2f2]
-                           border border-[rgba(51,51,51,0.1)] overflow-hidden
-                           px-[16px] py-[16px] sm:px-[24px] sm:py-[22px] lg:px-[1.927vw] lg:py-[1.771vw]"
-              >
-                <div className="flex items-center gap-[10px] sm:gap-[14px] lg:gap-[0.833vw]">
-                  <span
-                    className="inline-flex items-center justify-center rounded-full bg-white
-                               border-[1.068px] border-[#333] text-[#333]
-                               h-[34px] sm:h-[42px] lg:h-[2.656vw]
-                               px-[16px] sm:px-[20px] lg:px-[1.302vw]
-                               text-[13px] sm:text-[15px] lg:text-[1.001vw]"
-                    style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-                  >
-                    {plan.bhk}
-                  </span>
-                  <span
-                    className="inline-flex items-center justify-center rounded-full bg-white
-                               border-[1.068px] border-[#333] text-[#333]
-                               h-[34px] sm:h-[42px] lg:h-[2.656vw]
-                               px-[16px] sm:px-[20px] lg:px-[1.302vw]
-                               text-[13px] sm:text-[15px] lg:text-[1.001vw]"
-                    style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-                  >
-                    {plan.label}
-                  </span>
-                </div>
-                <div className="mt-[14px] sm:mt-[20px] lg:mt-[1.667vw] relative w-full h-[calc(100%-58px)] sm:h-[calc(100%-72px)] lg:h-[calc(100%-4.323vw)]">
-                  <Image
-                    src={plan.image}
-                    alt={`${plan.bhk} ${plan.label}`}
-                    fill
-                    sizes="(min-width:1024px) 41vw, (min-width:640px) 70vw, 95vw"
-                    className={`object-contain object-center select-none transition-[filter] duration-500 ease-out ${
-                      unlocked ? "" : "blur-[14px] scale-[1.03]"
-                    }`}
-                  />
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {isSingle ? (
+          // Single plan: centered, no slider / nav arrows.
+          <div className="flex justify-center">
+            <div className="w-full max-w-[785px] lg:max-w-[41vw]">
+              {activePlans[0] && renderCard(activePlans[0], 0)}
+            </div>
+          </div>
+        ) : (
+          <Swiper
+            key={activeTab}
+            modules={[Navigation, Keyboard, A11y]}
+            slidesPerView={1.05}
+            spaceBetween={16}
+            speed={650}
+            keyboard={{ enabled: true }}
+            onSwiper={(s) => {
+              swiperRef.current = s;
+            }}
+            onBeforeInit={(swiper) => {
+              swiper.params.navigation.prevEl = prevRef.current;
+              swiper.params.navigation.nextEl = nextRef.current;
+            }}
+            navigation={{ prevEl: null, nextEl: null }}
+            breakpoints={{
+              640: { slidesPerView: 1.4, spaceBetween: 20 },
+              768: { slidesPerView: 1.8, spaceBetween: 28 },
+              1024: { slidesPerView: 2.15, spaceBetween: 40 },
+            }}
+            className="!overflow-visible"
+          >
+            {activePlans.map((plan, idx) => (
+              <SwiperSlide key={`${activeTab}-${idx}`} className="!h-auto">
+                {renderCard(plan, idx)}
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
 
         {/* Locked overlay — single CTA over the whole slider while gated */}
         {!unlocked && (
@@ -407,33 +452,37 @@ export default function ProjectFloorPlans({
           </div>
         )}
 
-        {/* Side nav buttons */}
-        <button
-          ref={prevRef}
-          type="button"
-          aria-label="Previous plan"
-          className="absolute z-[5] top-1/2 -translate-y-1/2
-                     left-[12px] md:left-[24px] lg:left-[1.354vw]
-                     inline-flex items-center justify-center rounded-full
-                     bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
-                     w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[2.938vw] lg:h-[2.938vw]
-                     transition-transform duration-300 hover:scale-105 active:scale-95"
-        >
-          <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
-        </button>
-        <button
-          ref={nextRef}
-          type="button"
-          aria-label="Next plan"
-          className="absolute z-[5] top-1/2 -translate-y-1/2
-                     right-[12px] md:right-[24px] lg:right-[1.354vw]
-                     inline-flex items-center justify-center rounded-full
-                     bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
-                     w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[2.938vw] lg:h-[2.938vw]
-                     transition-transform duration-300 hover:scale-105 active:scale-95"
-        >
-          <ArrowRight className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
-        </button>
+        {/* Side nav buttons — only when there's more than one plan */}
+        {!isSingle && (
+          <>
+            <button
+              ref={prevRef}
+              type="button"
+              aria-label="Previous plan"
+              className="absolute z-[5] top-1/2 -translate-y-1/2
+                         left-[12px] md:left-[24px] lg:left-[1.354vw]
+                         inline-flex items-center justify-center rounded-full
+                         bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
+                         w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[2.938vw] lg:h-[2.938vw]
+                         transition-transform duration-300 hover:scale-105 active:scale-95"
+            >
+              <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
+            </button>
+            <button
+              ref={nextRef}
+              type="button"
+              aria-label="Next plan"
+              className="absolute z-[5] top-1/2 -translate-y-1/2
+                         right-[12px] md:right-[24px] lg:right-[1.354vw]
+                         inline-flex items-center justify-center rounded-full
+                         bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
+                         w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[2.938vw] lg:h-[2.938vw]
+                         transition-transform duration-300 hover:scale-105 active:scale-95"
+            >
+              <ArrowRight className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* ===== Unlock modal ===== */}

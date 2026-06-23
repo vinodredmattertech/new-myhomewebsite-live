@@ -56,9 +56,11 @@ export default function ProjectGallery({
   const sidebarRef = useRef(null);
   const tabsRef = useRef(null);
   const sliderWrapRef = useRef(null);
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
   const swiperRef = useRef(null);
+  // Hold the nav buttons in state (not refs) so Swiper re-initialises its
+  // navigation once the conditionally-rendered arrows are actually mounted.
+  const [prevEl, setPrevEl] = useState(null);
+  const [nextEl, setNextEl] = useState(null);
 
   // Bind Fancybox to the section so every [data-fancybox] walkthrough
   // tile opens its video in a lightbox modal.
@@ -130,6 +132,9 @@ export default function ProjectGallery({
   // For the image tab we keep one big slide per image. For the video tab
   // we show a 2-up grid on desktop so multiple walkthroughs are visible.
   const isVideoTab = activeKind === "videos";
+  // A single item is centered and locked (no nav/loop); multiple items get
+  // the slider arrows and loop enabled.
+  const hasMultiple = activeItems.length > 1;
 
   return (
     <section
@@ -177,9 +182,8 @@ export default function ProjectGallery({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-        >
-          {description}
-        </p>
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
 
         {/* Tabs */}
         <div
@@ -222,7 +226,7 @@ export default function ProjectGallery({
       {/* ===== Slider ===== */}
       <div
         ref={sliderWrapRef}
-        className="relative mt-[36px] lg:mt-[2.917vw] w-full px-5 md:px-12 lg:px-[2.083vw]"
+        className="relative mt-[36px] lg:mt-[2.917vw] w-full px-5 md:px-12 lg:px-[10.083vw]"
       >
         {activeItems.length === 0 ? (
           <div className="mx-auto max-w-[760px] py-[40px] text-center">
@@ -237,24 +241,23 @@ export default function ProjectGallery({
           <Swiper
             key={activeTab}
             modules={[Navigation, Keyboard, A11y]}
-            slidesPerView={1.05}
+            slidesPerView={hasMultiple ? 1.05 : 1}
             spaceBetween={16}
             speed={650}
             keyboard={{ enabled: true }}
+            loop={hasMultiple}
+            centeredSlides={!hasMultiple}
+            centerInsufficientSlides
             onSwiper={(s) => {
               swiperRef.current = s;
             }}
-            onBeforeInit={(swiper) => {
-              swiper.params.navigation.prevEl = prevRef.current;
-              swiper.params.navigation.nextEl = nextRef.current;
-            }}
-            navigation={{ prevEl: null, nextEl: null }}
+            navigation={{ prevEl, nextEl }}
             breakpoints={{
-              640: { slidesPerView: 1.4, spaceBetween: 20 },
-              768: { slidesPerView: 1.8, spaceBetween: 24 },
-              1024: { slidesPerView: 2, spaceBetween: 32 },
+              640: { slidesPerView: hasMultiple ? 1.4 : 1, spaceBetween: 20 },
+              768: { slidesPerView: hasMultiple ? 1.8 : 1, spaceBetween: 24 },
+              1024: { slidesPerView: hasMultiple ? 2 : 1, spaceBetween: 32 },
             }}
-            className="!overflow-visible"
+            className="rounded-[12px] !overflow-hidden"
           >
             {activeItems.map((item, idx) => {
               const hasVideo = !!item.videoSrc;
@@ -345,15 +348,11 @@ export default function ProjectGallery({
             onSwiper={(s) => {
               swiperRef.current = s;
             }}
-            onBeforeInit={(swiper) => {
-              swiper.params.navigation.prevEl = prevRef.current;
-              swiper.params.navigation.nextEl = nextRef.current;
-            }}
-            navigation={{ prevEl: null, nextEl: null }}
+            navigation={{ prevEl, nextEl }}
             breakpoints={{
               1024: { slidesPerView: 1, spaceBetween: 24 },
             }}
-            className="!overflow-visible"
+            className="rounded-[12px] !overflow-hidden"
           >
             {activeItems.map((item, idx) => (
               <SwiperSlide key={`image-${idx}`} className="!h-auto">
@@ -380,33 +379,37 @@ export default function ProjectGallery({
           </Swiper>
         )}
 
-        {/* Side nav buttons */}
-        <button
-          ref={prevRef}
-          type="button"
-          aria-label="Previous"
-          className="absolute z-[5] top-1/2 -translate-y-1/2
-                     left-[12px] md:left-[24px] lg:left-[3.125vw]
-                     inline-flex items-center justify-center rounded-full
-                     bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.35)]
-                     w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[3.092vw] lg:h-[3.092vw]
-                     transition-transform duration-300 hover:scale-105 active:scale-95"
-        >
-          <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.342vw] lg:h-[1.342vw]" />
-        </button>
-        <button
-          ref={nextRef}
-          type="button"
-          aria-label="Next"
-          className="absolute z-[5] top-1/2 -translate-y-1/2
-                     right-[12px] md:right-[24px] lg:right-[3.125vw]
-                     inline-flex items-center justify-center rounded-full
-                     bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.35)]
-                     w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[3.092vw] lg:h-[3.092vw]
-                     transition-transform duration-300 hover:scale-105 active:scale-95"
-        >
-          <ArrowRight className="w-[18px] h-[18px] lg:w-[1.342vw] lg:h-[1.342vw]" />
-        </button>
+        {/* Side nav buttons — only when there's more than one item */}
+        {hasMultiple && (
+          <>
+            <button
+              ref={setPrevEl}
+              type="button"
+              aria-label="Previous"
+              className="absolute z-[5] top-1/2 -translate-y-1/2
+                         left-[12px] md:left-[24px] lg:left-[8.5vw]
+                         inline-flex items-center justify-center rounded-full
+                         bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.35)]
+                         w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[3.092vw] lg:h-[3.092vw]
+                         transition-transform duration-300 hover:scale-105 active:scale-95"
+            >
+              <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.342vw] lg:h-[1.342vw]" />
+            </button>
+            <button
+              ref={setNextEl}
+              type="button"
+              aria-label="Next"
+              className="absolute z-[5] top-1/2 -translate-y-1/2
+                         right-[12px] md:right-[24px] lg:right-[8.5vw]
+                         inline-flex items-center justify-center rounded-full
+                         bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.35)]
+                         w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[3.092vw] lg:h-[3.092vw]
+                         transition-transform duration-300 hover:scale-105 active:scale-95"
+            >
+              <ArrowRight className="w-[18px] h-[18px] lg:w-[1.342vw] lg:h-[1.342vw]" />
+            </button>
+          </>
+        )}
       </div>
     </section>
   );

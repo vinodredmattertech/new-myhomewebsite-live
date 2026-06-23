@@ -100,7 +100,7 @@ export default function AboutLeadership({ data }) {
             />
           </div>
         )}
-
+{/* /home/mizaan/Desktop/react-projects/fronend-myhomegroup/public/assets/myhome/about/comma.svg */}
         {/* Card */}
         <div
           ref={cardRef}
@@ -108,7 +108,7 @@ export default function AboutLeadership({ data }) {
                      w-full max-w-[640px] lg:w-[41.66vw] lg:max-w-none
                      px-5 sm:px-8 md:px-12 lg:px-[3.333vw]
                      pt-[40px] md:pt-[56px] lg:pt-[4.687vw]
-                     pb-[56px] md:pb-[64px] lg:pb-[4.687vw]"
+                     pb-[26px] md:pb-[40px] lg:pb-[1.687vw]"
         >
           <div className="flex flex-col gap-[18px] md:gap-[24px] lg:gap-[1.562vw]">
             <p
@@ -140,13 +140,13 @@ export default function AboutLeadership({ data }) {
               <RichText>{data.body}</RichText>
             </div>
           </div>
-
-          <Quote
-            className="absolute right-[20px] bottom-[20px] lg:right-[1.562vw] lg:bottom-[1.562vw]
-                       text-[#ef493d] opacity-30
-                       w-[36px] h-[36px] lg:w-[2.604vw] lg:h-[2.604vw]"
-            strokeWidth={1.4}
-          />
+<div className="flex items-end justify-end">
+  <Image
+src='/assets/myhome/about/comma.svg'
+width={100}
+height={100}
+className="md:w-[6vw] md:h-[5vw] pt-4 h-10 md:pt-[1vw] w-10"/>
+</div>
         </div>
       </div>
     </section>

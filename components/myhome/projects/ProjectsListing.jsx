@@ -82,7 +82,7 @@ function phaseRank(p) {
 }
 
 const PRICE_MIN = 1000000;
-const PRICE_MAX = 4000000;
+const PRICE_MAX = 5000000;
 const PAGE_SIZE = 4;
 
 const FALLBACK_PROJECTS = [

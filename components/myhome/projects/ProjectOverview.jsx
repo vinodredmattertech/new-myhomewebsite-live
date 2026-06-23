@@ -149,9 +149,8 @@ export default function ProjectOverview({
                          lg:text-[0.938vw] lg:leading-[1.563vw]
                          lg:max-w-[36vw]"
               style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-            >
-              {description}
-            </p>
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
 
             <div
               ref={statsRef}
@@ -160,9 +159,9 @@ export default function ProjectOverview({
               {stats.map((stat, idx) => (
                 <div
                   key={`${stat.label}-${idx}`}
-                  className={`flex flex-col gap-[6px] lg:gap-[0.365vw] px-[14px] sm:px-[18px] lg:px-[1.25vw] ${
-                    idx % 3 !== 0 ? "sm:border-l sm:border-[#555]/25" : ""
-                  } ${idx % 2 !== 0 ? "border-l sm:border-l-0 border-[#555]/25 sm:border-0" : ""}`}
+                  className={`flex flex-col gap-[6px] lg:gap-[0.365vw] px-[14px] sm:px-[18px] lg:px-[1.25vw] border-[#555]/25 ${
+                    idx % 2 !== 1 ? "border-r" : ""
+                  } ${idx % 3 === 2 ? "sm:border-r-0" : "sm:border-r"}`}
                 >
                   <span
                     className="text-[#555] tracking-[0.03em]

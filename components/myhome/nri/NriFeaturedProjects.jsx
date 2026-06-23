@@ -17,9 +17,10 @@ function ProjectCard({ title, location, image, href }) {
     <Link
       href={href || "#"}
       className="group relative block w-full overflow-hidden rounded-[10px] lg:rounded-[0.625vw]
-                 bg-white border border-[rgba(43,43,43,0.14)]"
+                 bg-white border  border-[rgba(43,43,43,0.14)]"
     >
-      <div className="relative w-full aspect-[488/488] overflow-hidden">
+     <div className="md:p-[.7vw] p-[10px]">
+       <div className="relative w-full  aspect-[488/488] overflow-hidden">
         {image && (
           <Image
             src={image}
@@ -31,6 +32,7 @@ function ProjectCard({ title, location, image, href }) {
           />
         )}
       </div>
+     </div>
       <div className="flex items-center justify-between px-[18px] md:px-[24px] lg:px-[1.25vw] py-[20px] md:py-[24px] lg:py-[1.302vw]">
         <div className="flex flex-col gap-[6px] lg:gap-[0.312vw]">
           <h3
@@ -176,7 +178,7 @@ export default function NriFeaturedProjects({ data }) {
             breakpoints={{
               640: { slidesPerView: 1.5, spaceBetween: 20 },
               768: { slidesPerView: 1.8, spaceBetween: 24 },
-              1024: { slidesPerView: 2, spaceBetween: 22 },
+              1024: { slidesPerView: 1.5, spaceBetween: 22 },
             }}
             className="w-full !overflow-visible"
           >
