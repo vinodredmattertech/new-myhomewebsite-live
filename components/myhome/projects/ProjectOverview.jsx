@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const DEFAULT_STATS = [
   { value: "24.99", label: "Acres" },
@@ -112,18 +113,13 @@ export default function ProjectOverview({
 
       <div className="px-5 md:px-12 lg:px-[9.375vw]">
         {/* Heading */}
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="capitalize text-[#333] leading-[1.08] tracking-[0.022em] text-center
                      text-[34px] xs:text-[38px] sm:text-[48px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {heading}
-        </h2>
+        </SectionHeading>
 
         {/* Content grid: image left, text + stats right */}
         <div className="mt-[40px] lg:mt-[3.646vw] grid grid-cols-1 lg:grid-cols-[38.229vw_1fr] gap-[36px] lg:gap-[6.771vw] items-start">

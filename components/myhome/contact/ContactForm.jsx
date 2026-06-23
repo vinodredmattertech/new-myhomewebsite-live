@@ -8,6 +8,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronDown } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, submitLead } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const DEFAULT_PROJECT_OPTIONS = ["Apas", "Akrida", "Avali", "Sayuk", "Tridasa", "Vipina", "Other"];
 
@@ -173,18 +174,13 @@ export default function ContactForm({ data }) {
       </div>
 
       <div className="mt-[40px] md:mt-[64px] lg:mt-[2.604vw] px-5 md:px-10 lg:px-[9.375vw]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[34px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
 
         <div className="mt-[60px] md:mt-[56px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[10.208vw] items-center">
           {/* left: image */}

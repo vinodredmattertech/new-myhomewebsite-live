@@ -6,6 +6,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { CheckCircle2, ArrowUpRight } from "lucide-react";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Thank You — confirmation page rendered after every lead form submission.
@@ -129,15 +130,10 @@ export default function ThankYou() {
         </div>
 
         {/* Heading */}
-        <h1
+        <SectionHeading as="h1"
           ref={headingRef}
           className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[36px] xs:text-[44px] sm:text-[56px] md:text-[72px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           Thank You,{" "}
           <span
@@ -149,7 +145,7 @@ export default function ThankYou() {
           >
             we&apos;ll be in touch.
           </span>
-        </h1>
+        </SectionHeading>
 
         {/* Body */}
         <p

@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Statistics — Figma node 2609:1725
@@ -485,17 +486,13 @@ export default function Statistics({ data }) {
            grid so it adapts to 320 / 360 / 375 / 414 / 768 px viewports.
          ============================================================ */}
       <div className="lg:hidden relative z-[5] pt-[64px] sm:pt-[80px] pb-[36vh] sm:pb-[40vh]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           data-heading
           className="px-5 sm:px-8 pl-[52px] sm:pl-[72px] pr-5 sm:pr-8 capitalize text-[#333] tracking-[1.5px] leading-[1.18] text-[26px] xs:text-[30px] sm:text-[35px] will-change-transform"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={paraRef}
           data-body

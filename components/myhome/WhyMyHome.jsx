@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Why My Home — Figma node 2609:1613
@@ -166,16 +167,12 @@ export default function WhyMyHome({ data }) {
           Mobile (Figma 3152:3744): top:56 left:[calc(50%-180px)] w:337
           text:35px tracking:2px leading:normal
           Desktop: top:[4.687vw] left:[11.15vw] w:[36.82vw] text:[5vw] */}
-      <h2
+      <SectionHeading
         ref={headingRef}
         className="absolute z-[5] capitalize text-white will-change-transform leading-[1.2] lg:leading-[1.05] tracking-[2px] lg:tracking-[0.1vw] left-[max(52px,calc(50%-180px))] md:left-12 lg:left-[11.15vw] top-[56px] md:top-[80px] lg:top-[4.687vw] w-[337px] max-w-[calc(100vw-64px)] md:w-auto md:max-w-none md:right-12 lg:right-auto lg:w-[36.82vw] text-[35px] md:text-[56px] lg:text-[5vw]"
-        style={{
-          fontFamily:
-            '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-        }}
       >
         {data.heading}
-      </h2>
+      </SectionHeading>
 
       {/* ---------- Decorative floral bottom-left (DESKTOP ONLY)
           Replicates Figma node 2609:1568 1:1.

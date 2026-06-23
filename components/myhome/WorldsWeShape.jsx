@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { mediaUrl, relationList } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Worlds We Shape — Figma node 3152:3436
@@ -190,20 +191,16 @@ export default function WorldsWeShape({ data }) {
       {/* ===== Heading "Worlds We Shape"
           Mobile (Figma 3152:3785) — top:56 left:[max(52px,calc(50%-180px))] w:337 text:35 tracking:2
           Desktop (Figma 3152:3441) — top:[3.125vw] centered, w:[40.833vw], text:[5vw] */}
-      <h2
+      <SectionHeading
         ref={headingRef}
         className="absolute z-[5] capitalize text-[#333] will-change-transform
                    left-[max(52px,calc(50%-180px))] top-[56px] w-[337px] max-w-[calc(100vw-64px)]
                    text-[35px] tracking-[2px] leading-[1.2]
                    lg:left-[calc(50%-18.437vw)] lg:translate-x-[-50%] lg:top-[3.125vw]
                    lg:w-[40.833vw] lg:max-w-none lg:text-[5vw] lg:tracking-[0.02em] lg:leading-[normal]"
-        style={{
-          fontFamily:
-            '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-        }}
       >
         {data.heading}
-      </h2>
+      </SectionHeading>
 
       {/* ===== Intro body (Figma 3152:3787 mobile / 3152:3442 desktop)
           Mobile — top:123 left:[max(52px,calc(50%-180px))] w:365 text:14/24 text-justify

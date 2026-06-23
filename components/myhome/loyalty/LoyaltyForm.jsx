@@ -7,6 +7,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { submitLoyaltyApplication } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
@@ -180,14 +181,13 @@ export default function LoyaltyForm({
       </div>
 
       <div className="relative z-[1] px-5 md:px-12 lg:px-[15.625vw]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.021em]
                      text-[38px] xs:text-[44px] sm:text-[56px] md:text-[72px] lg:text-[5vw]"
-          style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
         >
           {heading}
-        </h2>
+        </SectionHeading>
 
         <form
           onSubmit={handleSubmit(onSubmit)}

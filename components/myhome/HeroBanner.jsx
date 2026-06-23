@@ -324,7 +324,7 @@ export default function HeroBanner({ data }) {
             <h1
               ref={copyHeadingRef}
               className="will-change-transform leading-[1.4] tracking-[0.025em] capitalize"
-              style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
+              style={{ fontFamily:  '"Tartuffo_Trial_Light","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
             >
               <span className="Tartuffo_Trial_Regular block text-[18px] xs:text-[20px] sm:text-[24px] md:text-[30px] lg:text-[2.083vw] tracking-[0.044em] font-[300] leading-[1.4]">
                 {data.headingLine1}

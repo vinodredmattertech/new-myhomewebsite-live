@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronRight } from "lucide-react";
+import SectionHeading from "@/components/common/SectionHeading";
 
 export default function ProjectDetailBanner({
   imageSrc = "/assets/myhome/projects/akrida-banner.jpg",
@@ -101,18 +102,13 @@ export default function ProjectDetailBanner({
       <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[9.323vw] pb-[40px] sm:pb-[56px] lg:pb-[1.794vw]">
         <div className="flex flex-col items-start gap-[18px] sm:gap-[22px] lg:gap-[1.562vw] w-full">
           <div className="flex flex-col gap-[8px] sm:gap-[10px] lg:gap-[0.521vw]">
-            <h1
+            <SectionHeading as="h1"
               ref={headingRef}
               className="capitalize text-white will-change-transform leading-[1.08] tracking-[0.03em]
                          text-[36px] xs:text-[40px] sm:text-[48px] md:text-[58px] lg:text-[3.646vw]"
-              style={{
-                fontFamily:
-                  '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                fontWeight: 300,
-              }}
             >
               {title}
-            </h1>
+            </SectionHeading>
 
             <p
               ref={subRef}

@@ -10,6 +10,7 @@ import "swiper/css/pagination";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Why Hyderabad — Figma node 3189:4180.
@@ -175,18 +176,13 @@ export default function NriWhyHyderabad({ data }) {
         className="px-5 md:px-10 lg:px-0 flex flex-col items-center text-center
                    lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-[4.687vw] lg:w-[52vw] lg:z-[4]"
       >
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={subRef}
           className="font-montserrat font-normal text-[#333]

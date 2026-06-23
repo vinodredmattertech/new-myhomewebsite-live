@@ -6,6 +6,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 export default function NriTrustedName({ data }) {
   const FEATURES = Array.isArray(data?.features)
@@ -76,18 +77,13 @@ export default function NriTrustedName({ data }) {
 
       {/* Top centered heading */}
       <div className="px-5 md:px-10 lg:px-[16vw] flex flex-col items-center text-center">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={subRef}
           className="font-montserrat font-normal text-[#333] mt-[16px] md:mt-[20px] lg:mt-[0.729vw]

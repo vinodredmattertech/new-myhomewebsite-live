@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 function FaqItem({ item, isOpen, onToggle, index }) {
   const contentRef = useRef(null);
@@ -140,18 +141,13 @@ export default function NriFaqs({ data }) {
       </div>
 
       <div className="px-5 md:px-10 lg:px-[11.146vw] flex flex-col items-center">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em] text-center
                      text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
 
         <div className="w-full mt-[50px] md:mt-[56px] lg:mt-[3.125vw] max-w-[1480px] lg:max-w-[77.03vw] border-t border-[rgba(85,85,85,0.2)]">
           {FAQS.map((item, idx) => (

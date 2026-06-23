@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Light","Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
@@ -90,16 +91,15 @@ export default function BuyersDiscover({ data }) {
 
         {/* Copy */}
         <div className="lg:pt-[1.04vw]">
-          <h2
+          <SectionHeading
             ref={headingRef}
             className="text-[#231f20] capitalize will-change-transform
                        leading-[1.08] tracking-[0.01em]
                        text-[34px] sm:text-[44px] md:text-[56px] lg:text-[3.646vw]
                        max-w-[640px] lg:max-w-[29.01vw]"
-            style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
           >
             {data.heading}
-          </h2>
+          </SectionHeading>
 
           {data.body && (
             <p

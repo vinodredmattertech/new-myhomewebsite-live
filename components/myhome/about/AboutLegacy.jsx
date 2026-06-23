@@ -6,6 +6,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 export default function AboutLegacy({ data }) {
   const rootRef = useRef(null);
@@ -59,18 +60,13 @@ export default function AboutLegacy({ data }) {
 
 
       <div className="max-sm:pl-[80px] pr-5 md:px-10 lg:px-[11.146vw] grid grid-cols-1 lg:grid-cols-12 gap-y-[24px] gap-x-[40px] lg:gap-x-[4.166vw] items-start">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className=" lg:pb-[10vw] lg:col-span-6 text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[34px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={paraRef}
           className="lg:col-span-6 font-montserrat font-normal text-[#6d6d6d] text-justify lg:mt-[6vw]

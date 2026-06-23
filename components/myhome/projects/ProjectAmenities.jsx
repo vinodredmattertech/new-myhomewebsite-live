@@ -9,6 +9,7 @@ import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
 import { cleanImage } from "@/components/ImageHandle";
+import SectionHeading from "@/components/common/SectionHeading";
 
 // const DEFAULT_AMENITIES = [
 //   {
@@ -125,18 +126,13 @@ console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
         </span>
       </div>
       <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[35px]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="capitalize text-[#333] leading-[1.08] tracking-[0.022em] text-center
                      text-[34px] xs:text-[38px] sm:text-[48px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data?.heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={descRef}
           className="mx-auto mt-[14px] lg:mt-[0.729vw] max-w-[760px] lg:max-w-[53.281vw]

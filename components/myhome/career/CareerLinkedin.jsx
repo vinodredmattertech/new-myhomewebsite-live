@@ -221,7 +221,7 @@ export default function CareerLinkedin({ section }) {
               <h3
                 className="capitalize text-[#333] leading-[1.25]
                            text-[26px] sm:text-[32px] lg:text-[2.18vw]"
-                style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
+                style={{ fontFamily: '"Tartuffo_Trial_Light","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif', fontWeight: 300 }}
               >
                 {active.postTitle}
               </h3>

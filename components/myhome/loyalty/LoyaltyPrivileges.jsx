@@ -6,6 +6,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Check, Images, Compass, Users, Play } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
@@ -144,14 +145,13 @@ export default function LoyaltyPrivileges({ data }) {
             <div className="grid grid-cols-1 lg:grid-cols-[39.375vw_1fr] gap-y-[32px] gap-x-[40px] lg:gap-x-[4.635vw] items-start">
               {/* left: heading + copy */}
               <div className="flex flex-col">
-                <h2
+                <SectionHeading
                   ref={headingRef}
                   className="text-[#333] capitalize will-change-transform leading-[1.06] tracking-[0.021em]
                              text-[40px] xs:text-[46px] sm:text-[58px] md:text-[72px] lg:text-[5vw]"
-                  style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
                 >
                   {heading}
-                </h2>
+                </SectionHeading>
 
                 {paragraphs.length > 0 && (
                   <div className="mt-[24px] md:mt-[32px] lg:mt-[1.823vw] flex flex-col gap-[18px] lg:gap-[1.25vw]">

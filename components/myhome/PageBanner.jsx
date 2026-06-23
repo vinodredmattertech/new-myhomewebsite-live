@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronRight } from "lucide-react";
+import SectionHeading from "@/components/common/SectionHeading";
 
 export default function PageBanner({
   imageSrc,
@@ -103,18 +104,13 @@ export default function PageBanner({
 
       <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[9.323vw] pb-[40px] sm:pb-[56px] lg:pb-[2.812vw]">
         <div className="flex flex-col items-start gap-[18px] sm:gap-[22px] lg:gap-[1.562vw] w-full">
-          <h1
+          <SectionHeading as="h1"
             ref={headingRef}
             className="capitalize text-white will-change-transform leading-[1.08] tracking-[0.025em]
                        text-[32px] xs:text-[36px] sm:text-[44px] md:text-[56px] lg:text-[3.646vw]"
-            style={{
-              fontFamily:
-                '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-              fontWeight: 300,
-            }}
           >
             {heading}
-          </h1>
+          </SectionHeading>
 
           <div
             ref={lineRef}

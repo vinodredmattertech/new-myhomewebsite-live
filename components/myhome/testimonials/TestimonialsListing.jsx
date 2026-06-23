@@ -10,6 +10,7 @@ import { Check, Play, Quote, ArrowLeft, ArrowRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import useFancybox from "@/components/common/useFancybox";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const BADGE_COLORS = { red: "#ef493d", gold: "#c39a3e" };
 
@@ -364,15 +365,14 @@ export default function TestimonialsListing({ heading, sectionLabel, items = [] 
       </div>
 
       <div className="relative z-10 px-5 md:px-10 lg:px-[8.33vw]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[36px] xs:text-[44px] sm:text-[56px] md:text-[72px] lg:text-[3.5vw]
                      max-w-[1100px] mx-auto"
-          style={{ ...HEADING_FONT, fontWeight: 300 }}
         >
           {heading || "Stories From Home"}
-        </h2>
+        </SectionHeading>
 
         {/* Filter tabs — All / Video / Text */}
         <div className="mt-[32px] md:mt-[44px] lg:mt-[2.6vw] flex justify-center">

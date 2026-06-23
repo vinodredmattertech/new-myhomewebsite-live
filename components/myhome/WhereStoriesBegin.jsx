@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { mediaUrl, relationList } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Where Stories Begin — Figma node 3152:3465
@@ -132,20 +133,16 @@ export default function WhereStoriesBegin({ data }) {
 
         {/* Heading + body */}
         <div className="col-span-12 lg:col-span-7 lg:col-start-2 flex flex-col gap-[16px] lg:gap-[1.563vw]">
-          <h2
+          <SectionHeading
             ref={headingRef}
             className="capitalize text-[#333] tracking-[2px]
                        leading-[1.15] lg:leading-[normal]
                        text-[35px] xs:text-[35px] sm:text-[44px] md:text-[64px] lg:text-[5vw]
                        w-full max-w-[359px] lg:max-w-none
                        will-change-transform"
-            style={{
-              fontFamily:
-                '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            }}
           >
             {data.heading}
-          </h2>
+          </SectionHeading>
           <p
             ref={paraRef}
             className="font-montserrat font-normal text-[#333] lg:text-[#6d6d6d] text-justify
@@ -295,7 +292,7 @@ export default function WhereStoriesBegin({ data }) {
                                   ${isActive ? "lg:text-[3.125vw]" : "lg:text-[1.719vw]"}`}
                       style={{
                         fontFamily:
-                          '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+                         '"Tartuffo_Trial_Light","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
                       }}
                     >
                       {p.title}

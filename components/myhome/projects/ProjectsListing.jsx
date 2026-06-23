@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 // Top pill-bar: project type (single-select)
 const PROJECT_TYPES = [
@@ -734,19 +735,14 @@ export default function ProjectsListing({ projects = [], heading }) {
       </div>
 
       <div className="px-5 md:px-10 lg:px-[8.333vw]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[36px] xs:text-[44px] sm:text-[56px] md:text-[72px] lg:text-[5vw]
                      max-w-[1100px] mx-auto"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {heading || "A Portfolio Built on Excellence"}
-        </h2>
+        </SectionHeading>
 
         {/* Filter pill bar */}
         <div

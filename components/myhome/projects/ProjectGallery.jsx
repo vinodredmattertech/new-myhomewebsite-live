@@ -8,6 +8,7 @@ import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Default content shown when no CMS data is wired (e.g. local dev).
@@ -162,18 +163,13 @@ export default function ProjectGallery({
       </div>
 
       <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[40px]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="capitalize text-white leading-[1.08] tracking-[0.022em] text-center
                      text-[34px] xs:text-[38px] sm:text-[48px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={descRef}
           className="mx-auto mt-[14px] lg:mt-[0.729vw] max-w-[760px] lg:max-w-[56.719vw]

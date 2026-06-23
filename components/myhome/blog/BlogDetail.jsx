@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const HEADING_FONT = {
   fontFamily:
@@ -150,14 +151,13 @@ export default function BlogDetail({ blog, related = [] }) {
                 {blog.category}
               </span>
             )}
-            <h1
+            <SectionHeading as="h1"
               ref={headingRef}
               className="text-white will-change-transform leading-[1.12] tracking-[0.015em]
                          text-[28px] xs:text-[32px] sm:text-[40px] md:text-[48px] lg:text-[2.917vw]"
-              style={{ ...HEADING_FONT, fontWeight: 300 }}
             >
               {blog?.title}
-            </h1>
+            </SectionHeading>
             <div
               className="flex flex-wrap items-center gap-x-[20px] gap-y-[8px] text-white/85 font-montserrat text-[13px] lg:text-[0.833vw]"
               style={BODY_FONT}

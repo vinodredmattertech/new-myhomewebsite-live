@@ -11,6 +11,7 @@ import { ArrowUpRight, ArrowLeft, ArrowRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, relationList } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 function ProjectCard({ title, location, image, href }) {
   return (
@@ -127,18 +128,13 @@ export default function NriFeaturedProjects({ data }) {
                    grid grid-cols-1 lg:grid-cols-12 gap-y-[20px] gap-x-[40px] lg:gap-x-[3.125vw] items-start"
       >
         <div className="lg:col-span-5 flex flex-col lg:relative lg:z-[10]">
-          <h2
+          <SectionHeading
             ref={headingRef}
             className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                        text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw] max-sm:pl-[35px]"
-            style={{
-              fontFamily:
-                '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-              fontWeight: 300,
-            }}
           >
             {data.heading}
-          </h2>
+          </SectionHeading>
           <p
             ref={subRef}
             className="font-montserrat font-normal text-[#6d6d6d] text-justify

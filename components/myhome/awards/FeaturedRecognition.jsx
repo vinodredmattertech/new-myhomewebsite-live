@@ -8,6 +8,7 @@ import { Navigation, A11y } from "swiper/modules";
 import { ArrowUpRight } from "lucide-react";
 import "swiper/css";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /* Brand accent used across the page. */
 const RED = "#ef493d";
@@ -188,18 +189,13 @@ export default function FeaturedRecognition({ section }) {
 
       <div className="relative z-[1] mx-auto w-full px-6 sm:px-10 lg:px-[11.146vw] max-sm:pl-[45px]">
         {/* Heading */}
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-center leading-[1.1] will-change-transform
                      text-[30px] sm:text-[40px] md:text-[48px] lg:text-[3.125vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {title}
-        </h2>
+        </SectionHeading>
 
         {/* ---------------- Featured main card ---------------- */}
         <article

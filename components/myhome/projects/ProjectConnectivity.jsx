@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ChevronDown } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const DEFAULT_CATEGORIES = [
   {
@@ -112,18 +113,13 @@ export default function ProjectConnectivity({
       </div>
 
       <div className="px-5 md:px-12 lg:px-[9.531vw] max-sm:pl-[60px]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="capitalize text-white leading-[1.08] tracking-[0.022em] text-center
                      text-[34px] xs:text-[38px] sm:text-[48px] md:text-[64px] lg:text-[5vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {heading}
-        </h2>
+        </SectionHeading>
 
         <div className="mt-[40px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-[35.696vw_44.219vw] gap-[24px] lg:gap-[3.438vw] items-start">
           {/* Accordion card */}

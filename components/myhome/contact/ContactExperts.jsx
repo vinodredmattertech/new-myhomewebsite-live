@@ -5,6 +5,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Phone, Mail, Clock, MapPin, ArrowUpRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const KIND_ICON = { phone: Phone, email: Mail, clock: Clock };
 
@@ -52,18 +53,13 @@ export default function ContactExperts({ data }) {
 
       <div className="px-5 md:px-10 lg:px-[9.375vw]">
         {/* Large heading */}
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] text-center capitalize will-change-transform leading-[1.05] tracking-[0.02em]  !font-[300]
                      text-[34px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[4.1vw]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            fontWeight: 300,
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
 
         <div className="mt-[40px] md:mt-[56px] lg:mt-[3.125vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[2.083vw] items-start">
           {/* ============= LEFT: contact info ============= */}

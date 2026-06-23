@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 export default function AboutJourney({ data }) {
   const JOURNEY = Array.isArray(data?.items)
@@ -75,19 +76,14 @@ export default function AboutJourney({ data }) {
       </div>
 
 
-      <h2
+      <SectionHeading
         ref={headingRef}
         className="text-center text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
                    text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]
                    px-5 md:px-10 lg:px-[8.333vw]"
-        style={{
-          fontFamily:
-            '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-          fontWeight: 300,
-        }}
       >
         {data.heading}
-      </h2>
+      </SectionHeading>
 
       <div className="relative mt-[40px] md:mt-[56px] lg:mt-[2.604vw] px-5 md:px-10 lg:px-[11.146vw]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-[16px] lg:gap-x-[2vw] items-start">

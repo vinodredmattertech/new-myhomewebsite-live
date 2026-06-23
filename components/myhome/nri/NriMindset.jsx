@@ -6,6 +6,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * The NRI Mindset — Figma node 3189:4197 ("Distance Shouldn't Make Ownership Difficult").
@@ -81,19 +82,14 @@ export default function NriMindset({ data }) {
          ============================================================ */}
 
       {/* Heading : left 214 / top 120 / w 713 (widened to ~42vw for font fallback) / text 96 / line 126 / tracking 2px */}
-      <h2
+      <SectionHeading
         ref={headingRef}
         className="hidden lg:block absolute capitalize text-white will-change-transform
                    left-[11.146vw] top-[6.25vw] w-[42vw]
                    text-[5vw] leading-[6.562vw] tracking-[0.104vw]"
-        style={{
-          fontFamily:
-            '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-          fontWeight: 300,
-        }}
       >
         {data.heading}
-      </h2>
+      </SectionHeading>
 
       {/* Body : left 214 / top 528 / w 492 / text 18 / line 30 / text-justify */}
       <p

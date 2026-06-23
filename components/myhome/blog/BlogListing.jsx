@@ -7,6 +7,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { CalendarDays, Clock, ArrowUpRight, ArrowRight, Check, ChevronDown } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const PAGE_SIZE = 6;
 
@@ -414,15 +415,14 @@ export default function BlogListing({
       </div>
 
       <div className="px-5 md:px-10 lg:px-[8.333vw]">
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.02em]
                      text-[36px] xs:text-[44px] sm:text-[56px] md:text-[72px] lg:text-[4vw]
                      max-w-[1100px] mx-auto"
-          style={{ ...HEADING_FONT, fontWeight: 300 }}
         >
           {heading || "Market Insights & Lifestyle Stories"}
-        </h2>
+        </SectionHeading>
 
         {/* Filter tabs */}
         <div className="mt-[36px] md:mt-[48px] lg:mt-[3.125vw] flex justify-center">

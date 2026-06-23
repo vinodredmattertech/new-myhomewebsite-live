@@ -272,6 +272,11 @@ input[type="number"] {
   src: url("/fonts/Tartuffo_Trial-Regular-BF643371db1355b.otf");
 }
 @font-face {
+  font-family: "Tartuffo_Trial_Light";
+  src: url("/fonts/Tartuffo_Trial-Light.otf");
+  font-weight: 300;
+}
+@font-face {
   font-family: "Avenir";
   src: url("/fonts/AvenirNextLTPro-Regular.otf");
 }
@@ -282,6 +287,11 @@ body {
 
 .Tartuffo_Trial_Regular {
   font-family: "Tartuffo_Trial_Regular";
+}
+
+.Tartuffo_Trial_Light {
+  font-family: "Tartuffo_Trial_Light";
+  font-weight: 300;
 }
 
 .Avenir {

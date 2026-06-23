@@ -10,6 +10,7 @@ import "swiper/css/navigation";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
 import useFancybox from "@/components/common/useFancybox";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const BADGE_COLORS = { red: "#ef493d", gold: "#c39a3e" };
 
@@ -170,19 +171,15 @@ export default function Testimonials({ data }) {
                    lg:pl-[11.146vw] lg:pr-[4.166vw]
                    max-w-[805px] lg:max-w-[41.927vw]"
       >
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="capitalize text-[#333] tracking-[2px]
                      leading-[1.15] lg:leading-[normal]
                      text-[32px] xs:text-[35px] sm:text-[44px] md:text-[64px] lg:text-[5vw]
                      will-change-transform"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
         <p
           ref={paraRef}
           className="font-montserrat font-normal text-[#333] lg:text-[#6d6d6d] text-justify

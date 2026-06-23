@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Keyboard, A11y } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const DEFAULT_TESTIMONIALS = [
   {
@@ -130,18 +131,13 @@ export default function ProjectTestimonials({
       <div className="px-5 md:px-12 lg:pl-[11.146vw] lg:pr-[9.375vw] max-sm:pl-[40px]">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-[24px] lg:gap-[3.125vw]">
           <div className="flex flex-col gap-[16px] lg:gap-[1.198vw] lg:max-w-[41.927vw]">
-            <h2
+            <SectionHeading
               ref={headingRef}
               className="capitalize text-white leading-[1.08] tracking-[0.022em]
                          text-[34px] xs:text-[38px] sm:text-[48px] md:text-[64px] lg:text-[5vw]"
-              style={{
-                fontFamily:
-                  '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                fontWeight: 300,
-              }}
             >
               {heading}
-            </h2>
+            </SectionHeading>
             <p
               ref={descRef}
               className="text-white text-justify

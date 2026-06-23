@@ -7,6 +7,7 @@ import { gsap } from "gsap";
 import { Download, X } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const DEFAULT_HIGHLIGHTS = [
   "24.99-Acre Master Planned Community",
@@ -235,18 +236,13 @@ export default function ProjectBrochure({
 
           {/* Right column */}
           <div className="flex flex-col items-start gap-[24px] lg:gap-[2.135vw] max-w-full lg:max-w-[43.021vw]">
-            <h2
+            <SectionHeading
               ref={headingRef}
               className="capitalize text-white leading-[1.08] tracking-[0.022em]
                          text-[34px] xs:text-[38px] sm:text-[48px] md:text-[64px] lg:text-[5vw]"
-              style={{
-                fontFamily:
-                  '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                fontWeight: 300,
-              }}
             >
               {heading}
-            </h2>
+            </SectionHeading>
 
             <ul
               ref={listRef}

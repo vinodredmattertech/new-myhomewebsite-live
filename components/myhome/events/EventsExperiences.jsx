@@ -8,6 +8,7 @@ import { Navigation, A11y, Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const BADGE_COLORS = { red: "#ef493d", gold: "#c39a3e" };
 
@@ -137,19 +138,15 @@ export default function EventsExperiences({ data }) {
                    px-6 sm:px-10 lg:px-[11.146vw]
                    mx-auto max-w-[1000px] lg:max-w-[66vw]"
       >
-        <h2
+        <SectionHeading
           ref={headingRef}
           className="capitalize tracking-[0.5px]
                      leading-[1.12] lg:leading-[1.06]
                      text-[30px] xs:text-[34px] sm:text-[42px] md:text-[56px] lg:text-[3.541vw]
                      will-change-transform max-sm:pl-[30px]"
-          style={{
-            fontFamily:
-              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-          }}
         >
           {data.heading}
-        </h2>
+        </SectionHeading>
       </div>
 
       {/* ============================================================

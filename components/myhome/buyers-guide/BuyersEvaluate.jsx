@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
+import SectionHeading from "@/components/common/SectionHeading";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Light","Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
@@ -99,16 +100,15 @@ export default function BuyersEvaluate({ data }) {
 
       <div className="px-5 md:px-10 lg:px-[8.541vw]">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_32.65vw] gap-[24px] lg:gap-[3vw] items-start">
-          <h2
+          <SectionHeading
             ref={headingRef}
             className="text-white capitalize will-change-transform
                        leading-[1.04] tracking-[0.02em]
                        text-[40px] sm:text-[60px] md:text-[78px] lg:text-[5vw]
                        max-w-[760px] lg:max-w-[36.82vw]"
-            style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
           >
             {data.heading}
-          </h2>
+          </SectionHeading>
 
           {data.intro && (
             <p

@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
+import SectionHeading from "@/components/common/SectionHeading";
 
 /**
  * Who We Are — Figma node 2828:2254 (desktop) + 3152:3734 (mobile)
@@ -216,16 +217,12 @@ export default function WhoWeAre({ data }) {
       <div className="absolute inset-x-0 top-[56px] sm:top-[64px] lg:top-[6.25vw] px-5 md:px-12 lg:px-0 lg:left-auto lg:right-[10.4vw] xl:right-[10.4vw] w-full lg:w-[28.33vw] z-[5]">
         <div className="max-sm:ml-[20px] flex flex-col items-end max-sm:items-left lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
           {/* Heading */}
-          <h2
+          <SectionHeading
             ref={headingRef}
-            className="w-full Tartuffo_Trial_Regular capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform text-white lg:text-[#333333]"
-            style={{
-              fontFamily:
-                '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-            }}
+            className="w-full Tartuffo_Trial_Light capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform text-white lg:text-[#333333]"
           >
             {data.heading}
-          </h2>
+          </SectionHeading>
 
           {/* Body */}
           <p
