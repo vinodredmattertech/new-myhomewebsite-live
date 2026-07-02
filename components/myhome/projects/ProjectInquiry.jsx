@@ -9,27 +9,31 @@ import { ChevronDown } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 
 const CONFIG_OPTIONS = ["2 BHK", "2.5 BHK", "3 BHK", "Not Sure"];
 
 const UnderlineField = React.forwardRef(function UnderlineField(
-  { label, hasError, errorMessage, type = "text", ...inputProps },
+  { label, hasError, errorMessage, type = "text", prefix, ...inputProps },
   ref
 ) {
   return (
     <label className="flex flex-col gap-[14px] lg:gap-[1.302vw] w-full">
-      <input
-        ref={ref}
-        type={type}
-        placeholder={label}
-        aria-invalid={hasError || undefined}
-        className="flex-1 bg-transparent outline-none border-none text-[#333]
-                   placeholder:text-[#333]
-                   text-[15px] sm:text-[18px] lg:text-[1.094vw]
-                   leading-[26px] sm:leading-[30px] lg:leading-[1.615vw]"
-        style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-        {...inputProps}
-      />
+      <div className="flex items-center gap-[10px] lg:gap-[0.521vw] w-full">
+        {prefix}
+        <input
+          ref={ref}
+          type={type}
+          placeholder={label}
+          aria-invalid={hasError || undefined}
+          className="flex-1 bg-transparent outline-none border-none text-[#333]
+                     placeholder:text-[#333]
+                     text-[15px] sm:text-[18px] lg:text-[1.094vw]
+                     leading-[26px] sm:leading-[30px] lg:leading-[1.615vw]"
+          style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+          {...inputProps}
+        />
+      </div>
       <div
         className={`h-px w-full ${
           hasError ? "bg-[#ef493d]" : "bg-[#33333322]"
@@ -79,6 +83,7 @@ export default function ProjectInquiry({
   } = useForm({
     defaultValues: {
       name: "",
+      countryCode: DEFAULT_COUNTRY_CODE,
       phone: "",
       email: "",
       configuration: "",
@@ -135,7 +140,7 @@ export default function ProjectInquiry({
     const payload = {
       name: formValues.name,
       email: formValues.email,
-      phone: formValues.phone,
+      phone: `${formValues.countryCode || DEFAULT_COUNTRY_CODE} ${formValues.phone}`.trim(),
       // Tag the lead with the actual CMS project title when the parent
       // page passes it; falls back to the section heading otherwise so
       // local-dev rendering still gets a useful project label.
@@ -242,6 +247,13 @@ export default function ProjectInquiry({
               type="tel"
               hasError={!!errors.phone}
               errorMessage="Please enter a valid phone number"
+              prefix={
+                <CountryCodeSelect
+                  {...register("countryCode")}
+                  className="text-[#333] text-[15px] sm:text-[18px] lg:text-[1.094vw]"
+                  style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+                />
+              }
               {...register("phone", {
                 required: true,
                 pattern: /^[+0-9 ()-]{7,}$/,

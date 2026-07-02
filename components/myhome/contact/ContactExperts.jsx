@@ -2,17 +2,14 @@ import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
-import { Phone, Mail, Clock, MapPin, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import RichText from "@/components/common/RichText";
 import SectionHeading from "@/components/common/SectionHeading";
 
-const KIND_ICON = { phone: Phone, email: Mail, clock: Clock };
-
 export default function ContactExperts({ data }) {
   const PHONE_ROWS = Array.isArray(data?.channels)
     ? data.channels.map((c) => ({
-        Icon: KIND_ICON[c.kind] || Phone,
         text: c.label || "",
         href: c.href || undefined,
       }))
@@ -72,7 +69,7 @@ export default function ContactExperts({ data }) {
                 style={{
                   fontFamily:
                     '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                  fontWeight: 300,
+                  fontWeight: 700,
                 }}
               >
                 {data.channelsHeading}
@@ -80,13 +77,8 @@ export default function ContactExperts({ data }) {
               <div className="h-px w-full max-w-[604px] lg:w-[31.458vw] bg-[#33333322]" />
 
               <ul className="flex flex-col gap-[14px] md:gap-[18px] lg:gap-[1.094vw] mt-[6px] lg:mt-[0.521vw]">
-                {PHONE_ROWS.map(({ Icon, text, href }, i) => (
-                  <li key={i} className="flex items-start gap-[12px] lg:gap-[0.729vw]">
-                    <Icon
-                      className="shrink-0 mt-[3px] lg:mt-[0.26vw] text-[#ef493d]
-                                 w-[18px] h-[18px] md:w-[20px] md:h-[20px] lg:w-[1.302vw] lg:h-[1.302vw]"
-                      strokeWidth={1.6}
-                    />
+                {PHONE_ROWS.map(({ text, href }, i) => (
+                  <li key={i} className="flex items-start">
                     {href ? (
                       <a
                         href={href}
@@ -120,19 +112,14 @@ export default function ContactExperts({ data }) {
                 style={{
                   fontFamily:
                     '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                  fontWeight: 300,
+                  fontWeight: 700,
                 }}
               >
                 {data.addressHeading}
               </h3>
               <div className="h-px w-full max-w-[604px] lg:w-[31.458vw] bg-[#33333322]" />
 
-              <div className="flex items-start gap-[12px] lg:gap-[0.729vw]">
-                <MapPin
-                  className="shrink-0 mt-[3px] lg:mt-[0.26vw] text-[#ef493d]
-                             w-[18px] h-[18px] md:w-[20px] md:h-[20px] lg:w-[1.302vw] lg:h-[1.302vw]"
-                  strokeWidth={1.6}
-                />
+              <div className="flex items-start">
                 <p
                   className="font-montserrat font-normal text-[#333]
                              text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.094vw]

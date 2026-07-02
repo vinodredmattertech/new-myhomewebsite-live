@@ -8,28 +8,32 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { submitLoyaltyApplication } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
 
 /** Underline input — Montserrat 21px label/placeholder on a thin rule. */
 const Field = React.forwardRef(function Field(
-  { label, hasError, errorMessage, ...inputProps },
+  { label, hasError, errorMessage, prefix, ...inputProps },
   ref
 ) {
   return (
     <label className="flex flex-col gap-[12px] lg:gap-[1.042vw] w-full">
-      <input
-        ref={ref}
-        placeholder={label}
-        aria-invalid={hasError || undefined}
-        className="w-full bg-transparent outline-none border-none
-                   font-montserrat text-[#333] placeholder:text-[#333]
-                   text-[16px] sm:text-[18px] lg:text-[1.094vw]
-                   leading-[26px] lg:leading-[1.615vw] pb-[8px] lg:pb-[0.521vw]"
-        style={{ fontFamily: "Montserrat, sans-serif" }}
-        {...inputProps}
-      />
+      <div className="flex items-center gap-[10px] lg:gap-[0.521vw] w-full">
+        {prefix}
+        <input
+          ref={ref}
+          placeholder={label}
+          aria-invalid={hasError || undefined}
+          className="w-full bg-transparent outline-none border-none
+                     font-montserrat text-[#333] placeholder:text-[#333]
+                     text-[16px] sm:text-[18px] lg:text-[1.094vw]
+                     leading-[26px] lg:leading-[1.615vw] pb-[8px] lg:pb-[0.521vw]"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+          {...inputProps}
+        />
+      </div>
       <div
         className={`h-px w-full ${
           hasError ? "bg-[#ef493d]" : "bg-[#33333333]"
@@ -72,6 +76,7 @@ export default function LoyaltyForm({
   } = useForm({
     defaultValues: {
       name: "",
+      countryCode: DEFAULT_COUNTRY_CODE,
       phone: "",
       email: "",
       city: "",
@@ -106,7 +111,7 @@ export default function LoyaltyForm({
     const application = {
       name: v.name,
       email: v.email,
-      mobile: v.phone,
+      mobile: `${v.countryCode || DEFAULT_COUNTRY_CODE} ${v.phone}`.trim(),
       city: v.city || "",
       project: v.project || "",
       apartmentUnit: v.apartment || "",
@@ -209,6 +214,13 @@ export default function LoyaltyForm({
             type="tel"
             hasError={!!errors.phone}
             errorMessage={errors.phone?.message}
+            prefix={
+              <CountryCodeSelect
+                {...register("countryCode")}
+                className="font-montserrat text-[#333] pb-[8px] lg:pb-[0.521vw]
+                           text-[16px] sm:text-[18px] lg:text-[1.094vw]"
+              />
+            }
             {...register("phone", {
               required: "Please enter your mobile number",
               pattern: {

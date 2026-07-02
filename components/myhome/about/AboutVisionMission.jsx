@@ -116,16 +116,16 @@ export default function AboutVisionMission({ data }) {
   return (
     <section
       ref={rootRef}
-      className="relative w-full bg-[#2a2828] overflow-hidden lg:h-[100vh] lg:min-h-[640px]"
+      className="relative w-full bg-[#f5f1eb] overflow-hidden lg:h-[100vh] lg:min-h-[640px]"
     >
       {/* ===== Side label "Vission & mission" — Figma left:80 top:90 ===== */}
       <div
-        className="absolute z-[5] flex flex-col items-center left-[12px] top-[24px] gap-[11px] w-[28px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-white pointer-events-none"
+        className="absolute z-[5] flex flex-col items-center left-[12px] top-[24px] gap-[11px] w-[28px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-[#2a2828] pointer-events-none"
 
         style={{ left: "4.16vw", top: "8.33vh" }}
         aria-hidden="true"
       >
-        <span className="block w-px h-[31px] lg:h-[3.125vw] bg-white" />
+        <span className="block w-px h-[31px] lg:h-[3.125vw] bg-[#2a2828]" />
         <span
           className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
           style={{
@@ -169,12 +169,12 @@ export default function AboutVisionMission({ data }) {
               />
             )}
           </div>
-          {/* Figma gradient: to-left from #2a2828 0%, via transparent 50%, to #2a2828 90.547% */}
+          {/* Gradient blends the image into the cream bg: to-left from #f5f1eb 0%, via transparent 50%, to #f5f1eb 90.547% */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "linear-gradient(to left, #2a2828 0%, rgba(42,40,40,0) 50%, #2a2828 90.547%)",
+                "linear-gradient(to left, #f5f1eb 0%, rgba(245,241,235,0) 50%, #f5f1eb 90.547%)",
             }}
           />
 
@@ -204,7 +204,7 @@ export default function AboutVisionMission({ data }) {
         {/* ----- Our Vision : title at left:214 top:130 ----- */}
         <h2
           data-vm-heading="vision"
-          className="absolute capitalize text-white leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
+          className="absolute capitalize text-[#2a2828] leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
           style={{ ...headingStyle, left: "11.15vw", top: "12.04vh" }}
         >
           {data.visionHeading}
@@ -213,7 +213,7 @@ export default function AboutVisionMission({ data }) {
         {/* ----- Vision body at left:214 top:469 w:566 ----- */}
         <p
           data-vm-body="vision"
-          className="absolute font-montserrat font-normal text-white text-justify text-[0.938vw] leading-[1.77vw] will-change-transform"
+          className="absolute font-montserrat font-normal text-[#2a2828] text-justify text-[0.938vw] leading-[1.77vw] will-change-transform"
           style={{
             ...bodyStyle,
             left: "11.15vw",
@@ -227,7 +227,7 @@ export default function AboutVisionMission({ data }) {
         {/* ----- Our Mission : title at left:1948 top:130 ----- */}
         <h2
           data-vm-heading="mission"
-          className="absolute capitalize text-white leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
+          className="absolute capitalize text-[#2a2828] leading-[0.95] tracking-[0.0188em] text-[5.52vw] will-change-transform"
           style={{ ...headingStyle, left: "111.35vw", top: "12.04vh" }}
         >
           {data.missionHeading}
@@ -236,7 +236,7 @@ export default function AboutVisionMission({ data }) {
         {/* ----- Mission body at left:2138 top:469 w:566 ----- */}
         <p
           data-vm-body="mission"
-          className="absolute font-montserrat font-normal text-white text-justify text-[0.938vw] leading-[1.77vw] will-change-transform"
+          className="absolute font-montserrat font-normal text-[#2a2828] text-justify text-[0.938vw] leading-[1.77vw] will-change-transform"
           style={{
             ...bodyStyle,
             left: "111.35vw",
@@ -259,7 +259,7 @@ export default function AboutVisionMission({ data }) {
           <div key={p.title || `vm-${idx}`} className="flex flex-col gap-[20px] md:gap-[28px]">
             <h2
               data-vm-heading
-              className="max-sm:pl-[80px] capitalize text-white leading-[0.95] tracking-[0.02em]
+              className="max-sm:pl-[80px] capitalize text-[#2a2828] leading-[0.95] tracking-[0.02em]
                          text-[44px] sm:text-[56px] md:text-[72px]"
               style={headingStyle}
             >
@@ -267,7 +267,7 @@ export default function AboutVisionMission({ data }) {
             </h2>
             <p
               data-vm-body
-              className="max-sm:pl-[80px] font-montserrat font-normal text-white/85 text-justify
+              className="max-sm:pl-[80px] font-montserrat font-normal text-[#2a2828]/85 text-justify
                          text-[14px] sm:text-[15px] md:text-[16px]
                          leading-[24px] sm:leading-[26px] md:leading-[28px]"
               style={bodyStyle}

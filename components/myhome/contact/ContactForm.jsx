@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronDown } from "lucide-react";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
@@ -13,27 +14,30 @@ import SectionHeading from "@/components/common/SectionHeading";
 const DEFAULT_PROJECT_OPTIONS = ["Apas", "Akrida", "Avali", "Sayuk", "Tridasa", "Vipina", "Other"];
 
 const UnderlineField = React.forwardRef(function UnderlineField(
-  { label, hasError, errorMessage, dropdown = false, children, ...inputProps },
+  { label, hasError, errorMessage, dropdown = false, prefix, children, ...inputProps },
   ref
 ) {
   return (
     <label className="flex flex-col gap-[12px] lg:gap-[1.302vw] w-full">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between w-full gap-[10px] lg:gap-[0.521vw]">
         {dropdown ? (
           <>{children}</>
         ) : (
-          <input
-            ref={ref}
-            placeholder={label}
-            aria-invalid={hasError || undefined}
-            className={`flex-1 bg-transparent outline-none border-none
-                        font-montserrat text-[#333] placeholder:text-[#333]
-                        text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.094vw]
-                        leading-[26px] sm:leading-[28px] md:leading-[30px] lg:leading-[1.614vw]
-                        pb-[8px] lg:pb-[0.521vw]`}
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-            {...inputProps}
-          />
+          <>
+            {prefix}
+            <input
+              ref={ref}
+              placeholder={label}
+              aria-invalid={hasError || undefined}
+              className={`flex-1 bg-transparent outline-none border-none
+                          font-montserrat text-[#333] placeholder:text-[#333]
+                          text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.094vw]
+                          leading-[26px] sm:leading-[28px] md:leading-[30px] lg:leading-[1.614vw]
+                          pb-[8px] lg:pb-[0.521vw]`}
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+              {...inputProps}
+            />
+          </>
         )}
       </div>
       <div
@@ -77,6 +81,7 @@ export default function ContactForm({ data }) {
   } = useForm({
     defaultValues: {
       name: "",
+      countryCode: DEFAULT_COUNTRY_CODE,
       phone: "",
       email: "",
       project: "",
@@ -108,7 +113,7 @@ export default function ContactForm({ data }) {
     const payload = {
       name: formValues.name,
       email: formValues.email,
-      phone: formValues.phone,
+      phone: `${formValues.countryCode || DEFAULT_COUNTRY_CODE} ${formValues.phone}`.trim(),
       project: formValues.project || "",
       message: formValues.message || "",
       formSource: "Contact Us Page",
@@ -220,6 +225,13 @@ export default function ContactForm({ data }) {
               type="tel"
               hasError={!!errors.phone}
               errorMessage={errors.phone?.message}
+              prefix={
+                <CountryCodeSelect
+                  {...register("countryCode")}
+                  className="font-montserrat text-[#333] pb-[8px] lg:pb-[0.521vw]
+                             text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.094vw]"
+                />
+              }
               {...register("phone", {
                 required: "Please enter your phone number",
                 pattern: {

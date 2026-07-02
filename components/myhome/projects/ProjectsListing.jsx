@@ -25,7 +25,7 @@ const PROJECT_TYPES = [
   { key: "All", label: "All", Icon: Check },
   { key: "Residential", label: "Residential", Icon: Building },
   { key: "Commercial", label: "Commercial", Icon: Building2 },
-  { key: "Completed", label: "Completed", Icon: Warehouse },
+  { key: "Mixed-Use Development", label: "Mixed-Use Development", Icon: Warehouse },
 ];
 
 // Sidebar: project status / phase (multi-select)
@@ -43,19 +43,8 @@ const LOCATIONS = [
   "Madhapur",
 ];
 
-const CONFIGURATIONS = [
-  "ALL",
-  "2 BHK",
-  "2.5 BHK",
-  "3 BHK",
-  "3.5 BHK",
-  "4 BHK",
-  "4.5 BHK",
-  "5 BHK",
-];
-
 const SORT_OPTIONS = [
-  "Select Sort option",
+  "Select Sort Option",
   "Newest First",
   "Price: Low to High",
   "Price: High to Low",
@@ -67,6 +56,7 @@ const SORT_OPTIONS = [
 // mapped from those per the agreed product decision (no dedicated schema field).
 function projectType(p) {
   if (p.status === "Commercial") return "Commercial";
+  if (p.status === "Residential & Commercial") return "Mixed-Use Development";
   return "Residential"; // default, incl. legacy "Completed" status rows
 }
 
@@ -82,8 +72,6 @@ function phaseRank(p) {
   return PHASE_ORDER[projectStatus(p)] ?? 0;
 }
 
-const PRICE_MIN = 1000000;
-const PRICE_MAX = 5000000;
 const PAGE_SIZE = 4;
 
 const FALLBACK_PROJECTS = [
@@ -560,8 +548,6 @@ export default function ProjectsListing({ projects = [], heading }) {
   const [selectedType, setSelectedType] = useState("All");
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
-  const [selectedConfigs, setSelectedConfigs] = useState(["ALL"]);
-  const [priceMax, setPriceMax] = useState(PRICE_MAX);
   const [sort, setSort] = useState(SORT_OPTIONS[0]);
   const [sortOpen, setSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -596,16 +582,6 @@ export default function ProjectsListing({ projects = [], heading }) {
       list = list.filter((p) => selectedLocations.includes(p.locationKey));
     }
 
-    const configsActive =
-      selectedConfigs.length > 0 && !selectedConfigs.includes("ALL");
-    if (configsActive) {
-      list = list.filter((p) =>
-        p.bhks.some((b) => selectedConfigs.includes(b))
-      );
-    }
-
-    list = list.filter((p) => p.price <= priceMax);
-
     switch (sort) {
       case "Newest First":
         list = [...list].sort((a, b) => b.year - a.year);
@@ -628,11 +604,11 @@ export default function ProjectsListing({ projects = [], heading }) {
     list = [...list].sort((a, b) => phaseRank(a) - phaseRank(b));
 
     return list;
-  }, [selectedType, selectedStatuses, selectedLocations, selectedConfigs, priceMax, sort]);
+  }, [selectedType, selectedStatuses, selectedLocations, sort]);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [selectedType, selectedStatuses, selectedLocations, selectedConfigs, priceMax, sort]);
+  }, [selectedType, selectedStatuses, selectedLocations, sort]);
 
   const visible = filteredAll.slice(0, visibleCount);
   const hasMore = visibleCount < filteredAll.length;
@@ -679,25 +655,9 @@ export default function ProjectsListing({ projects = [], heading }) {
     );
   };
 
-  const toggleConfig = (cfg) => {
-    animateGrid(() =>
-      setSelectedConfigs((prev) => {
-        if (cfg === "ALL") return ["ALL"];
-        const next = prev.includes(cfg)
-          ? prev.filter((x) => x !== cfg && x !== "ALL")
-          : [...prev.filter((x) => x !== "ALL"), cfg];
-        return next.length === 0 ? ["ALL"] : next;
-      })
-    );
-  };
-
   const onSortChange = (opt) => {
     setSortOpen(false);
     animateGrid(() => setSort(opt));
-  };
-
-  const onPriceChange = (n) => {
-    setPriceMax(n);
   };
 
   const handleReset = () => {
@@ -705,8 +665,6 @@ export default function ProjectsListing({ projects = [], heading }) {
       setSelectedType("All");
       setSelectedStatuses([]);
       setSelectedLocations([]);
-      setSelectedConfigs(["ALL"]);
-      setPriceMax(PRICE_MAX);
       setSort(SORT_OPTIONS[0]);
     });
   };
@@ -719,8 +677,6 @@ export default function ProjectsListing({ projects = [], heading }) {
     setVisibleCount(PAGE_SIZE);
     rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-
-  const formatPrice = (n) => `₹ ${n.toLocaleString("en-IN")}`;
 
   return (
     <section
@@ -747,10 +703,10 @@ export default function ProjectsListing({ projects = [], heading }) {
         {/* Filter pill bar */}
         <div
           className="mt-[36px] md:mt-[48px] lg:mt-[3.125vw]
-                     mx-auto max-w-[1149px] lg:max-w-[59.84vw]
+                     mx-auto max-w-[1149px] lg:w-fit lg:max-w-full
                      border-[0.5px] border-[#e7e7e7]
                      px-[12px] lg:px-[0.781vw] py-[8px] lg:py-[0.417vw]
-                     grid grid-cols-2 lg:flex lg:flex-nowrap items-stretch lg:items-center
+                     grid grid-cols-2 lg:flex lg:flex-nowrap items-stretch lg:items-center lg:justify-center
                      gap-[8px] lg:gap-[0.521vw] whitespace-nowrap"
         >
           {/* Project Type — single-select */}
@@ -769,40 +725,6 @@ export default function ProjectsListing({ projects = [], heading }) {
             ))}
           </FilterDropdown>
 
-          {/* Project Status — multi-select */}
-          <FilterDropdown
-            icon={Warehouse}
-            label="Project Status"
-            count={selectedStatuses.length}
-            active={selectedStatuses.length > 0}
-          >
-            {PROJECT_STATUSES.map((st) => (
-              <DropdownOption
-                key={st}
-                label={st}
-                selected={selectedStatuses.includes(st)}
-                onClick={() => toggleStatus(st)}
-              />
-            ))}
-          </FilterDropdown>
-
-          {/* Flat Type — multi-select (BHK configuration) */}
-          <FilterDropdown
-            icon={BedDouble}
-            label="Flat Type"
-            count={selectedConfigs.filter((c) => c !== "ALL").length}
-            active={selectedConfigs.some((c) => c !== "ALL")}
-          >
-            {CONFIGURATIONS.map((cfg) => (
-              <DropdownOption
-                key={cfg}
-                label={cfg === "ALL" ? "All" : cfg}
-                selected={selectedConfigs.includes(cfg)}
-                onClick={() => toggleConfig(cfg)}
-              />
-            ))}
-          </FilterDropdown>
-
           {/* Location — multi-select */}
           <FilterDropdown
             icon={MapPin}
@@ -816,6 +738,23 @@ export default function ProjectsListing({ projects = [], heading }) {
                 label={loc}
                 selected={selectedLocations.includes(loc)}
                 onClick={() => toggleLocation(loc)}
+              />
+            ))}
+          </FilterDropdown>
+
+          {/* Project Status — multi-select */}
+          <FilterDropdown
+            icon={Warehouse}
+            label="Project Status"
+            count={selectedStatuses.length}
+            active={selectedStatuses.length > 0}
+          >
+            {PROJECT_STATUSES.map((st) => (
+              <DropdownOption
+                key={st}
+                label={st}
+                selected={selectedStatuses.includes(st)}
+                onClick={() => toggleStatus(st)}
               />
             ))}
           </FilterDropdown>
@@ -921,46 +860,6 @@ export default function ProjectsListing({ projects = [], heading }) {
               </div>
             </FilterPanel>
 
-            <FilterPanel title="FLAT TYPE:" collapsible>
-              <div className="flex flex-col">
-                {CONFIGURATIONS.map((cfg) => (
-                  <CheckRow
-                    key={cfg}
-                    label={cfg}
-                    checked={selectedConfigs.includes(cfg)}
-                    onChange={() => toggleConfig(cfg)}
-                  />
-                ))}
-              </div>
-            </FilterPanel>
-
-            <FilterPanel title="PRICE">
-              <div className="pt-[8px] lg:pt-[0.417vw]">
-                <input
-                  type="range"
-                  min={PRICE_MIN}
-                  max={PRICE_MAX}
-                  step={100000}
-                  value={priceMax}
-                  onChange={(e) => onPriceChange(Number(e.target.value))}
-                  className="w-full accent-[#ef493d] cursor-pointer"
-                />
-                <div className="mt-[14px] lg:mt-[0.729vw] flex items-center justify-between">
-                  <span
-                    className="font-montserrat font-normal text-[#333] text-[16px] lg:text-[0.938vw] leading-[1.7] tracking-[0.36px]"
-                    style={{ fontFamily: "Montserrat, sans-serif" }}
-                  >
-                    {formatPrice(PRICE_MIN)}
-                  </span>
-                  <span
-                    className="font-montserrat font-normal text-[#333] text-[16px] lg:text-[0.938vw] leading-[1.7] tracking-[0.36px]"
-                    style={{ fontFamily: "Montserrat, sans-serif" }}
-                  >
-                    {formatPrice(priceMax)}
-                  </span>
-                </div>
-              </div>
-            </FilterPanel>
           </aside>
 
           {/* === Cards grid === */}

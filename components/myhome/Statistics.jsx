@@ -61,7 +61,7 @@ const STAT_LAYOUT = [
  * Single stat tile — runs its own GSAP count-up the first time it enters
  * the viewport. The parent timeline reveals (opacity) the tiles in order.
  */
-function StatItem({ stat, index, shouldAnimate, mobile = false }) {
+function StatItem({ stat, index, shouldAnimate, mobile = false, bottomRow = false }) {
   const numRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -134,6 +134,35 @@ function StatItem({ stat, index, shouldAnimate, mobile = false }) {
           style={{
             fontFamily: "Montserrat, sans-serif",
           }}
+        >
+          {stat.label}
+        </span>
+      </div>
+    );
+  }
+
+  if (bottomRow) {
+    // Desktop bottom-row variant — same tile typography as the curve layout
+    // but laid out in normal flow so the tiles sit evenly along the bottom.
+    return (
+      <div
+        ref={wrapRef}
+        data-stat
+        className="flex flex-1 flex-col gap-[0.26vw] leading-[0] text-[#333] items-center text-center"
+      >
+        <span
+          ref={numRef}
+          className="font-tartuffo-reg capitalize text-[3.65vw] leading-[5.21vw] tracking-[0.109vw]"
+          style={{
+            fontFamily:
+              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+          }}
+        >
+          0{stat.suffix}
+        </span>
+        <span
+          className="block font-montserrat font-normal text-[1.146vw] leading-[1.823vw] whitespace-pre-line"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
         >
           {stat.label}
         </span>
@@ -357,7 +386,7 @@ export default function Statistics({ data }) {
       ref={rootRef}
       id="statistics"
       data-section="statistics"
-      className="relative w-full bg-white overflow-hidden lg:h-[67.708vw] lg:min-h-[780px] lg:max-h-[1300px]"
+      className="relative w-full bg-white overflow-hidden lg:h-[80vw] lg:min-h-[900px] lg:max-h-[1560px]"
     >
       {/* ===== Top decorative birds (Figma group2199755 — desktop only)
           inset-[8.46%_13.23%_86%_79.58%] resolves to 138×72 px on a 1920×1300
@@ -437,8 +466,8 @@ export default function Statistics({ data }) {
           Desktop: anchored to bottom 68.31% of the 1300-px section. */}
       <div
         ref={cityRef}
-        className="absolute z-[1] inset-x-0 bottom-0 will-change-transform pointer-events-none
-                   h-[40vh] sm:h-[44vh] md:h-[48vh] lg:h-[68.31%]"
+        className="absolute z-[1] inset-x-0 bottom-0 lg:bottom-[11vw] will-change-transform pointer-events-none
+                   h-[40vh] sm:h-[44vh] md:h-[48vh] lg:h-[46.25vw]"
       >
         {cityImage && (
           <Image
@@ -553,10 +582,11 @@ export default function Statistics({ data }) {
         </p>
       </div>
 
-      {/* ===== Desktop: 5 stats scattered along the curve at Figma coords ===== */}
+      {/* ===== Desktop: stats laid out as an even row along the bottom ===== */}
       <div
         ref={statsWrapRef}
-        className="hidden lg:block absolute inset-x-0 top-0 h-full pointer-events-none z-[4]"
+        className="hidden lg:flex absolute inset-x-0 bottom-[2.5vw] z-[5] pointer-events-none
+                   px-[8.333vw] items-end justify-between gap-[2.083vw]"
       >
         {STATS.map((s, i) => (
           <StatItem
@@ -564,6 +594,7 @@ export default function Statistics({ data }) {
             stat={s}
             index={i}
             shouldAnimate={statsInView}
+            bottomRow
           />
         ))}
       </div>

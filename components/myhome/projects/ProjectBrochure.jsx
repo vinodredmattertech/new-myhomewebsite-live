@@ -8,6 +8,7 @@ import { Download, X } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 
 const DEFAULT_HIGHLIGHTS = [
   "24.99-Acre Master Planned Community",
@@ -90,7 +91,7 @@ export default function ProjectBrochure({
     const payload = {
       name: data.name,
       email: data.email,
-      phone: data.phone,
+      phone: `${data.countryCode || DEFAULT_COUNTRY_CODE} ${data.phone}`.trim(),
       project: projectName,
       message: "Requested project brochure download",
       formSource: "Project Brochure Download",
@@ -393,24 +394,33 @@ export default function ProjectBrochure({
               </div>
 
               <div>
-                <input
-                  type="tel"
-                  placeholder="Phone Number*"
-                  aria-invalid={!!errors.phone || undefined}
-                  className={`w-full bg-transparent outline-none border-b
-                              text-[#333] placeholder:text-[#999]
-                              text-[14px] sm:text-[16px] lg:text-[0.938vw]
-                              py-[8px] lg:py-[0.417vw]
+                <div
+                  className={`flex items-center gap-[8px] lg:gap-[0.417vw] w-full border-b
                               ${errors.phone ? "border-[#ef493d]" : "border-[#33333322]"}`}
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                  {...register("phone", {
-                    required: "Please enter your phone",
-                    pattern: {
-                      value: /^[0-9+\-\s()]{7,15}$/,
-                      message: "Enter a valid phone",
-                    },
-                  })}
-                />
+                >
+                  <CountryCodeSelect
+                    {...register("countryCode")}
+                    className="text-[#333] text-[14px] sm:text-[16px] lg:text-[0.938vw] py-[8px] lg:py-[0.417vw]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number*"
+                    aria-invalid={!!errors.phone || undefined}
+                    className="flex-1 min-w-0 bg-transparent outline-none border-none
+                               text-[#333] placeholder:text-[#999]
+                               text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                               py-[8px] lg:py-[0.417vw]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                    {...register("phone", {
+                      required: "Please enter your phone",
+                      pattern: {
+                        value: /^[0-9+\-\s()]{7,15}$/,
+                        message: "Enter a valid phone",
+                      },
+                    })}
+                  />
+                </div>
                 {errors.phone && (
                   <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.phone.message}</p>
                 )}

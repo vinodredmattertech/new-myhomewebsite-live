@@ -139,7 +139,7 @@ export default function MyHomeHeader() {
         ref={headerRef}
         className={`fixed inset-x-0 top-0 z-[60] transition-all duration-500 ${
           scrolled
-            ? "bg-[#2a2828]/85 backdrop-blur-md border-b border-white/10"
+            ? "bg-[#2a2828]/60 backdrop-blur-md border-b border-white/10"
             : "bg-white/10 backdrop-blur-[6px] border-b border-white/30"
         }`}
       >
@@ -161,18 +161,14 @@ export default function MyHomeHeader() {
             type="button"
             aria-label="Menu"
             onClick={() => setOpen(true)}
-            className="md:hidden ml-auto group flex items-center gap-[12px] text-white"
+            className="md:hidden ml-auto group flex items-center gap-[12px] text-white
+                       bg-white/10 backdrop-blur-md border border-white/20 rounded-full
+                       px-[16px] py-[10px] hover:bg-white/20 transition-colors duration-300"
           >
             <span className="relative flex flex-col gap-[4px] w-[24px] h-[14px] justify-center">
               <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
               <span className="block h-[1.5px] w-[70%] ml-auto bg-white transition-all duration-500 group-hover:w-full" />
               <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
-            </span>
-            <span
-              className="font-montserrat font-medium text-[16px] leading-[32px] tracking-wide"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              {MENU_LABEL}
             </span>
           </button>
 
@@ -181,15 +177,15 @@ export default function MyHomeHeader() {
             type="button"
             aria-label="Menu"
             onClick={() => setOpen(true)}
-            className="hidden md:flex group items-center gap-3 lg:gap-[0.781vw] text-white"
+            className="hidden md:flex group items-center gap-3 lg:gap-[0.781vw] text-white
+                       bg-white/10 backdrop-blur-md border border-white/20 rounded-full
+                       px-[18px] py-[10px] lg:px-[1.042vw] lg:py-[0.625vw]
+                       hover:bg-white/20 transition-colors duration-300"
           >
             <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
               <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
               <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
               <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
-            </span>
-            <span className="font-montserrat font-medium text-[16px] lg:text-[0.938vw] leading-none tracking-wide">
-              {MENU_LABEL}
             </span>
           </button>
 
@@ -210,7 +206,10 @@ export default function MyHomeHeader() {
 
           <Link
             href={CONTACT_CTA_LINK}
-            className="hidden md:inline-flex ml-auto items-center font-montserrat font-medium uppercase text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group"
+            className="hidden md:inline-flex ml-auto items-center font-montserrat font-medium uppercase text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group
+                       bg-white/10 backdrop-blur-md border border-white/20 rounded-full
+                       px-[20px] py-[10px] lg:px-[1.302vw] lg:py-[0.625vw]
+                       hover:bg-white/20 transition-colors duration-300"
           >
             <span>{CONTACT_CTA_LABEL}</span>
             <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />

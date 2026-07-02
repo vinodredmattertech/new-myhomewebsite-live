@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@studio-freight/lenis": "^1.0.42",
     "axios": "^1.13.6",
+    "country-codes-list": "^2.0.0",
     "formidable": "^3.5.4",
     "framer-motion": "^12.23.3",
     "gsap": "^3.13.0",

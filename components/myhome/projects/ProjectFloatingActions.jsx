@@ -5,6 +5,7 @@ import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { Phone, X } from "lucide-react";
 import { submitLead } from "@/lib/strapi";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 
 const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
 
@@ -42,7 +43,7 @@ export default function ProjectFloatingActions({
     const payload = {
       name: data.name,
       email: data.email,
-      phone: data.phone,
+      phone: `${data.countryCode || DEFAULT_COUNTRY_CODE} ${data.phone}`.trim(),
       project: projectName,
       message: [
         "Requested a site visit",
@@ -202,7 +203,7 @@ export default function ProjectFloatingActions({
                 fontWeight: 400,
               }}
             >
-              Request A Site Visit
+              Request a Site Visit
             </Dialog.Title>
             <p
               className="font-montserrat text-[#6d6d6d] mt-[8px] lg:mt-[0.521vw]
@@ -241,24 +242,33 @@ export default function ProjectFloatingActions({
               </div>
 
               <div>
-                <input
-                  type="tel"
-                  placeholder="Phone Number*"
-                  aria-invalid={!!errors.phone || undefined}
-                  className={`w-full bg-transparent outline-none border-b
-                              text-[#333] placeholder:text-[#999]
-                              text-[14px] sm:text-[16px] lg:text-[0.938vw]
-                              py-[8px] lg:py-[0.417vw]
+                <div
+                  className={`flex items-center gap-[8px] lg:gap-[0.417vw] w-full border-b
                               ${errors.phone ? "border-[#ef493d]" : "border-[#33333322]"}`}
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                  {...register("phone", {
-                    required: "Please enter your phone",
-                    pattern: {
-                      value: /^[0-9+\-\s()]{7,15}$/,
-                      message: "Enter a valid phone",
-                    },
-                  })}
-                />
+                >
+                  <CountryCodeSelect
+                    {...register("countryCode")}
+                    className="text-[#333] text-[14px] sm:text-[16px] lg:text-[0.938vw] py-[8px] lg:py-[0.417vw]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number*"
+                    aria-invalid={!!errors.phone || undefined}
+                    className="flex-1 min-w-0 bg-transparent outline-none border-none
+                               text-[#333] placeholder:text-[#999]
+                               text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                               py-[8px] lg:py-[0.417vw]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                    {...register("phone", {
+                      required: "Please enter your phone",
+                      pattern: {
+                        value: /^[0-9+\-\s()]{7,15}$/,
+                        message: "Enter a valid phone",
+                      },
+                    })}
+                  />
+                </div>
                 {errors.phone && (
                   <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.phone.message}</p>
                 )}

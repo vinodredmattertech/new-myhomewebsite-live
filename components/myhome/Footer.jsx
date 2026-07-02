@@ -17,6 +17,7 @@ import {
   Youtube,
 } from "lucide-react";
 import { getFooterData, mediaUrl, submitLead } from "@/lib/strapi";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 
 const SOCIAL_ICON_MAP = {
   instagram: Instagram,
@@ -96,9 +97,9 @@ export default function MyHomeFooter() {
   const SUBMITTING_LABEL = cms?.submittingLabel || "Submitting…";
   const SUCCESS_LABEL = cms?.successLabel || "Submitted ✓";
   const FORM_SOURCE = cms?.formSource || "Website Footer";
-  const NAME_PLACEHOLDER = cms?.namePlaceholder || "Your name";
+  const NAME_PLACEHOLDER = cms?.namePlaceholder || "Your Name";
   const EMAIL_PLACEHOLDER = cms?.emailPlaceholder || "Your Email";
-  const PHONE_PLACEHOLDER = cms?.phonePlaceholder || "+91 |  Enter your number";
+  const PHONE_PLACEHOLDER = cms?.phonePlaceholder || "Phone Number";
   const ADDRESS_HEADING = cms?.addressHeading || "Corporate Address";
   const QUICK_LINKS_HEADING = cms?.quickLinksHeading || "Quick Links";
   const QUICK_LINKS =
@@ -122,7 +123,7 @@ export default function MyHomeFooter() {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: { name: "", email: "", phone: "" },
+    defaultValues: { name: "", email: "", countryCode: DEFAULT_COUNTRY_CODE, phone: "" },
     mode: "onBlur",
   });
 
@@ -151,7 +152,7 @@ export default function MyHomeFooter() {
     const payload = {
       name: formValues.name,
       email: formValues.email,
-      phone: formValues.phone,
+      phone: `${formValues.countryCode || DEFAULT_COUNTRY_CODE} ${formValues.phone}`.trim(),
       formSource: FORM_SOURCE,
     };
     try {
@@ -279,19 +280,45 @@ export default function MyHomeFooter() {
               </div>
 
              
-              <FieldInput
-                placeholder={PHONE_PLACEHOLDER}
-                type="tel"
-                hasError={!!errors.phone}
-                {...register("phone", {
-                  required: "Please enter your phone number",
-                  pattern: {
-                    value: /^[0-9+\-\s()]{7,15}$/,
-                    message: "Enter a valid phone number",
-                  },
-                })}
-                errorMessage={errors.phone?.message}
-              />
+              <label className="block w-full">
+                <div
+                  className={`flex items-center gap-[8px] lg:gap-[0.417vw] w-full
+                              border-b border-solid transition-colors duration-300
+                              h-[37px] md:h-[48px] lg:h-[3.125vw]
+                              ${errors.phone ? "border-[#ef493d]" : "border-white/85 focus-within:border-white"}`}
+                >
+                  <CountryCodeSelect
+                    {...register("countryCode")}
+                    className="text-white text-[11px] md:text-[14px] lg:text-[0.938vw] pl-[7px] lg:pl-[0.625vw]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  />
+                  <input
+                    type="tel"
+                    placeholder={PHONE_PLACEHOLDER}
+                    aria-invalid={!!errors.phone || undefined}
+                    className="flex-1 min-w-0 bg-transparent border-none outline-none
+                               text-white placeholder:text-white/65
+                               text-[11px] md:text-[14px] lg:text-[0.938vw]
+                               pr-[8px] pt-[8px] pb-[8px] lg:pt-[12px] lg:pb-[12px]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                    {...register("phone", {
+                      required: "Please enter your phone number",
+                      pattern: {
+                        value: /^[0-9+\-\s()]{7,15}$/,
+                        message: "Enter a valid phone number",
+                      },
+                    })}
+                  />
+                </div>
+                {errors.phone && (
+                  <span
+                    className="mt-1 block font-montserrat text-[12px] text-[#ef493d]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  >
+                    {errors.phone.message}
+                  </span>
+                )}
+              </label>
             </div>
 
             
