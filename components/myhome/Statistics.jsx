@@ -586,7 +586,7 @@ export default function Statistics({ data }) {
       <div
         ref={statsWrapRef}
         className="hidden lg:flex absolute inset-x-0 bottom-[2.5vw] z-[5] pointer-events-none
-                   px-[8.333vw] items-end justify-between gap-[2.083vw]"
+                   px-[8.333vw] items-start justify-between gap-[2.083vw]"
       >
         {STATS.map((s, i) => (
           <StatItem

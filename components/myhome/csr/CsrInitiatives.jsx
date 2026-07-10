@@ -136,7 +136,10 @@ function CardArrow({ href }) {
     "w-[44px] h-[44px] lg:w-[2.604vw] lg:h-[2.604vw] " +
     "border-[#e31f24] text-[#e31f24] hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white";
   const icon = (
-    <ArrowUpRight className="w-[18px] h-[18px] lg:w-[0.99vw] lg:h-[0.99vw]" strokeWidth={1.5} />
+    <ArrowUpRight
+      className="w-[18px] h-[18px] lg:w-[0.99vw] lg:h-[0.99vw]"
+      strokeWidth={1.5}
+    />
   );
   if (!href) return <span className={cls}>{icon}</span>;
   return (
@@ -198,7 +201,7 @@ export default function CsrInitiatives({ section }) {
 
   const cards = useMemo(
     () => visible.filter((i) => i.id !== featured?.id),
-    [visible, featured]
+    [visible, featured],
   );
 
   const trackRef = useRef(null);
@@ -224,7 +227,10 @@ export default function CsrInitiatives({ section }) {
                    lg:left-[4.166vw] lg:top-[4.688vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
         style={{ color: RED }}
       >
-        <span className="block w-px h-[26px] lg:h-[3.125vw]" style={{ background: RED }} />
+        <span
+          className="block w-px h-[26px] lg:h-[3.125vw]"
+          style={{ background: RED }}
+        />
         <span
           className="font-medium capitalize whitespace-nowrap text-[11px] lg:text-[1.25vw]"
           style={{
@@ -292,8 +298,10 @@ export default function CsrInitiatives({ section }) {
         <div className="mt-[32px] lg:mt-[3.125vw] px-5 md:px-10 lg:px-[9.583vw]">
           <div className="grid grid-cols-1 lg:grid-cols-[53.18vw_1fr] gap-[28px] lg:gap-[3.125vw] items-center">
             {/* image */}
-            <div className="relative w-full overflow-hidden rounded-[8px] lg:rounded-[0.417vw]
-                            aspect-[1021/589]">
+            <div
+              className="relative w-full overflow-hidden rounded-[8px] lg:rounded-[0.417vw]
+                            aspect-[1021/589]"
+            >
               <Image
                 key={featured.id}
                 src={featured.image}

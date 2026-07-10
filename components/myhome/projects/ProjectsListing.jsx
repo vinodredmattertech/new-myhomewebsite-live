@@ -15,6 +15,8 @@ import {
   BedDouble,
   Maximize2,
   ArrowUpRight,
+  Crown,
+  Gem,
 } from "lucide-react";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl } from "@/lib/strapi";
@@ -26,6 +28,8 @@ const PROJECT_TYPES = [
   { key: "Residential", label: "Residential", Icon: Building },
   { key: "Commercial", label: "Commercial", Icon: Building2 },
   { key: "Mixed-Use Development", label: "Mixed-Use Development", Icon: Warehouse },
+  { key: "Ultra-Luxury", label: "Ultra-Luxury", Icon: Crown },
+  { key: "Premium", label: "Premium", Icon: Gem },
 ];
 
 // Sidebar: project status / phase (multi-select)
@@ -55,6 +59,11 @@ const SORT_OPTIONS = [
 // Residential & Commercial) and a free-text `badge`; the project *phase* is
 // mapped from those per the agreed product decision (no dedicated schema field).
 function projectType(p) {
+  // A tier tag (Ultra-Luxury / Premium) takes precedence over the base
+  // Residential/Commercial classification for the single-select Project Type
+  // filter, when the CMS provides it.
+  const tier = p.tier || p.category;
+  if (tier === "Ultra-Luxury" || tier === "Premium") return tier;
   if (p.status === "Commercial") return "Commercial";
   if (p.status === "Residential & Commercial") return "Mixed-Use Development";
   return "Residential"; // default, incl. legacy "Completed" status rows
@@ -526,6 +535,7 @@ function normaliseCmsProject(p) {
     acres: p.acres || "",
     image: mediaUrl(p.image),
     status: p.status || "Residential",
+    tier: p.tier || p.category || "",
     badge: p.badge || null,
     price: typeof p.price === "number" ? p.price : 0,
     year: typeof p.year === "number" ? p.year : 0,

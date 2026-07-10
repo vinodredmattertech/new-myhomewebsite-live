@@ -51,7 +51,7 @@ const ButtonWhite = ({
       {/* Button text */}
       <span
         className={`
-          relative z-[0] font-medium montserrat uppercase content-sm
+          relative z-[0] font-medium montserrat capitalize content-sm
           transition-colors duration-300
           ${hoverTextClasses[variant]}
         `}

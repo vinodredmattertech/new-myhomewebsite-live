@@ -139,7 +139,7 @@ export default function MyHomeHeader() {
         ref={headerRef}
         className={`fixed inset-x-0 top-0 z-[60] transition-all duration-500 ${
           scrolled
-            ? "bg-[#2a2828]/60 backdrop-blur-md border-b border-white/10"
+            ? "bg-[#2a2828]/90 backdrop-blur-md border-b border-white/10"
             : "bg-white/10 backdrop-blur-[6px] border-b border-white/30"
         }`}
       >
@@ -172,22 +172,17 @@ export default function MyHomeHeader() {
             </span>
           </button>
 
-          {/* ===== Desktop (md+): Menu LEFT, Logo CENTER, Contact RIGHT ===== */}
-          <button
-            type="button"
-            aria-label="Menu"
-            onClick={() => setOpen(true)}
-            className="hidden md:flex group items-center gap-3 lg:gap-[0.781vw] text-white
+          {/* ===== Desktop (md+): Contact LEFT, Logo CENTER, Menu RIGHT ===== */}
+          <Link
+            href={CONTACT_CTA_LINK}
+            className="hidden md:inline-flex items-center font-montserrat font-medium capitalize text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group
                        bg-white/10 backdrop-blur-md border border-white/20 rounded-full
-                       px-[18px] py-[10px] lg:px-[1.042vw] lg:py-[0.625vw]
+                       px-[20px] py-[10px] lg:px-[1.302vw] lg:py-[0.625vw]
                        hover:bg-white/20 transition-colors duration-300"
           >
-            <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
-              <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
-            </span>
-          </button>
+            <span>{CONTACT_CTA_LABEL}</span>
+            <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />
+          </Link>
 
           <Link
             href="/"
@@ -204,16 +199,21 @@ export default function MyHomeHeader() {
             />
           </Link>
 
-          <Link
-            href={CONTACT_CTA_LINK}
-            className="hidden md:inline-flex ml-auto items-center font-montserrat font-medium uppercase text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group
+          <button
+            type="button"
+            aria-label="Menu"
+            onClick={() => setOpen(true)}
+            className="hidden md:flex ml-auto group items-center gap-3 lg:gap-[0.781vw] text-white
                        bg-white/10 backdrop-blur-md border border-white/20 rounded-full
-                       px-[20px] py-[10px] lg:px-[1.302vw] lg:py-[0.625vw]
+                       px-[18px] py-[10px] lg:px-[1.042vw] lg:py-[0.625vw]
                        hover:bg-white/20 transition-colors duration-300"
           >
-            <span>{CONTACT_CTA_LABEL}</span>
-            <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />
-          </Link>
+            <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
+              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
+              <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
+              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
+            </span>
+          </button>
         </div>
       </header>
 
@@ -230,8 +230,8 @@ export default function MyHomeHeader() {
           }`}
         />
         <aside
-          className={`absolute top-0 left-0 h-full w-full sm:w-[440px] bg-[#2a2828] text-white transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            open ? "translate-x-0" : "-translate-x-full"
+          className={`absolute top-0 right-0 h-full w-full sm:w-[440px] bg-[#2a2828] text-white transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            open ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <div className="flex items-center justify-between px-8 md:px-12 py-8">
@@ -253,7 +253,7 @@ export default function MyHomeHeader() {
               </svg>
             </button>
           </div>
-          <nav className="px-8 md:px-12 py-6 flex flex-col gap-3">
+          <nav className="px-8 md:px-12 py-6 flex flex-col gap-1">
             {NAV_ITEMS.map((item, i) => (
               <Link
                 key={item.label}
@@ -261,10 +261,10 @@ export default function MyHomeHeader() {
                 target={item.openInNewTab ? "_blank" : undefined}
                 rel={item.openInNewTab ? "noopener noreferrer" : undefined}
                 onClick={() => setOpen(false)}
-                className="group inline-flex items-center justify-between border-b border-white/10 py-4 font-tartuffo text-[28px] md:text-[34px] capitalize tracking-wide hover:text-mh-red transition-colors duration-500"
+                className="group inline-flex items-center justify-between border-b border-white/10 py-[10px] font-tartuffo text-[18px] md:text-[22px] capitalize tracking-wide hover:text-mh-red transition-colors duration-500"
                 style={{
                   transitionDelay: open ? `${0.1 + i * 0.04}s` : "0s",
-                  transform: open ? "translateX(0)" : "translateX(-30px)",
+                  transform: open ? "translateX(0)" : "translateX(30px)",
                   opacity: open ? 1 : 0,
                   transitionProperty: "opacity, transform, color",
                   transitionDuration: "0.7s",

@@ -350,7 +350,7 @@ export default function HeroBanner({ data }) {
             className="group self-start lg:self-end shrink-0 inline-flex items-center justify-center lg:justify-between gap-0 lg:gap-[1.041vw] w-[152px] sm:w-[180px] lg:w-[15.354vw] xl:w-[15.354vw] h-[42px] sm:h-[50px] lg:h-[3.125vw] px-4 sm:px-5 lg:px-[1.5vw] bg-white text-[#2a2828] hover:bg-mh-red hover:text-white transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden whitespace-nowrap"
           >
             <span
-              className="font-montserrat font-medium uppercase text-[12px] sm:text-[13px] lg:text-[0.833vw] tracking-[0.08em] whitespace-nowrap"
+              className="font-montserrat font-medium capitalize text-[12px] sm:text-[13px] lg:text-[0.833vw] tracking-[0.08em] whitespace-nowrap"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               {data.ctaText}

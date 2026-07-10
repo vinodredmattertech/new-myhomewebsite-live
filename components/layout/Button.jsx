@@ -53,7 +53,7 @@ const Button = ({
       {/* Button text */}
       <span
         className={`
-          relative flex items-center justify-center z-[0] font-medium montserrat uppercase content-sm
+          relative flex items-center justify-center z-[0] font-medium montserrat capitalize content-sm
           transition-colors duration-300
           ${hoverTextClasses[variant]}
         `}
