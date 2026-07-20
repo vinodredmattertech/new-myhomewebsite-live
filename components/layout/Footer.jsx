@@ -121,8 +121,13 @@ const Footer = () => {
 
   if (!footerData) return null;
 
-
-
+  // The logo relation can be absent from the CMS response. Building the src
+  // unconditionally would stringify `undefined` into the URL and blow up
+  // next/image, so resolve it first and skip the <Image> when there is none.
+  const footerLogoPath = footerData?.FooterLogo?.data?.attributes?.url;
+  const footerLogoSrc = footerLogoPath
+    ? `${process.env.NEXT_PUBLIC_BACKEND_API_URL}${footerLogoPath}`
+    : null;
 
   return (
     <footer className=" relative">
@@ -188,16 +193,18 @@ const Footer = () => {
       </div>
 
       {/* Logo */}
-      <div className=" flex items-center justify-center">
-        <Image
-          src={`${process.env.NEXT_PUBLIC_BACKEND_API_URL}${footerData?.FooterLogo?.data?.attributes?.url}`}
-          alt="Logo"
-          width={268}
-          height={147}
-          priority
-          className="h-[126px] w-auto lg:h-[7.604vw]"
-        />
-      </div>
+      {footerLogoSrc && (
+        <div className=" flex items-center justify-center">
+          <Image
+            src={footerLogoSrc}
+            alt={footerData?.FooterLogo?.data?.attributes?.alternativeText || "Logo"}
+            width={268}
+            height={147}
+            priority
+            className="h-[126px] w-auto lg:h-[7.604vw]"
+          />
+        </div>
+      )}
 
       {/* Divider */}
       <div className=" h-[1px]  bg-[#5F5F5F80] my-10 lg:my-[2vw]   lg:max-w-[80vw] max-w-[90%] mx-auto" />

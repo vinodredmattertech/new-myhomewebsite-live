@@ -12,12 +12,24 @@ export default function SmoothScroll({ children }) {
       smooth: true,
     });
 
+    // Exposed so in-page anchor navigation (e.g. the project detail section
+    // nav) can scroll through Lenis instead of fighting it with native
+    // `scrollIntoView`, which Lenis overrides.
+    window.__lenis = lenis;
+
+    let rafId;
     function raf(time) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+      if (window.__lenis === lenis) delete window.__lenis;
+    };
   }, []);
 
   return children;

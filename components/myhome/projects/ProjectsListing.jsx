@@ -878,7 +878,7 @@ export default function ProjectsListing({ projects = [], heading }) {
               ref={gridRef}
               className="grid grid-cols-1 sm:grid-cols-2 gap-x-[20px] gap-y-[24px] md:gap-x-[28px] md:gap-y-[32px] lg:gap-x-[1.562vw] lg:gap-y-[1.562vw]"
             >
-              {visible.length === 0 ? (
+              {visible.length === 0 ?  0(
                 <p
                   className="col-span-full text-center font-montserrat text-[#6d6d6d] py-[40px]
                              text-[14px] lg:text-[1.042vw]"

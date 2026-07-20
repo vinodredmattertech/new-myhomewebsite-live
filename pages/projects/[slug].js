@@ -12,6 +12,7 @@ import ProjectTestimonials from "@/components/myhome/projects/ProjectTestimonial
 import ProjectInquiry from "@/components/myhome/projects/ProjectInquiry";
 import ProjectConnectivity from "@/components/myhome/projects/ProjectConnectivity";
 import ProjectFloatingActions from "@/components/myhome/projects/ProjectFloatingActions";
+import ProjectSectionNav from "@/components/myhome/projects/ProjectSectionNav";
 import { getProjectBySlug, mediaUrl, STRAPI_URL } from "@/lib/strapi";
 
 /** Split a newline-separated text field into a trimmed string array. */
@@ -185,6 +186,24 @@ export default function ProjectDetailPage({ project }) {
   // so it shows whenever the CMS component is present — not gated on text.
   const hasInquiry = Boolean(project.inquiry);
 
+  // Sticky section-nav tabs. Each entry is gated on the same `has*` flag that
+  // gates its section, so a tab only ever exists when its section rendered.
+  // Order matches the DOM order of the sections below.
+  const navSections = [
+    { id: "overview", label: "Overview", show: hasOverview },
+    { id: "location", label: "Location", show: hasConnectivity },
+    { id: "amenities", label: "Amenities", show: hasAmenities },
+    { id: "plans", label: "Plans", show: hasFloorPlans },
+    { id: "gallery", label: "Gallery", show: hasGallery },
+    { id: "specification", label: "Specification", show: hasSpecifications },
+    {
+      id: "construction-updates",
+      label: "Construction Updates",
+      show: hasProgress,
+    },
+    { id: "testimonials", label: "Testimonials", show: hasTestimonials },
+  ].filter((s) => s.show);
+
   return (
     <>
       <Seo seo={project.seo} />
@@ -199,28 +218,34 @@ export default function ProjectDetailPage({ project }) {
         />
       )}
 
+      <ProjectSectionNav sections={navSections} />
+
       {hasOverview && (
-        <ProjectOverview
-          imageSrc={mediaUrl(ov?.image)}
-          imageAlt={`${project.title} overview`}
-          sidebarLabel={ov.sidebarLabel}
-          heading={ov.heading}
-          description={ov.description}
-          stats={overviewStats.length ? overviewStats : undefined}
-        />
+        <div id="overview">
+          <ProjectOverview
+            imageSrc={mediaUrl(ov?.image)}
+            imageAlt={`${project.title} overview`}
+            sidebarLabel={ov.sidebarLabel}
+            heading={ov.heading}
+            description={ov.description}
+            stats={overviewStats.length ? overviewStats : undefined}
+          />
+        </div>
       )}
 
       {hasConnectivity && (
-        <ProjectConnectivity
-          sidebarLabel={co.sidebarLabel}
-          heading={co.heading}
-          categories={
-            connectivityCategories.length ? connectivityCategories : undefined
-          }
-          mapEmbedUrl={co.mapEmbedUrl}
-          mapSrc={mediaUrl(co?.mapImage)}
-          mapAlt={co.mapAlt}
-        />
+        <div id="location">
+          <ProjectConnectivity
+            sidebarLabel={co.sidebarLabel}
+            heading={co.heading}
+            categories={
+              connectivityCategories.length ? connectivityCategories : undefined
+            }
+            mapEmbedUrl={co.mapEmbedUrl}
+            mapSrc={mediaUrl(co?.mapImage)}
+            mapAlt={co.mapAlt}
+          />
+        </div>
       )}
 
       {/* {project.amenities && (
@@ -231,43 +256,56 @@ export default function ProjectDetailPage({ project }) {
           amenities={amenities.length ? amenities : undefined}
         />
       )} */}
-      {hasAmenities && <ProjectAmenities data={project?.amenities} />}
+      {hasAmenities && (
+        <div id="amenities">
+          <ProjectAmenities data={project?.amenities} />
+        </div>
+      )}
+
       {hasFloorPlans && (
-        <ProjectFloorPlans
-          sidebarLabel={fp.sidebarLabel}
-          heading={fp.heading}
-          description={fp.description}
-          tabs={floorPlanTabs.length ? floorPlanTabs : undefined}
-          projectName={project.title}
-        />
+        <div id="plans">
+          <ProjectFloorPlans
+            sidebarLabel={fp.sidebarLabel}
+            heading={fp.heading}
+            description={fp.description}
+            tabs={floorPlanTabs.length ? floorPlanTabs : undefined}
+            projectName={project.title}
+          />
+        </div>
       )}
 
       {hasGallery && (
-        <ProjectGallery
-          sidebarLabel={ga.sidebarLabel}
-          heading={ga.heading}
-          description={ga.description}
-          tabs={galleryTabs.length ? galleryTabs : undefined}
-        />
+        <div id="gallery">
+          <ProjectGallery
+            sidebarLabel={ga.sidebarLabel}
+            heading={ga.heading}
+            description={ga.description}
+            tabs={galleryTabs.length ? galleryTabs : undefined}
+          />
+        </div>
       )}
 
       {hasSpecifications && (
-        <ProjectSpecifications
-          sidebarLabel={sp.sidebarLabel}
-          heading={sp.heading}
-          description={sp.description}
-          specs={specs.length ? specs : undefined}
-        />
+        <div id="specification">
+          <ProjectSpecifications
+            sidebarLabel={sp.sidebarLabel}
+            heading={sp.heading}
+            description={sp.description}
+            specs={specs.length ? specs : undefined}
+          />
+        </div>
       )}
 
       {hasProgress && (
-        <ProjectProgress
-          sidebarLabel={pr.sidebarLabel}
-          heading={pr.heading}
-          description={pr.description}
-          metrics={progressMetrics.length ? progressMetrics : undefined}
-          images={progressImages.length ? progressImages : undefined}
-        />
+        <div id="construction-updates">
+          <ProjectProgress
+            sidebarLabel={pr.sidebarLabel}
+            heading={pr.heading}
+            description={pr.description}
+            metrics={progressMetrics.length ? progressMetrics : undefined}
+            images={progressImages.length ? progressImages : undefined}
+          />
+        </div>
       )}
 
       {hasBrochure && (
@@ -286,12 +324,14 @@ export default function ProjectDetailPage({ project }) {
       )}
 
       {hasTestimonials && (
-        <ProjectTestimonials
-          sidebarLabel={tm.sidebarLabel}
-          heading={tm.heading}
-          description={tm.description}
-          testimonials={testimonials.length ? testimonials : undefined}
-        />
+        <div id="testimonials">
+          <ProjectTestimonials
+            sidebarLabel={tm.sidebarLabel}
+            heading={tm.heading}
+            description={tm.description}
+            testimonials={testimonials.length ? testimonials : undefined}
+          />
+        </div>
       )}
 
       {hasInquiry && (
