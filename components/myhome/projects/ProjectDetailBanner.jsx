@@ -158,9 +158,12 @@ export default function ProjectDetailBanner({
       </div>
 
       {logoSrc ? (
+        // z-[60] clears the sticky ProjectSectionNav (z-[50]) that follows this
+        // section — the card hangs half its height into the nav's band, so a
+        // lower value leaves it clipped. Stays under the header chrome (z-[70]+).
         <div
           ref={logoCardRef}
-          className="hidden lg:flex absolute bottom-0 right-[3vw] z-[10] translate-y-1/2
+          className="hidden lg:flex absolute bottom-0 right-[3vw] z-[60] translate-y-1/2
                      items-center justify-center bg-white rounded-[12px]
                      border border-[rgba(85,85,85,0.1)]
                      shadow-[0_0_30px_0_rgba(0,0,0,0.05)]
