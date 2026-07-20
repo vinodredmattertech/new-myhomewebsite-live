@@ -1,16 +1,16 @@
 import Seo from "@/components/Seo/Seo";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import NewsBanner from "@/components/myhome/news/NewsBanner";
-import NewsListing from "@/components/myhome/news/NewsListing";
-import { getNewsListing } from "@/lib/strapi";
+import MediaGallery from "@/components/myhome/news/MediaGallery";
+import { getMediaGalleryListing } from "@/lib/strapi";
 
-export default function NewsPage({ page, news }) {
+export default function NewsPage({ page, items }) {
   return (
     <>
       <Seo seo={page?.seo} />
       <NewsBanner banner={page?.banner} />
-      <NewsListing
-        news={news || []}
+      <MediaGallery
+        items={items || []}
         heading={page?.listingHeading}
         sectionLabel={page?.sectionLabel}
         backgroundImage={page?.backgroundImage}
@@ -22,11 +22,11 @@ export default function NewsPage({ page, news }) {
 NewsPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
 
 export async function getServerSideProps() {
-  const { page, news } = await getNewsListing();
+  const { page, items } = await getMediaGalleryListing();
   return {
     props: {
       page: page ?? null,
-      news: news ?? [],
+      items: items ?? [],
     },
   };
 }
