@@ -172,17 +172,22 @@ export default function MyHomeHeader() {
             </span>
           </button>
 
-          {/* ===== Desktop (md+): Contact LEFT, Logo CENTER, Menu RIGHT ===== */}
-          <Link
-            href={CONTACT_CTA_LINK}
-            className="hidden md:inline-flex items-center font-montserrat font-medium capitalize text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group
+          {/* ===== Desktop (md+): Menu LEFT, Logo CENTER, Contact RIGHT ===== */}
+          <button
+            type="button"
+            aria-label="Menu"
+            onClick={() => setOpen(true)}
+            className="hidden md:flex group items-center gap-3 lg:gap-[0.781vw] text-white
                        bg-white/10 backdrop-blur-md border border-white/20 rounded-full
-                       px-[20px] py-[10px] lg:px-[1.302vw] lg:py-[0.625vw]
+                       px-[18px] py-[10px] lg:px-[1.042vw] lg:py-[0.625vw]
                        hover:bg-white/20 transition-colors duration-300"
           >
-            <span>{CONTACT_CTA_LABEL}</span>
-            <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />
-          </Link>
+            <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
+              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
+              <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
+              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
+            </span>
+          </button>
 
           <Link
             href="/"
@@ -199,21 +204,16 @@ export default function MyHomeHeader() {
             />
           </Link>
 
-          <button
-            type="button"
-            aria-label="Menu"
-            onClick={() => setOpen(true)}
-            className="hidden md:flex ml-auto group items-center gap-3 lg:gap-[0.781vw] text-white
+          <Link
+            href={CONTACT_CTA_LINK}
+            className="hidden md:inline-flex ml-auto items-center font-montserrat font-medium capitalize text-white text-[14px] lg:text-[0.833vw] tracking-[0.08em] relative group
                        bg-white/10 backdrop-blur-md border border-white/20 rounded-full
-                       px-[18px] py-[10px] lg:px-[1.042vw] lg:py-[0.625vw]
+                       px-[20px] py-[10px] lg:px-[1.302vw] lg:py-[0.625vw]
                        hover:bg-white/20 transition-colors duration-300"
           >
-            <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
-              <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
-            </span>
-          </button>
+            <span>{CONTACT_CTA_LABEL}</span>
+            <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />
+          </Link>
         </div>
       </header>
 

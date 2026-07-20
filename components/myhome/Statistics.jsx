@@ -394,7 +394,7 @@ export default function Statistics({ data }) {
       <div
         ref={birdsTopRef}
         className="hidden lg:block absolute z-[3] pointer-events-none"
-        style={{ top: "8.46%", right: "13.23%", width: "7.187vw", height: "3.75vw" }}
+        style={{ top: "5.73vw", right: "13.23%", width: "7.187vw", height: "3.75vw" }}
       >
         {birdsTopImage && (
           /* eslint-disable-next-line @next/next/no-img-element */
@@ -412,7 +412,7 @@ export default function Statistics({ data }) {
         ref={birdsBottomRef}
         className="hidden lg:block absolute z-[3] pointer-events-none"
         style={{
-          top: "68.15%",
+          top: "46.14vw",
           left: "20.16%",
           width: "4.323vw",
           height: "2.343vw",
@@ -436,7 +436,7 @@ export default function Statistics({ data }) {
       <div
         ref={curveRef}
         className="hidden lg:block absolute z-[2] pointer-events-none will-change-transform
-                   top-[41.46%] left-[calc(45.83%-2.072vw)] w-[105.29vw] h-[20.13vw]
+                   top-[28.07vw] left-[calc(45.83%-2.072vw)] w-[105.29vw] h-[20.13vw]
                    flex items-center justify-center"
         style={{
           transform: "translateX(-50%)",
@@ -582,11 +582,13 @@ export default function Statistics({ data }) {
         </p>
       </div>
 
-      {/* ===== Desktop: stats laid out as an even row along the bottom ===== */}
+      {/* ===== Desktop: stats scattered along the curve at exact Figma coords
+           (node 3511:3773). Each tile's left/top/width come from STAT_LAYOUT,
+           already converted from the 1920-wide frame to vw. The wrapper is a
+           plain positioning context — the tiles position themselves. ===== */}
       <div
         ref={statsWrapRef}
-        className="hidden lg:flex absolute inset-x-0 bottom-[2.5vw] z-[5] pointer-events-none
-                   px-[8.333vw] items-start justify-between gap-[2.083vw]"
+        className="hidden lg:block absolute inset-0 z-[5] pointer-events-none"
       >
         {STATS.map((s, i) => (
           <StatItem
@@ -594,7 +596,6 @@ export default function Statistics({ data }) {
             stat={s}
             index={i}
             shouldAnimate={statsInView}
-            bottomRow
           />
         ))}
       </div>

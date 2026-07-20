@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -25,6 +25,20 @@ export default function HeroBanner({ data }) {
   const btnRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+
+  // Which breakpoint we're on — `null` until hydration so the server and the
+  // first client render agree. Only the matching video is ever mounted, so we
+  // never download both the desktop and the mobile file.
+  const [isMobileView, setIsMobileView] = useState(null);
+
+  useEffect(() => {
+    // 1023px = just under Tailwind's `lg`, matching the image swap below.
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const apply = () => setIsMobileView(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   useGSAP(
     () => {
@@ -275,6 +289,14 @@ export default function HeroBanner({ data }) {
   // Fall back to the desktop image if a mobile-specific upload isn't set.
   const mobileImage = mediaUrl(data.mobileImage) || desktopImage;
 
+  // Same desktop/mobile pairing for video, gated behind the `isVideo` toggle.
+  const desktopVideo = mediaUrl(data.desktopVideo);
+  const mobileVideo = mediaUrl(data.mobileVideo) || desktopVideo;
+  const activeVideo =
+    isMobileView === null ? null : isMobileView ? mobileVideo : desktopVideo;
+  const activePoster = isMobileView ? mobileImage : desktopImage;
+  const showVideo = Boolean(data.isVideo && activeVideo);
+
   return (
     <section
       ref={rootRef}
@@ -308,6 +330,25 @@ export default function HeroBanner({ data }) {
             className="hidden lg:block object-cover object-bottom"
           />
         )}
+        {/* ---------- Hero video ----------
+            Layered over the image, which stays as the poster/fallback so the
+            hero still paints if the file is slow or fails. Mounted only after
+            the breakpoint is known, so exactly one source is requested. */}
+        {showVideo && (
+          <video
+            key={activeVideo}
+            className="absolute inset-0 h-full w-full object-cover object-bottom"
+            src={activeVideo}
+            poster={activePoster || undefined}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+          />
+        )}
+
         {/* gradient washes for depth */}
         <div className="absolute inset-0 bg-black/25" />
         <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-black/55 via-black/20 to-transparent" />

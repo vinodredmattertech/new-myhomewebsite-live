@@ -8,7 +8,7 @@ export default function ProjectsPage({ page, projects }) {
   return (
     <>
       <Seo seo={page?.seo} />
-      <ProjectsBanner banner={page?.banner} />
+      <ProjectsBanner banner={page?.banner} slides={page?.bannerSlides} />
       <ProjectsListing
         heading={page?.listingHeading}
         projects={projects || []}
