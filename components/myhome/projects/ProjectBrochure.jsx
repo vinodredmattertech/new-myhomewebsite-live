@@ -245,6 +245,7 @@ export default function ProjectBrochure({
               {heading}
             </SectionHeading>
 
+            {highlights.length > 0 && (
             <ul
               ref={listRef}
               className="flex flex-col text-white list-disc pl-[24px] lg:pl-[1.953vw]"
@@ -265,6 +266,7 @@ export default function ProjectBrochure({
                 </li>
               ))}
             </ul>
+            )}
 
             <button
               ref={buttonRef}

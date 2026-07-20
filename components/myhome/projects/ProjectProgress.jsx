@@ -208,14 +208,15 @@ export default function ProjectProgress({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-        >
-          {description}
-        </p>
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
 
-        {/* Content row: charts left, image slider right */}
-        <div className="mt-[40px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-[37.969vw_minmax(0,1fr)] gap-[36px] lg:gap-[3.333vw] items-center">
-          {/* Charts grid */}
-          <div
+        {/* Content row. The charts column is currently disabled, so the slider
+            is centred on its own. Restore the two-column grid
+            (lg:grid-cols-[37.969vw_minmax(0,1fr)]) when the charts come back. */}
+        <div className="mt-[40px] lg:mt-[3.385vw] flex flex-col items-center gap-[36px] lg:gap-[3.333vw]">
+          {/* Charts grid — hidden for now */}
+          {/* <div
             ref={metricsRef}
             className="min-w-0 grid grid-cols-2 gap-y-[40px] gap-x-[20px]
                        sm:gap-y-[48px] sm:gap-x-[40px]
@@ -255,10 +256,13 @@ export default function ProjectProgress({
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
-          {/* Image slider */}
-          <div ref={sliderWrapRef} className="relative w-full min-w-0">
+          {/* Image slider — centred, since it is the only column now */}
+          <div
+            ref={sliderWrapRef}
+            className="relative w-full min-w-0 mx-auto max-w-[560px] lg:max-w-[48vw]"
+          >
             <Swiper
               modules={[Navigation, Keyboard, A11y]}
               slidesPerView={1}

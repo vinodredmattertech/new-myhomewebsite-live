@@ -80,6 +80,10 @@ export default function ProjectFloorPlans({
   const [activeTab, setActiveTab] = useState(tabs[0]?.key);
   const activePlans = tabs.find((t) => t.key === activeTab)?.plans || [];
   const isSingle = activePlans.length <= 1;
+  // Desktop fits 2.15 plans per view, so two cards are already fully visible
+  // and the arrows have nothing to scroll to. Narrower breakpoints show far
+  // fewer (1.05–1.8), where two plans still overflow and keep their nav.
+  const hideNavOnDesktop = activePlans.length <= 2;
 
   // ===== Unlock state =====
   const storageKey = `${STORAGE_PREFIX}${projectName}`;
@@ -449,19 +453,20 @@ export default function ProjectFloorPlans({
           </div>
         )}
 
-        {/* Side nav buttons — only when there's more than one plan */}
+        {/* Side nav buttons — more than one plan, and (on desktop) more than two */}
         {!isSingle && (
           <>
             <button
               ref={prevRef}
               type="button"
               aria-label="Previous plan"
-              className="absolute z-[5] top-1/2 -translate-y-1/2
+              className={`absolute z-[5] top-1/2 -translate-y-1/2
                          left-[12px] md:left-[24px] lg:left-[1.354vw]
                          inline-flex items-center justify-center rounded-full
                          bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
                          w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[2.938vw] lg:h-[2.938vw]
-                         transition-transform duration-300 hover:scale-105 active:scale-95"
+                         transition-transform duration-300 hover:scale-105 active:scale-95
+                         ${hideNavOnDesktop ? "lg:hidden" : ""}`}
             >
               <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
             </button>
@@ -469,12 +474,13 @@ export default function ProjectFloorPlans({
               ref={nextRef}
               type="button"
               aria-label="Next plan"
-              className="absolute z-[5] top-1/2 -translate-y-1/2
+              className={`absolute z-[5] top-1/2 -translate-y-1/2
                          right-[12px] md:right-[24px] lg:right-[1.354vw]
                          inline-flex items-center justify-center rounded-full
                          bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
                          w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] lg:w-[2.938vw] lg:h-[2.938vw]
-                         transition-transform duration-300 hover:scale-105 active:scale-95"
+                         transition-transform duration-300 hover:scale-105 active:scale-95
+                         ${hideNavOnDesktop ? "lg:hidden" : ""}`}
             >
               <ArrowRight className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
             </button>

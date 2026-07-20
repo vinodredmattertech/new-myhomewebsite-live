@@ -43,7 +43,11 @@ export default function ProjectAmenities({
   heading = "Modern Living, Elevated",
   description = "To ensure a seamless experience for over 3,000 families, the amenities are divided into two distinct world-class clubhouses Cotta and Terra comprising over 100,000 sq. ft. of curated leisure space.",
   data,
-  amenities = data.items,
+  // Each card is an image tile, so items left without an image in the CMS are
+  // skipped rather than rendered as an empty (and next/image-crashing) slide.
+  amenities = (data?.items || []).filter(
+    (a) => a?.image?.data?.attributes?.url
+  ),
 }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);

@@ -29,9 +29,20 @@ function hasText(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export default function ProjectDetailPage({ project }) {
-  console.log(project, "jjj");
+/**
+ * Coerce a CMS value to "" so it is never `undefined`.
+ *
+ * The section components each carry hardcoded sample copy as default parameter
+ * values (written against the Akrida demo project). A JS default only fires on
+ * `undefined`, so passing `undefined` for an empty CMS field would silently
+ * render that sample copy on a live project. Passing "" keeps the default
+ * inert, and the components render nothing for empty values.
+ */
+function txt(value) {
+  return hasText(value) ? value : "";
+}
 
+export default function ProjectDetailPage({ project }) {
   if (!project) {
     return (
       <section className="min-h-[60vh] flex items-center justify-center px-5 text-center">
@@ -73,16 +84,23 @@ export default function ProjectDetailPage({ project }) {
     image: mediaUrl(it.image),
   }));
 
+  // A floor plan is only meaningful with its drawing, so plans whose image was
+  // left empty in the CMS are dropped (an imageless plan would otherwise render
+  // an empty card — and crash next/image on a null src).
   const fp = project.floorPlans || {};
-  const floorPlanTabs = (fp.tabs || []).map((t) => ({
-    key: t.key,
-    label: t.label,
-    plans: (t.plans || []).map((p) => ({
-      bhk: p.bhk,
-      label: p.label,
-      image: mediaUrl(p.image),
-    })),
-  }));
+  const floorPlanTabs = (fp.tabs || [])
+    .map((t) => ({
+      key: t.key,
+      label: t.label,
+      plans: (t.plans || [])
+        .map((p) => ({
+          bhk: p.bhk,
+          label: p.label,
+          image: mediaUrl(p.image),
+        }))
+        .filter((p) => p.image),
+    }))
+    .filter((t) => t.plans.length > 0);
 
   // Gallery tabs can be either images (multi-media `items`) or walkthrough
   // videos (`videos` repeatable). We normalise both into the same array of
@@ -116,11 +134,13 @@ export default function ProjectDetailPage({ project }) {
   });
 
   const sp = project.specifications || {};
-  const specs = (sp.items || []).map((it, i) => ({
-    key: `spec-${i}`,
-    title: it.title,
-    image: mediaUrl(it.image),
-  }));
+  const specs = (sp.items || [])
+    .map((it, i) => ({
+      key: `spec-${i}`,
+      title: it.title,
+      image: mediaUrl(it.image),
+    }))
+    .filter((it) => it.image);
 
   const pr = project.progress || {};
   const progressMetrics = (pr.metrics || []).map((m) => ({
@@ -223,12 +243,12 @@ export default function ProjectDetailPage({ project }) {
       {hasOverview && (
         <div id="overview">
           <ProjectOverview
-            imageSrc={mediaUrl(ov?.image)}
+            imageSrc={mediaUrl(ov?.image) || ""}
             imageAlt={`${project.title} overview`}
-            sidebarLabel={ov.sidebarLabel}
-            heading={ov.heading}
-            description={ov.description}
-            stats={overviewStats.length ? overviewStats : undefined}
+            sidebarLabel={txt(ov.sidebarLabel)}
+            heading={txt(ov.heading)}
+            description={txt(ov.description)}
+            stats={overviewStats}
           />
         </div>
       )}
@@ -236,14 +256,12 @@ export default function ProjectDetailPage({ project }) {
       {hasConnectivity && (
         <div id="location">
           <ProjectConnectivity
-            sidebarLabel={co.sidebarLabel}
-            heading={co.heading}
-            categories={
-              connectivityCategories.length ? connectivityCategories : undefined
-            }
-            mapEmbedUrl={co.mapEmbedUrl}
-            mapSrc={mediaUrl(co?.mapImage)}
-            mapAlt={co.mapAlt}
+            sidebarLabel={txt(co.sidebarLabel)}
+            heading={txt(co.heading)}
+            categories={connectivityCategories}
+            mapEmbedUrl={txt(co.mapEmbedUrl)}
+            mapSrc={mediaUrl(co?.mapImage) || ""}
+            mapAlt={txt(co.mapAlt)}
           />
         </div>
       )}
@@ -265,10 +283,10 @@ export default function ProjectDetailPage({ project }) {
       {hasFloorPlans && (
         <div id="plans">
           <ProjectFloorPlans
-            sidebarLabel={fp.sidebarLabel}
-            heading={fp.heading}
-            description={fp.description}
-            tabs={floorPlanTabs.length ? floorPlanTabs : undefined}
+            sidebarLabel={txt(fp.sidebarLabel)}
+            heading={txt(fp.heading)}
+            description={txt(fp.description)}
+            tabs={floorPlanTabs}
             projectName={project.title}
           />
         </div>
@@ -277,10 +295,10 @@ export default function ProjectDetailPage({ project }) {
       {hasGallery && (
         <div id="gallery">
           <ProjectGallery
-            sidebarLabel={ga.sidebarLabel}
-            heading={ga.heading}
-            description={ga.description}
-            tabs={galleryTabs.length ? galleryTabs : undefined}
+            sidebarLabel={txt(ga.sidebarLabel)}
+            heading={txt(ga.heading)}
+            description={txt(ga.description)}
+            tabs={galleryTabs}
           />
         </div>
       )}
@@ -288,10 +306,10 @@ export default function ProjectDetailPage({ project }) {
       {hasSpecifications && (
         <div id="specification">
           <ProjectSpecifications
-            sidebarLabel={sp.sidebarLabel}
-            heading={sp.heading}
-            description={sp.description}
-            specs={specs.length ? specs : undefined}
+            sidebarLabel={txt(sp.sidebarLabel)}
+            heading={txt(sp.heading)}
+            description={txt(sp.description)}
+            specs={specs}
           />
         </div>
       )}
@@ -299,26 +317,24 @@ export default function ProjectDetailPage({ project }) {
       {hasProgress && (
         <div id="construction-updates">
           <ProjectProgress
-            sidebarLabel={pr.sidebarLabel}
-            heading={pr.heading}
-            description={pr.description}
-            metrics={progressMetrics.length ? progressMetrics : undefined}
-            images={progressImages.length ? progressImages : undefined}
+            sidebarLabel={txt(pr.sidebarLabel)}
+            heading={txt(pr.heading)}
+            description={txt(pr.description)}
+            metrics={progressMetrics}
+            images={progressImages}
           />
         </div>
       )}
 
       {hasBrochure && (
         <ProjectBrochure
-          sidebarLabel={br.sidebarLabel}
-          heading={br.heading}
-          highlights={
-            lines(br.highlights).length ? lines(br.highlights) : undefined
-          }
-          imageSrc={mediaUrl(br?.image)}
-          imageAlt={br.imageAlt}
+          sidebarLabel={txt(br.sidebarLabel)}
+          heading={txt(br.heading)}
+          highlights={lines(br.highlights)}
+          imageSrc={mediaUrl(br?.image) || ""}
+          imageAlt={txt(br.imageAlt)}
           brochureHref={brochureFileUrl}
-          buttonLabel={br.buttonLabel}
+          buttonLabel={txt(br.buttonLabel) || "Download Brochure"}
           projectName={project.title}
         />
       )}
@@ -326,24 +342,24 @@ export default function ProjectDetailPage({ project }) {
       {hasTestimonials && (
         <div id="testimonials">
           <ProjectTestimonials
-            sidebarLabel={tm.sidebarLabel}
-            heading={tm.heading}
-            description={tm.description}
-            testimonials={testimonials.length ? testimonials : undefined}
+            sidebarLabel={txt(tm.sidebarLabel)}
+            heading={txt(tm.heading)}
+            description={txt(tm.description)}
+            testimonials={testimonials}
           />
         </div>
       )}
 
       {hasInquiry && (
         <ProjectInquiry
-          sidebarLabel={iq.sidebarLabel}
-          heading={iq.heading || `Secure Your Future At ${project.title}`}
-          description={iq.description}
-          address={iq.address}
-          disclaimer={iq.disclaimer}
-          reraNumber={iq.reraNumber}
-          reraUrl={iq.reraUrl}
-          qrSrc={mediaUrl(iq?.qrImage)}
+          sidebarLabel={txt(iq.sidebarLabel)}
+          heading={txt(iq.heading) || `Secure Your Future At ${project.title}`}
+          description={txt(iq.description)}
+          address={txt(iq.address)}
+          disclaimer={txt(iq.disclaimer)}
+          reraNumber={txt(iq.reraNumber)}
+          reraUrl={txt(iq.reraUrl)}
+          qrSrc={mediaUrl(iq?.qrImage) || ""}
           projectName={project.title}
         />
       )}
@@ -365,6 +381,5 @@ export async function getServerSideProps({ params, res }) {
     return { props: { project: null } };
   }
 
-  console.log(project, "leo");
   return { props: { project } };
 }

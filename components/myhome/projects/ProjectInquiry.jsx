@@ -351,66 +351,98 @@ export default function ProjectInquiry({
             ref={infoRef}
             className="flex flex-col gap-[36px] lg:gap-[5.208vw] w-full lg:pl-[3.385vw]"
           >
-            <div className="flex flex-col gap-[24px] lg:gap-[2.344vw]">
-              <p
-                className="text-[#333]
+            {(address || disclaimer) && (
+              <div className="flex flex-col gap-[24px] lg:gap-[2.344vw]">
+                {address && (
+                  <p
+                    className="text-[#333]
                            text-[15px] leading-[26px]
                            sm:text-[17px] sm:leading-[30px]
                            lg:text-[1.094vw] lg:leading-[1.823vw]"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                <span style={{ fontWeight: 600 }}>Address:</span>{" "}
-                <span style={{ fontWeight: 400 }}>{address}</span>
-              </p>
-              <p
-                className="text-[#333]
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  >
+                    <span style={{ fontWeight: 600 }}>Address:</span>{" "}
+                    <span style={{ fontWeight: 400 }}>{address}</span>
+                  </p>
+                )}
+                {disclaimer && (
+                  <p
+                    className="text-[#333]
                            text-[15px] leading-[26px]
                            sm:text-[17px] sm:leading-[30px]
                            lg:text-[1.094vw] lg:leading-[1.823vw]"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                <span style={{ fontWeight: 600 }}>Disclaimer:</span>{" "}
-                <span style={{ fontWeight: 400 }}>{disclaimer}</span>
-              </p>
-            </div>
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  >
+                    <span style={{ fontWeight: 600 }}>Disclaimer:</span>{" "}
+                    <span style={{ fontWeight: 400 }}>{disclaimer}</span>
+                  </p>
+                )}
+              </div>
+            )}
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[20px] sm:gap-[30px] lg:gap-[1.563vw]">
-              <div className="relative shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] lg:w-[10.625vw] lg:h-[10.833vw] bg-white">
-                <Image
-                  src={qrSrc}
-                  alt={`MahaRERA QR code for ${reraNumber}`}
-                  fill
-                  sizes="180px"
-                  className="object-contain object-left select-none"
-                />
-              </div>
-              <div className="flex flex-col gap-[4px] lg:gap-[0.156vw]">
-                <p
-                  className="text-[#333]
+            {/* RERA block — each piece (QR, number, link) is optional in the
+                CMS, so render only the parts that actually have data. */}
+            {(qrSrc || reraNumber || reraUrl) && (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[20px] sm:gap-[30px] lg:gap-[1.563vw]">
+                {qrSrc && (
+                  <div className="relative shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] lg:w-[10.625vw] lg:h-[10.833vw] bg-white">
+                    <Image
+                      src={qrSrc}
+                      alt={
+                        reraNumber ? `RERA QR code for ${reraNumber}` : "RERA QR code"
+                      }
+                      fill
+                      unoptimized
+                      sizes="180px"
+                      className="object-contain object-left select-none"
+                    />
+                  </div>
+                )}
+                {(reraNumber || reraUrl) && (
+                  <div className="flex flex-col gap-[4px] lg:gap-[0.156vw] min-w-0">
+                    {reraNumber && (
+                      <>
+                        <p
+                          className="text-[#333]
                              text-[15px] lg:text-[1.094vw] leading-[1.4]"
-                  style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 600 }}
-                >
-                  MahaRERA No.:
-                </p>
-                <p
-                  className="text-[#333]
+                          style={{
+                            fontFamily: "Montserrat, sans-serif",
+                            fontWeight: 600,
+                          }}
+                        >
+                          MahaRERA No.:
+                        </p>
+                        <p
+                          className="text-[#333]
                              text-[28px] sm:text-[36px] lg:text-[2.344vw] leading-[1.1]"
-                  style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700 }}
-                >
-                  {reraNumber}
-                </p>
-                <Link
-                  href={reraUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#333] hover:text-[#ef493d] transition-colors break-all
+                          style={{
+                            fontFamily: "Montserrat, sans-serif",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {reraNumber}
+                        </p>
+                      </>
+                    )}
+                    {reraUrl && (
+                      <Link
+                        href={reraUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#333] hover:text-[#ef493d] transition-colors break-all
                              text-[13px] sm:text-[15px] lg:text-[1.094vw] leading-[1.4]"
-                  style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
-                >
-                  {reraUrl}
-                </Link>
+                        style={{
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {reraUrl}
+                      </Link>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
