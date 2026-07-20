@@ -243,7 +243,7 @@ export default function WhyMyHome({ data }) {
                 left:[calc(50%-180px)] w:329 text:22 leading:36 tracking:0.44 (= 0.02em) */}
             <h3
               ref={i === active ? subRef : null}
-              className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] top-[216px] capitalize text-white tracking-[0.02em] leading-[36px] text-[22px] will-change-transform"
+              className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] max-lg:top-[170px] top-[216px] capitalize text-white tracking-[0.02em] leading-[36px] text-[22px] will-change-transform"
               style={{
                 fontFamily:
                   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
@@ -256,7 +256,7 @@ export default function WhyMyHome({ data }) {
                 Figma: top:307 left:[calc(50%-180px)] w:329 text:14 leading:24 text-justify */}
             <p
               ref={i === active ? bodyRef : null}
-              className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] top-[307px] font-montserrat font-normal text-white text-[14px] leading-[24px] text-justify"
+              className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] max-lg:top-[250px] top-[307px] font-montserrat font-normal text-white text-[14px] leading-[24px] text-justify"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               <RichText>{slide.body}</RichText>

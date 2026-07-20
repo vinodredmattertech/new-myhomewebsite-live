@@ -177,7 +177,7 @@ export default function WhoWeAre({ data }) {
             fill
             unoptimized
             sizes="100vw"
-            className="object-fill object-bottom lg:object-center select-none"
+            className="object-cover lg:object-fill object-bottom lg:object-center select-none"
           />
         )}
         {/* Desktop dim gradient for white text readability after reveal */}
@@ -219,7 +219,7 @@ export default function WhoWeAre({ data }) {
           {/* Heading */}
           <SectionHeading
             ref={headingRef}
-            className="w-full Tartuffo_Trial_Light capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform text-white lg:text-[#333333]"
+            className="w-full Tartuffo_Trial_Light capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform !text-white lg:text-[#333333]"
           >
             {data.heading}
           </SectionHeading>
@@ -227,7 +227,7 @@ export default function WhoWeAre({ data }) {
           {/* Body */}
           <p
             ref={paraRef}
-            className="font-montserrat font-normal text-[14px] md:text-[15px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw] text-justify w-full max-w-[318px]  md:max-w-[544px] lg:w-[28.33vw] lg:max-w-none text-white lg:text-[#6d6d6d]"
+            className="font-montserrat font-normal text-[14px] md:text-[15px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw] text-justify w-full max-w-[318px]  md:max-w-[544px] lg:w-[28.33vw] lg:max-w-none !text-white lg:text-[#6d6d6d]"
             style={{
               fontFamily: "Montserrat, sans-serif",
             }}
