@@ -1,23 +1,21 @@
 import ScrollToTop from "@/components/common/ScrollToTop";
-import SmoothScroll from "@/components/common/SmoothScroll";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import "@/styles/globals.css";
 import { useRouter } from "next/router";
 
-const defaultLayout = (page, router) => (
-  <SmoothScroll>
+// The legacy components/layout Header + Footer belong to an older template and
+// read a Strapi schema this project no longer has, so any page falling back to
+// them crashed. MyHomeLayout is the site's real chrome.
+const defaultLayout = (page) => (
+  <MyHomeLayout>
     <ScrollToTop />
-    {router.pathname !== "/" && <Header />}
     {page}
-    {router.pathname !== "/" && <Footer />}
-  </SmoothScroll>
+  </MyHomeLayout>
 );
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
-  const getLayout =
-    Component.getLayout || ((page) => defaultLayout(page, router));
+  const getLayout = Component.getLayout || defaultLayout;
 
   return <>{getLayout(<Component {...pageProps} />, router)}</>;
 }

@@ -169,13 +169,13 @@ export default function Testimonials({ data }) {
         className="relative z-[3] flex flex-col gap-[16px] lg:gap-[1.563vw]
                    pl-[64px] pr-5 sm:pl-[80px] sm:pr-8
                    lg:pl-[11.146vw] lg:pr-[4.166vw]
-                   max-w-[805px] lg:max-w-[41.927vw]"
+                   max-w-[805px] lg:max-w-[61.927vw]"
       >
         <SectionHeading
           ref={headingRef}
           className="capitalize text-[#333] tracking-[2px]
                      leading-[1.15] lg:leading-[normal]
-                     text-[32px] xs:text-[35px] sm:text-[44px] md:text-[64px] lg:text-[5vw]
+                     text-[32px] xs:text-[35px] sm:text-[44px] md:text-[64px] lg:text-[4vw]
                      will-change-transform"
         >
           {data.heading}

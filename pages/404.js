@@ -1,4 +1,5 @@
 import Button from "@/components/layout/Button";
+import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,7 +33,7 @@ export default function Custom404() {
   };
 
   return (
-    <div className="w-full h-screen ">
+    <div className="w-full h-[70vh] min-h-[520px]">
       <div className="relative w-full h-full ">
         <div className="absolute left-0 bottom-0 lg:h-[40.635vw] h-[40vh]">
           <Image
@@ -114,3 +115,7 @@ export default function Custom404() {
     </div>
   );
 }
+
+Custom404.getLayout = (page) => (
+  <MyHomeLayout title="Page Not Found | My Home Group">{page}</MyHomeLayout>
+);

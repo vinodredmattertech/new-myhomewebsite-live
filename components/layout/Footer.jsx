@@ -17,6 +17,17 @@ import { useRouter } from "next/router";
 
 
 
+// CMS entries can be saved without a URL, and next/link throws when `href` is
+// undefined. Render those as plain text instead of a dead link.
+const FooterLink = ({ href, className, children }) =>
+  href ? (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  ) : (
+    <span className={className}>{children}</span>
+  );
+
 const iconMap = {
   facebook: FaFacebookF,
   instagram: FaInstagram,
@@ -284,7 +295,7 @@ const Footer = () => {
             {footerData?.quickLinks?.map((item) => (
               <li key={item.id} className="flex items-center gap-3">
                 <MdKeyboardArrowRight className="text-[#BE9C58]" />
-                <Link href={item.link}>{item.name}</Link>
+                <FooterLink href={item.link}>{item.name}</FooterLink>
               </li>
             ))}
           </ul>
@@ -298,7 +309,7 @@ const Footer = () => {
             {footerData?.projects?.map((item) => (
               <li key={item.id} className="flex items-center gap-3">
                 <MdKeyboardArrowRight className="text-[#BE9C58]" />
-                <Link href={item.link}>{item.name}</Link>
+                <FooterLink href={item.link}>{item.name}</FooterLink>
               </li>
             ))}
           </ul>
@@ -313,7 +324,7 @@ const Footer = () => {
             {footerData?.Typology?.map((item) => (
               <li key={item.id} className="flex items-center gap-3">
                 <MdKeyboardArrowRight className="text-[#BE9C58]" />
-                <Link href={item.link}>{item.name}</Link>
+                <FooterLink href={item.link}>{item.name}</FooterLink>
               </li>
             ))}
           </ul>
@@ -352,13 +363,13 @@ const Footer = () => {
           </p>
           <div className="flex gap-4  lg:gap-[4vw] lg:text-[0.833vw] text-[16px] text-[#5F5F5F] Avenir">
             {footerData?.bottomLinks?.map((item) => (
-              <Link
+              <FooterLink
                 key={item.id}
                 href={item.link}
                 className="hover:text-[#2E2E2E]"
               >
                 {item.name}
-              </Link>
+              </FooterLink>
             ))}
           </div>
         </div>

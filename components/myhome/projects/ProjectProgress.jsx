@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y } from "swiper/modules";
+import { Navigation, Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
@@ -261,15 +261,24 @@ export default function ProjectProgress({
           {/* Image slider — centred, since it is the only column now */}
           <div
             ref={sliderWrapRef}
-            className="relative w-full min-w-0 mx-auto max-w-[560px] lg:max-w-[48vw]"
+            className="relative w-full min-w-0 mx-auto max-w-[560px] lg:max-w-none"
           >
             <Swiper
-              modules={[Navigation, Keyboard, A11y]}
+              modules={[Navigation, Keyboard, A11y, Autoplay]}
               slidesPerView={1}
               spaceBetween={16}
+              breakpoints={{
+                1024: { slidesPerView: 2, spaceBetween: 24 },
+              }}
               speed={650}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
               keyboard={{ enabled: true }}
-              loop={images.length > 1}
+              loop={images.length >= 4}
+              rewind={images.length > 1 && images.length < 4}
               onBeforeInit={(swiper) => {
                 swiper.params.navigation.prevEl = prevRef.current;
                 swiper.params.navigation.nextEl = nextRef.current;
@@ -279,7 +288,7 @@ export default function ProjectProgress({
             >
               {images.map((img, idx) => (
                 <SwiperSlide key={`${img.src}-${idx}`} className="!h-auto">
-                  <div className="relative w-full aspect-[657/639] lg:aspect-auto lg:h-[33.281vw] rounded-[12px] overflow-hidden bg-[#eee]">
+                  <div className="relative w-full aspect-[657/639] lg:aspect-auto lg:h-[27.604vw] rounded-[12px] overflow-hidden bg-[#eee]">
                    <a
   href={img.src}
   data-fancybox="progress-gallery"

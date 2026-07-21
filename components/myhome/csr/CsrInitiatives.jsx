@@ -82,9 +82,33 @@ const DEFAULT_CARDS = [
   },
 ];
 
+/** Normalise a category key so tabs and cards match regardless of how they
+ *  were typed in Strapi — "Education", "education", "Rural Development" and
+ *  "rural development" all collapse to the same slug. Editors fill the filter
+ *  `value` and the card `category` by hand, so an exact compare is too brittle. */
+function slugifyCategory(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** `initiative-card.image` is a *multiple* media field, so Strapi returns
+ *  `{ data: [...] }` (or a flat array) rather than the single-media shape
+ *  `mediaUrl` understands. Take the first upload, falling back to the plain
+ *  single-media / string forms. */
+function cardImageUrl(image) {
+  if (!image) return null;
+  const list = Array.isArray(image) ? image : Array.isArray(image?.data) ? image.data : null;
+  if (list) return list.length ? mediaUrl(list[0]) : null;
+  return mediaUrl(image) || (typeof image === "string" ? image : null);
+}
+
 /** Normalise a raw CSR card component into the flat shape the UI consumes. */
 function normaliseCard(raw, idx) {
-  const catSlug = raw?.category || "";
+  const catSlug = slugifyCategory(raw?.category);
   return {
     id: raw?.id ?? `${catSlug}-${idx}`,
     title: raw?.title || "",
@@ -92,8 +116,7 @@ function normaliseCard(raw, idx) {
     categorySlug: catSlug,
     categoryName: raw?.categoryLabel || "",
     image:
-      mediaUrl(raw?.image) ||
-      (typeof raw?.image === "string" ? raw.image : null) ||
+      cardImageUrl(raw?.image) ||
       FALLBACK_BY_CATEGORY[catSlug] ||
       FALLBACK_DEFAULT,
     date: raw?.date || "",
@@ -173,18 +196,24 @@ export default function CsrInitiatives({ section }) {
       : DEFAULT_CARDS;
   const items = useMemo(() => rawCards.map(normaliseCard), [rawCards]);
 
-  // Filter tabs: prefer CMS filters; else built-in defaults.
+  // Filter tabs: prefer CMS filters; else built-in defaults. "All" is always
+  // the first tab — editors don't have to remember to add it in Strapi, and
+  // without it the section would open on a single category and hide the rest.
   const tabs = useMemo(() => {
     const defined = Array.isArray(section?.filters) ? section.filters : [];
     const source = defined.length ? defined : DEFAULT_FILTERS;
-    return source
-      .map((f) => ({
-        slug: f?.value || "",
-        value: f?.value || "",
-        name: f?.label || "",
-        icon: f?.icon,
-      }))
+    const mapped = source
+      .map((f) => {
+        // Fall back to the label when `value` is left blank in Strapi.
+        const slug = slugifyCategory(f?.value || f?.label);
+        return { slug, value: slug, name: f?.label || "", icon: f?.icon };
+      })
       .filter((f) => f.slug && f.name);
+
+    const hasAll = mapped.some((f) => f.slug === "all");
+    return hasAll
+      ? mapped
+      : [{ slug: "all", value: "all", name: "All", icon: null }, ...mapped];
   }, [section]);
 
   const [active, setActive] = useState(tabs[0]?.slug || "all");
@@ -259,7 +288,7 @@ export default function CsrInitiatives({ section }) {
               they sit in a single bordered row. */}
           <div
             className="flex flex-wrap lg:flex-nowrap justify-center items-stretch
-                       border border-[#e7e7e7] max-w-full h-auto lg:h-[3.854vw] max-sm:p-[10px]"
+                       border border-[#e7e7e7] max-w-full h-auto lg:h-[3.154vw] max-sm:p-[10px]"
           >
             {tabs.map((t) => {
               const isActive = active === t.slug;
@@ -271,7 +300,7 @@ export default function CsrInitiatives({ section }) {
                   aria-pressed={isActive}
                   className={`flex items-center justify-center gap-[8px] lg:gap-[0.521vw] lg:shrink-0 capitalize
                               font-montserrat transition-colors duration-300
-                              px-[14px] sm:px-[20px] lg:px-[1.146vw]
+                              px-[14px] sm:px-[20px] lg:px-[.8vw]
                               py-[10px] sm:py-[12px] lg:py-0
                               text-[13px] sm:text-[15px] lg:text-[1.042vw]
                               ${
@@ -291,6 +320,18 @@ export default function CsrInitiatives({ section }) {
             })}
           </div>
         </div>
+      )}
+
+      {/* Nothing tagged with this category yet — say so instead of leaving a
+          blank gap that reads as a broken filter. */}
+      {!visible.length && (
+        <p
+          className="mt-[32px] lg:mt-[3.125vw] text-center text-[#6d6d6d] font-montserrat
+                     text-[14px] lg:text-[0.833vw]"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          No initiatives in this category yet.
+        </p>
       )}
 
       {/* ---------------- Featured row ---------------- */}

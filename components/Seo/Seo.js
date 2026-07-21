@@ -9,7 +9,7 @@ const Seo = (props) => {
   return (
     <Head>
       <title>
-        {props?.seo?.metaTitle == null ? "Rama Group" : props?.seo?.metaTitle}
+        {props?.seo?.metaTitle == null ? "" : props?.seo?.metaTitle}
       </title>
       <meta
         name="keywords"

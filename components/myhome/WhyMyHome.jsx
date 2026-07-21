@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade, Autoplay } from "swiper/modules";
+import { EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import { mediaUrl } from "@/lib/strapi";
@@ -86,6 +86,21 @@ export default function WhyMyHome({ data }) {
       // initial in-slide reveal
       requestAnimationFrame(() => animateActive());
 
+      // Maps a 0→1 ScrollTrigger progress onto a slide index and drives Swiper.
+      const syncToProgress = (self) => {
+        const idx = Math.min(
+          SLIDES.length - 1,
+          Math.round(self.progress * (SLIDES.length - 1))
+        );
+        if (
+          swiperRef.current &&
+          swiperRef.current.activeIndex !== idx &&
+          !swiperRef.current.animating
+        ) {
+          swiperRef.current.slideTo(idx, 700, false);
+        }
+      };
+
       // ----- desktop: pin + snap, scroll drives swiper -----
       const mm = gsap.matchMedia();
 
@@ -106,19 +121,21 @@ export default function WhyMyHome({ data }) {
             delay: 0.04,
             ease: "expo.inOut",
           },
-          onUpdate: (self) => {
-            const idx = Math.min(
-              SLIDES.length - 1,
-              Math.round(self.progress * (SLIDES.length - 1))
-            );
-            if (
-              swiperRef.current &&
-              swiperRef.current.activeIndex !== idx &&
-              !swiperRef.current.animating
-            ) {
-              swiperRef.current.slideTo(idx, 700, false);
-            }
-          },
+          onUpdate: syncToProgress,
+        });
+
+        return () => st.kill();
+      });
+
+      // ----- mobile/tablet: no pin (layout is a tall static stack), so the
+      // section's own scroll travel drives the slides instead. Autoplay used
+      // to do this job; scroll is now the only driver on every breakpoint.
+      mm.add("(max-width: 1023px)", () => {
+        const st = ScrollTrigger.create({
+          trigger: rootRef.current,
+          start: "top 70%",
+          end: "bottom bottom",
+          onUpdate: syncToProgress,
         });
 
         return () => st.kill();
@@ -205,7 +222,7 @@ export default function WhyMyHome({ data }) {
       <div
         aria-hidden="true"
         className="hidden lg:block absolute z-[3] top-[40.86vw] left-[53.44vw] w-px h-[11.25vw] bg-white/20 overflow-hidden"
-      >
+      > 
         <span
           className="absolute inset-x-0 top-0 block bg-[#ef493d] transition-[height] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{ height: `${((active + 1) / SLIDES.length) * 100}%` }}
@@ -213,14 +230,15 @@ export default function WhyMyHome({ data }) {
       </div>
 
       {/* ---------- Right image + left text (Swiper, EffectFade) ---------- */}
+      {/* Slides are driven purely by scroll (see the ScrollTrigger above) plus
+          the pagination buttons — no autoplay, and no loop so `activeIndex`
+          maps 1:1 onto the scroll progress index. */}
       <Swiper
-        modules={[EffectFade, Autoplay]}
+        modules={[EffectFade]}
         effect="fade"
         fadeEffect={{ crossFade: true }}
         speed={900}
         allowTouchMove={false}
-        autoplay={{ delay: 2000, disableOnInteraction: false }}
-        loop={true}
         onSwiper={(s) => (swiperRef.current = s)}
         onSlideChange={(s) => {
           setActive(s.activeIndex);
