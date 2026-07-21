@@ -38,6 +38,29 @@ export default function MyHomeHeader() {
     };
   }, []);
 
+  // While the drawer is open on mobile, freeze the page behind it. Scoped to
+  // <md so desktop behaviour is untouched; Lenis owns scrolling, so it has to
+  // be stopped alongside the native overflow lock.
+  useEffect(() => {
+    if (!open) return;
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.__lenis?.stop();
+
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.__lenis?.start();
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   const NAV_ITEMS =
     Array.isArray(cms?.navItems) && cms.navItems.length > 0
       ? cms.navItems.map((n) => ({
@@ -160,15 +183,17 @@ export default function MyHomeHeader() {
           <button
             type="button"
             aria-label="Menu"
+            aria-expanded={open}
             onClick={() => setOpen(true)}
-            className="md:hidden ml-auto group flex items-center gap-[12px] text-white
-                       bg-white/10 backdrop-blur-md border border-white/20 rounded-full
-                       px-[16px] py-[10px] hover:bg-white/20 transition-colors duration-300"
+            className="md:hidden ml-auto flex h-[42px] w-[42px] items-center justify-center text-white
+                       bg-white/10 backdrop-blur-md border border-white/25 rounded-full
+                       shadow-[0_2px_10px_rgba(0,0,0,0.18)]
+                       active:scale-95 active:bg-white/20 transition-all duration-300"
           >
-            <span className="relative flex flex-col gap-[4px] w-[24px] h-[14px] justify-center">
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
-              <span className="block h-[1.5px] w-[70%] ml-auto bg-white transition-all duration-500 group-hover:w-full" />
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
+            <span className="flex flex-col items-center gap-[5px] w-[18px]">
+              <span className="block h-[1.5px] w-full rounded-full bg-white" />
+              <span className="block h-[1.5px] w-full rounded-full bg-white" />
+              <span className="block h-[1.5px] w-[60%] mr-auto rounded-full bg-white" />
             </span>
           </button>
 
@@ -226,34 +251,44 @@ export default function MyHomeHeader() {
         <div
           onClick={() => setOpen(false)}
           className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-            open ? "opacity-60" : "opacity-0"
+            open ? "opacity-60 backdrop-blur-[2px] md:backdrop-blur-none" : "opacity-0"
           }`}
         />
         <aside
-          className={`absolute top-0 right-0 h-full w-full sm:w-[440px] bg-[#2a2828] text-white transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute top-0 right-0 h-full flex flex-col overflow-hidden
+                      w-[88%] max-w-[360px] rounded-l-[24px] shadow-[-20px_0_60px_rgba(0,0,0,0.45)]
+                      sm:w-[440px] sm:max-w-none md:rounded-none md:shadow-none
+                      bg-[#2a2828] text-white transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          <div className="flex items-center justify-between px-8 md:px-12 py-8">
+          {/* Soft brand glow — mobile only, keeps the tall panel from reading flat */}
+          <span
+            aria-hidden
+            className="md:hidden pointer-events-none absolute -bottom-24 -right-16 h-[260px] w-[260px] rounded-full bg-mh-red/20 blur-[80px]"
+          />
+
+          <div className="relative flex items-center justify-between shrink-0 px-6 pt-[max(20px,env(safe-area-inset-top))] pb-5 border-b border-white/10 md:border-0 md:px-12 md:py-8">
             <Image
               src={LOGO}
               alt="My Home Group"
               width={110}
               height={58}
               unoptimized
-              className="h-auto w-[100px]"
+              className="h-auto w-[76px] md:w-[100px]"
             />
             <button
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center hover:bg-mh-red hover:border-mh-red transition-colors duration-300"
+              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center active:scale-95 hover:bg-mh-red hover:border-mh-red transition-all duration-300"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
               </svg>
             </button>
           </div>
-          <nav className="px-8 md:px-12 py-6 flex flex-col gap-1">
+
+          <nav className="relative flex-1 overflow-y-auto overscroll-contain px-6 py-4 flex flex-col gap-1 md:flex-none md:overflow-visible md:px-12 md:py-6">
             {NAV_ITEMS.map((item, i) => (
               <Link
                 key={item.label}
@@ -261,7 +296,7 @@ export default function MyHomeHeader() {
                 target={item.openInNewTab ? "_blank" : undefined}
                 rel={item.openInNewTab ? "noopener noreferrer" : undefined}
                 onClick={() => setOpen(false)}
-                className="group inline-flex items-center justify-between border-b border-white/10 py-[10px] font-tartuffo text-[18px] md:text-[22px] capitalize tracking-wide hover:text-mh-red transition-colors duration-500"
+                className="group inline-flex items-center justify-between border-b border-white/10 py-[14px] md:py-[10px] font-tartuffo text-[20px] md:text-[22px] capitalize tracking-wide active:text-mh-red hover:text-mh-red transition-colors duration-500"
                 style={{
                   transitionDelay: open ? `${0.1 + i * 0.04}s` : "0s",
                   transform: open ? "translateX(0)" : "translateX(30px)",
@@ -272,10 +307,23 @@ export default function MyHomeHeader() {
                 }}
               >
                 <span>{item.label}</span>
-                <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">→</span>
+                <span className="text-white/35 md:opacity-0 md:-translate-x-2 md:text-inherit group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-inherit transition-all duration-500">
+                  →
+                </span>
               </Link>
             ))}
           </nav>
+
+          {/* Mobile-only footer CTA — the mobile header has no Contact button */}
+          <div className="md:hidden relative shrink-0 px-6 pt-4 pb-[max(20px,env(safe-area-inset-bottom))] border-t border-white/10">
+            <Link
+              href={CONTACT_CTA_LINK}
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center justify-center rounded-full bg-mh-red py-[14px] font-montserrat text-[14px] font-medium capitalize tracking-[0.08em] text-white active:scale-[0.98] transition-transform duration-300"
+            >
+              {CONTACT_CTA_LABEL}
+            </Link>
+          </div>
         </aside>
       </div>
     </>

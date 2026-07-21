@@ -26,6 +26,9 @@ export default function HeroBanner({ data }) {
 
   const [loading, setLoading] = useState(true);
 
+  // Strapi can leave `ctaText` blank — treat blank/whitespace as "no button".
+  const hasCta = Boolean(data?.ctaText && String(data.ctaText).trim());
+
   // Which breakpoint we're on — `null` until hydration so the server and the
   // first client render agree. Only the matching video is ever mounted, so we
   // never download both the desktop and the mobile file.
@@ -130,10 +133,15 @@ export default function HeroBanner({ data }) {
       gsap.set(bgRef.current, { scale: 1.18, autoAlpha: 0.7, filter: "blur(8px)" });
       gsap.set(welcomeRef.current, { yPercent: 105, autoAlpha: 0 });
       gsap.set(subtitleRef.current, { yPercent: 110, autoAlpha: 0 });
-      gsap.set([copyHeadingRef.current, copyBodyRef.current, btnRef.current], {
-        y: 50,
-        autoAlpha: 0,
-      });
+      gsap.set(
+        [copyHeadingRef.current, copyBodyRef.current, btnRef.current].filter(
+          Boolean
+        ),
+        {
+          y: 50,
+          autoAlpha: 0,
+        }
+      );
 
       // Lock scroll while loader plays
       lockScroll();
@@ -250,12 +258,17 @@ export default function HeroBanner({ data }) {
           copyBodyRef.current,
           { y: 0, autoAlpha: 1, duration: 1.0, ease: "expo.out" },
           "hold+=1.45"
-        )
-        .to(
+        );
+
+      // The CTA is optional — when Strapi sends an empty `ctaText` the button
+      // isn't rendered at all, so there's nothing to fade in.
+      if (btnRef.current) {
+        tl.to(
           btnRef.current,
           { y: 0, autoAlpha: 1, duration: 0.9, ease: "expo.out" },
           "hold+=1.6"
         );
+      }
 
       // Scroll parallax on the hero image — kicks in after loader is gone
       gsap.to(bgRef.current, {
@@ -348,11 +361,6 @@ export default function HeroBanner({ data }) {
             aria-hidden="true"
           />
         )}
-
-        {/* gradient washes for depth */}
-        <div className="absolute inset-0 bg-black/25" />
-        <div className="absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-black/55 via-black/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
       </div>
 
       {/* ---------- Bottom hero block: copy + Enquire button ---------- */}
@@ -384,7 +392,8 @@ export default function HeroBanner({ data }) {
             </p>
           </div>
 
-          {/* Enquire button */}
+          {/* Enquire button — only when the CMS actually supplies a label */}
+          {hasCta && (
           <a
             ref={btnRef}
             href={data.ctaLink || "#"}
@@ -409,6 +418,7 @@ export default function HeroBanner({ data }) {
               />
             </svg>
           </a>
+          )}
         </div>
       </div>
 
