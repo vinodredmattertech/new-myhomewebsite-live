@@ -565,7 +565,7 @@ export default function Statistics({ data }) {
       >
         <h2
           data-heading
-          className="capitalize text-[#333] will-change-transform text-[5vw] tracking-[0.02em] leading-[1.1]"
+          className="capitalize text-[#333] will-change-transform md:max-w-[30vw] !text-[4vw] tracking-[0.02em] leading-[1.1]"
           style={{
             fontFamily:
               '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
