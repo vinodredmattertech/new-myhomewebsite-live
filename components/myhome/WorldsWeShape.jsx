@@ -29,14 +29,11 @@ const CARD_LAYOUT = [
 ];
 
 export default function WorldsWeShape({ data }) {
-  console.log("feature data", data)
   // Source is the `verticals` relation (collection type) — flatten the
   // v4 envelope and map to the shape the rest of the section expects.
   const rawVerticals = relationList(data?.verticals);
-  // Sort by `order` if provided so the admin can rearrange without code.
-  rawVerticals.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  const SLIDES = rawVerticals.map((v, i) => ({
-    id: v.number || String(i + 1).padStart(2, "0"),
+  const SLIDES = rawVerticals.map((v) => ({
+    id: v.number || "",
     title: v.title || "",
     body: v.body || "",
     image: mediaUrl(v.image),
@@ -358,6 +355,7 @@ export default function WorldsWeShape({ data }) {
                    lg:left-[66.614vw] lg:top-[18.646vw] lg:w-[26.146vw] lg:gap-[1.823vw] lg:max-w-none"
       >
         <span
+          key={`vertical-${active}`}
           ref={numberRef}
           className="text-[#ef493d] opacity-40 leading-[1] block
                      text-[35px] tracking-[1.05px]
@@ -368,7 +366,7 @@ export default function WorldsWeShape({ data }) {
             fontWeight: 400,
           }}
         >
-          {SLIDES[active].id}
+          {SLIDES[active]?.id}
         </span>
         <h3
           ref={titleRef}
