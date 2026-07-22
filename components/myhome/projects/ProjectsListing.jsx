@@ -27,9 +27,9 @@ const PROJECT_TYPES = [
   { key: "All", label: "All", Icon: Check },
   { key: "Residential", label: "Residential", Icon: Building },
   { key: "Commercial", label: "Commercial", Icon: Building2 },
-  { key: "Mixed-Use Development", label: "Mixed-Use Development", Icon: Warehouse },
-  { key: "Ultra-Luxury", label: "Ultra-Luxury", Icon: Crown },
-  { key: "Premium", label: "Premium", Icon: Gem },
+  // { key: "Mixed-Use Development", label: "Mixed-Use Development", Icon: Warehouse },
+  // { key: "Ultra-Luxury", label: "Ultra-Luxury", Icon: Crown },
+  // { key: "Premium", label: "Premium", Icon: Gem },
 ];
 
 // Sidebar: project status / phase (multi-select)
