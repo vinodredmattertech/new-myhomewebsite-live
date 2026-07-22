@@ -79,14 +79,13 @@ export default function SustainabilityVision({ vision }) {
             </h2>
 
             {description ? (
-              <p
+              <div
                 data-reveal
-                className="mt-[28px] lg:mt-[10px] lg:pt-[3.333vw] max-w-[52ch] text-white/90
+                className="sus-vision-richtext mt-[28px] lg:mt-[10px] lg:pt-[3.333vw] max-w-[52ch] text-white/90
                            text-[15px] leading-[1.75] text-justify lg:text-[0.937vw] lg:leading-[1.6vw]"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                {description}
-              </p>
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
             ) : null}
           </div>
 
@@ -141,6 +140,28 @@ export default function SustainabilityVision({ vision }) {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .sus-vision-richtext :global(p) {
+          margin-bottom: 1em;
+        }
+        .sus-vision-richtext :global(p:last-child) {
+          margin-bottom: 0;
+        }
+        .sus-vision-richtext :global(a) {
+          text-decoration: underline;
+        }
+        .sus-vision-richtext :global(ul),
+        .sus-vision-richtext :global(ol) {
+          margin-bottom: 1em;
+          padding-left: 1.2em;
+          list-style: revert;
+          text-align: left;
+        }
+        .sus-vision-richtext :global(strong) {
+          font-weight: 600;
+        }
+      `}</style>
     </section>
   );
 }

@@ -87,7 +87,7 @@ export default function SustainabilityEsg({ esg }) {
         </div>
 
         {/* Pillars + image */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.62fr] gap-[40px] lg:gap-[4.166vw] items-stretch">
+        <div className="grid grid-cols-1  lg:grid-cols-[1fr_0.62fr] gap-[40px] lg:gap-[4.166vw] items-stretch">
           <div className="flex flex-col">
             {items.map((item, i) => {
               const iconUrl = mediaUrl(item?.icon);
@@ -134,16 +134,17 @@ export default function SustainabilityEsg({ esg }) {
           {imageUrl ? (
             <div
               data-reveal
-              className="relative w-full overflow-hidden rounded-[12px]
-                         h-[320px] sm:h-[420px] lg:h-auto lg:min-h-[29vw]"
+              className="relative flex items-center w-full overflow-hidden rounded-[12px]
+                         h-[320px] max-lg:w-full sm:h-[420px] lg:h-auto lg:min-h-[29vw]"
             >
               <Image
                 src={imageUrl}
                 alt={imageAlt}
-                fill
+                width={524}
+                height={554}
                 unoptimized
-                sizes="(max-width: 1024px) 100vw, 30vw"
-                className="object-cover object-center"
+                sizes="md:w-[27.292vw] md:h-[28.854vw] "
+                className="object-cover object-center max-lg:w-full max-lg:h-full"
               />
             </div>
           ) : null}
