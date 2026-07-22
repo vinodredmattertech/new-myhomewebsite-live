@@ -215,7 +215,7 @@ export default function WhoWeAre({ data }) {
           {/* Heading */}
           <SectionHeading
             ref={headingRef}
-            className="w-full Tartuffo_Trial_Light capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform text-[#333333] lg:!text-white"
+            className="w-full max-md:!text-black Tartuffo_Trial_Light capitalize leading-[1.04] tracking-[0.02em] text-[35px] xs:text-[40px] sm:text-[48px] md:text-[64px] lg:text-[5vw] xl:text-[5vw] text-left will-change-transform text-[#333333] lg:!text-white"
           >
             {data.heading}
           </SectionHeading>
@@ -223,7 +223,7 @@ export default function WhoWeAre({ data }) {
           {/* Body */}
           <p
             ref={paraRef}
-            className="font-montserrat font-normal text-[14px] md:text-[15px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw] text-justify w-full max-w-[318px]  md:max-w-[544px] lg:w-[28.33vw] lg:max-w-none text-[#6d6d6d] lg:!text-white"
+            className="font-montserrat  max-md:!text-black font-normal text-[14px] md:text-[15px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw] text-justify w-full max-w-[318px]  md:max-w-[544px] lg:w-[28.33vw] lg:max-w-none text-[#6d6d6d] lg:!text-white"
             style={{
               fontFamily: "Montserrat, sans-serif",
             }}
