@@ -66,27 +66,28 @@ export default function SustainabilityOverview({
       </SectionLabel>
 
       <div className="mx-auto w-full px-6 sm:px-10 lg:px-[11.146vw]">
-        <div className="grid grid-cols-1 lg:grid-cols-[0.66fr_1fr] gap-[32px] lg:gap-[4.166vw] items-center">
+        <div className="flex max-lg:flex-col max-2xl:gap-[5vw] items-center justify-center">
           {/* Left — image */}
           <div
             data-reveal
             className="relative w-full overflow-hidden rounded-[4px] order-2 lg:order-1
-                       h-[280px] sm:h-[360px] lg:h-[29.53vw]"
+                       h-[280px] sm:h-[360px] md:mt-[6vw] lg:h-[29.53vw]"
           >
             {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={alt}
-                fill
+                width={774}
+                height={567}
                 unoptimized
-                sizes="(max-width: 1024px) 100vw, 40vw"
+                sizes="md:w-[40.313vw]  md:h-[29.531vw]"
                 className="object-cover object-center"
               />
             ) : null}
           </div>
 
           {/* Right — heading + copy */}
-          <div className="order-1 lg:order-2">
+          <div className="order-1 lg:pb-[10vw] pb-6 lg:order-2">
             <h2
               data-reveal
               className="leading-[1.05] text-[40px] sm:text-[56px] md:text-[68px] lg:text-[5vw]"
@@ -103,7 +104,7 @@ export default function SustainabilityOverview({
             {description ? (
               <div
                 data-reveal
-                className="sus-richtext mt-[24px] lg:mt-[2.448vw] max-w-[60ch] text-[#6d6d6d]
+                className="sus-richtext mt-[24px] lg:mt-[2.448vw] lg:max-w-[29.01vw] text-[#6d6d6d]
                            text-[15px] leading-[1.9] text-justify lg:text-[0.937vw] lg:leading-[1.9vw]"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
                 dangerouslySetInnerHTML={{ __html: description }}

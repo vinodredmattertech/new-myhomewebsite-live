@@ -11,32 +11,28 @@ const RED = "#ef493d";
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
 
-const DEFAULT_FILTERS = [
-  { label: "All", value: "all" },
-  { label: "Recruitment Drive", value: "recruitment-drive" },
-  { label: "Employee Engagement", value: "employee-engagement" },
-  { label: "Team Outing", value: "team-outing" },
-  { label: "Creativity", value: "creativity" },
-  { label: "Fun Day", value: "fun-day" },
-];
-
-const DEFAULT_CARDS = [
-  { title: "Recruitment Drive", category: "recruitment-drive", image: "/assets/myhome/whoweare-color.jpg" },
-  { title: "Employee Engagement", category: "employee-engagement", image: "/assets/myhome/whoweare-color.jpg" },
-  { title: "Learning & Development", category: "creativity", image: "/assets/myhome/whoweare-color.jpg" },
-  { title: "Team Outings", category: "team-outing", image: "/assets/myhome/whoweare-color.jpg" },
-];
+/**
+ * Card categories and filter values are typed by hand in the CMS, so they
+ * rarely match character-for-character ("Recruitment Drive" vs
+ * "recruitment drive"). Compare on a slug instead of the raw string.
+ */
+function slugify(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 /** Normalise a raw workplace card into the flat shape the UI consumes. */
 function normaliseCard(raw, idx) {
   return {
     id: raw?.id ?? `${raw?.category || "card"}-${idx}`,
     title: raw?.title || "",
-    category: raw?.category || "all",
+    category: slugify(raw?.category) || "all",
     image:
       mediaUrl(raw?.image) ||
-      (typeof raw?.image === "string" ? raw.image : null) ||
-      "/assets/myhome/whoweare-color.jpg",
+      (typeof raw?.image === "string" ? raw.image : null),
   };
 }
 
@@ -49,36 +45,48 @@ function normaliseCard(raw, idx) {
  * single bordered filter bar (the active tab filled red, "All" prefixed with a
  * check) and a 4-up row of tall photo cards with side navigation arrows.
  *
- * Driven by the `workplace` component on the Career single type; falls back to
- * built-in defaults so the section always renders.
+ * Driven entirely by the `workplace` component on the Career single type —
+ * nothing is invented locally, so an empty CMS section renders no tabs and no
+ * cards rather than placeholder content.
  */
 export default function CareerWorkplace({ section }) {
   const sideLabel = section?.sideLabel || "Inside My Home";
   const heading = section?.heading || "More Than a Workplace";
-  const featuredImage =
-    mediaUrl(section?.featuredImage) || "/assets/myhome/whoweare-color.jpg";
+  const featuredImage = mediaUrl(section?.featuredImage);
   const videoUrl = section?.videoUrl || "";
 
-  const rawCards =
-    Array.isArray(section?.cards) && section.cards.length
-      ? section.cards
-      : DEFAULT_CARDS;
-  const items = useMemo(() => rawCards.map(normaliseCard), [rawCards]);
+  const items = useMemo(() => {
+    const raw = Array.isArray(section?.cards) ? section.cards : [];
+    return raw.map(normaliseCard).filter((c) => c.image);
+  }, [section]);
 
   const tabs = useMemo(() => {
     const defined = Array.isArray(section?.filters) ? section.filters : [];
-    const source = defined.length ? defined : DEFAULT_FILTERS;
-    return source
-      .map((f) => ({ value: f?.value || "", name: f?.label || "" }))
+    const mapped = defined
+      // `value` is optional in the CMS — fall back to the label so a filter
+      // that only has a label still works.
+      .map((f) => ({ value: slugify(f?.value || f?.label), name: f?.label || "" }))
       .filter((f) => f.value && f.name);
+
+    // No filters authored → no tab bar at all.
+    if (!mapped.length) return [];
+
+    // The CMS list holds only the real categories, so supply the "All" tab
+    // that the design leads with unless an editor already added one.
+    return mapped.some((t) => t.value === "all")
+      ? mapped
+      : [{ value: "all", name: "All" }, ...mapped];
   }, [section]);
 
-  const [active, setActive] = useState(tabs[0]?.value || "all");
+  const [active, setActive] = useState("all");
 
   const visible = useMemo(() => {
-    if (!active || active === "all") return items;
+    // Guard against an `active` tab that no longer exists (CMS edit) — fall
+    // back to showing everything instead of an empty row.
+    const known = active === "all" || tabs.some((t) => t.value === active);
+    if (!known || active === "all") return items;
     return items.filter((i) => i.category === active || i.category === "all");
-  }, [items, active]);
+  }, [items, active, tabs]);
 
   const rootRef = useRef(null);
   const trackRef = useRef(null);
@@ -107,6 +115,10 @@ export default function CareerWorkplace({ section }) {
     },
     { scope: rootRef }
   );
+
+  // Nothing authored for this section at all — render nothing rather than a
+  // bare heading over empty space.
+  if (!section) return null;
 
   return (
     <section
@@ -145,37 +157,41 @@ export default function CareerWorkplace({ section }) {
         {heading}
       </h2>
 
-      {/* Featured image + play */}
-      <div data-reveal className="mt-[28px] lg:mt-[2.5vw] px-5 md:px-10 lg:px-[8.333vw]">
-        <a
-          href={videoUrl || undefined}
-          target={videoUrl ? "_blank" : undefined}
-          rel={videoUrl ? "noopener noreferrer" : undefined}
-          className={`group relative block w-full overflow-hidden rounded-[8px] lg:rounded-[0.417vw] aspect-[1616/725] ${
-            videoUrl ? "cursor-pointer" : "cursor-default"
-          }`}
-          aria-label={videoUrl ? "Play video" : undefined}
-        >
-          <Image
-            src={featuredImage}
-            alt={heading}
-            fill
-            unoptimized
-            sizes="(max-width: 1024px) 100vw, 84vw"
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
-          />
-          <div className="absolute inset-0 bg-black/20" />
-          <span
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full
-                       w-[56px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw] transition-transform duration-300 group-hover:scale-110"
-            style={{ background: RED }}
+      {/* Featured image + play — omitted entirely when the CMS has no image */}
+      {featuredImage && (
+        <div data-reveal className="mt-[28px] lg:mt-[2.5vw] px-5 md:px-10 lg:px-[8.333vw]">
+          <a
+            href={videoUrl || undefined}
+            target={videoUrl ? "_blank" : undefined}
+            rel={videoUrl ? "noopener noreferrer" : undefined}
+            className={`group relative block w-full overflow-hidden rounded-[8px] lg:rounded-[0.417vw] aspect-[1616/725] ${
+              videoUrl ? "cursor-pointer" : "cursor-default"
+            }`}
+            aria-label={videoUrl ? "Play video" : undefined}
           >
-            <Play className="w-[18px] h-[18px] lg:w-[1.125vw] lg:h-[1.125vw] text-white" fill="currentColor" />
-          </span>
-        </a>
-      </div>
+            <Image
+              src={featuredImage}
+              alt={heading}
+              fill
+              unoptimized
+              sizes="(max-width: 1024px) 100vw, 84vw"
+              className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+            <div className="absolute inset-0 bg-black/20" />
+            {videoUrl && (
+              <span
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full
+                           w-[56px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw] transition-transform duration-300 group-hover:scale-110"
+                style={{ background: RED }}
+              >
+                <Play className="w-[18px] h-[18px] lg:w-[1.125vw] lg:h-[1.125vw] text-white" fill="currentColor" />
+              </span>
+            )}
+          </a>
+        </div>
+      )}
 
-      {/* Filter tabs */}
+      {/* Filter tabs — CMS-driven only; hidden when nothing is authored */}
       {tabs.length > 0 && (
         <div data-reveal className="mt-[28px] lg:mt-[2.5vw] flex justify-center px-5">
           <div

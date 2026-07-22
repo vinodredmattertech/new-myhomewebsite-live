@@ -66,6 +66,13 @@ const FALLBACK_QUICK_LINKS = [
 
 const FALLBACK_LOGO = "/assets/myhome/logo-footer.svg";
 
+/* Legal pages sit on the copyright line rather than in Quick Links, so they
+   stay put no matter how the CMS quick-links list is edited. */
+const LEGAL_LINKS = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms & Conditions", href: "/terms-conditions" },
+];
+
 export default function MyHomeFooter() {
   const router = useRouter();
   const rootRef = useRef(null);
@@ -483,16 +490,38 @@ export default function MyHomeFooter() {
       <div className="mt-[60px] lg:mt-[4.25vw] px-5 sm:px-8 lg:px-[8.854vw]">
         <div className="h-px w-full bg-white/15" />
         {/* Copyright row — Figma 3152:3969 + 3152:3970
-            Mobile: copyright left, "Created by Realatte™" right, both 12 Montserrat
-            Desktop: same row, larger text */}
-        <div className="mt-[20px] lg:mt-[2.083vw] flex flex-row items-center justify-between gap-[12px] sm:gap-[20px]">
-          <p
-            className="capitalize font-montserrat font-medium text-white/85
-                       text-[11px] xs:text-[12px] md:text-[14px] lg:text-[0.938vw] tracking-[0.02em]"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
-            {COPYRIGHT}
-          </p>
+            Mobile: copyright + legal links stacked above "Created by Realatte™"
+            Desktop: copyright & legal links left, credit right */}
+        <div
+          className="mt-[20px] lg:mt-[2.083vw] flex flex-col gap-[10px]
+                     sm:flex-row sm:items-center sm:justify-between sm:gap-[20px]"
+        >
+          <div className="flex flex-wrap items-center gap-x-[10px] gap-y-[6px] lg:gap-x-[0.833vw]">
+            <p
+              className="capitalize font-montserrat font-medium text-white/85
+                         text-[11px] xs:text-[12px] md:text-[14px] lg:text-[0.938vw] tracking-[0.02em]"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              {COPYRIGHT}
+            </p>
+            {LEGAL_LINKS.map((link) => (
+              <React.Fragment key={link.href}>
+                <span
+                  className="h-[11px] w-px bg-white/30 lg:h-[0.729vw]"
+                  aria-hidden="true"
+                />
+                <Link
+                  href={link.href}
+                  className="capitalize font-montserrat font-medium text-white/85 whitespace-nowrap
+                             hover:text-[#ef493d] transition-colors
+                             text-[11px] xs:text-[12px] md:text-[14px] lg:text-[0.938vw] tracking-[0.02em]"
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
+                  {link.label}
+                </Link>
+              </React.Fragment>
+            ))}
+          </div>
           <p
             className="font-montserrat font-normal text-white/75 whitespace-nowrap
                        text-[11px] xs:text-[12px] md:text-[14px] lg:text-[0.833vw]"

@@ -20,12 +20,40 @@ const HEADING_FONT = {
 };
 const BODY_FONT = { fontFamily: "Montserrat, sans-serif" };
 
+/* Tab glyphs are inlined (rather than <Image src="/images/*.svg">) so they
+   paint with currentColor and follow the pill's active / hover states. */
+function VideoTabIcon(props) {
+  return (
+    <svg viewBox="0 0 25 19" fill="none" aria-hidden="true" {...props}>
+      <path
+        d="M4.01786 0C2.95226 0 1.9303 0.428953 1.1768 1.19249C0.423309 1.95603 0 2.99162 0 4.07143V14.9286C0 16.0084 0.423309 17.044 1.1768 17.8075C1.9303 18.571 2.95226 19 4.01786 19H14.7321C15.7977 19 16.8197 18.571 17.5732 17.8075C18.3267 17.044 18.75 16.0084 18.75 14.9286V13.5859L22.3402 16.388C23.4268 17.2348 25 16.4504 25 15.0616V3.93843C25 2.54962 23.4268 1.76519 22.3402 2.61205L18.75 5.4141V4.07143C18.75 2.99162 18.3267 1.95603 17.5732 1.19249C16.8197 0.428953 15.7977 0 14.7321 0H4.01786ZM17.8571 6.32881V14.9286C17.8571 15.7684 17.5279 16.5739 16.9419 17.1677C16.3558 17.7616 15.5609 18.0952 14.7321 18.0952H4.01786C3.18906 18.0952 2.3942 17.7616 1.80815 17.1677C1.2221 16.5739 0.892857 15.7684 0.892857 14.9286V4.07143C0.892857 3.23158 1.2221 2.42612 1.80815 1.83226C2.3942 1.23839 3.18906 0.904762 4.01786 0.904762H14.7321C15.5609 0.904762 16.3558 1.23839 16.9419 1.83226C17.5279 2.42612 17.8571 3.23158 17.8571 4.07143V6.32881ZM18.75 12.4441V6.5559L22.8848 3.32952C22.9971 3.2418 23.1314 3.1877 23.2725 3.17336C23.4136 3.15902 23.5558 3.18502 23.683 3.24841C23.8103 3.3118 23.9175 3.41004 23.9924 3.53199C24.0674 3.65395 24.1071 3.79475 24.1071 3.93843V15.0616C24.1071 15.2052 24.0674 15.346 23.9924 15.468C23.9175 15.59 23.8103 15.6882 23.683 15.7516C23.5558 15.815 23.4136 15.841 23.2725 15.8266C23.1314 15.8123 22.9971 15.7582 22.8848 15.6705L18.75 12.4441Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function TextTabIcon(props) {
+  return (
+    <svg viewBox="0 0 24 21" fill="none" aria-hidden="true" {...props}>
+      <path
+        d="M7.35 6.20962H16.15M7.35 9.4854H16.15M19.45 14.945H16.6725C16.5085 14.9452 16.3467 14.982 16.1991 15.0529C16.0514 15.1238 15.9219 15.2269 15.82 15.3545L12.6025 19.34C12.4994 19.4679 12.3687 19.5712 12.22 19.6422C12.0713 19.7132 11.9084 19.75 11.7434 19.75C11.5784 19.75 11.4155 19.7132 11.2668 19.6422C11.1181 19.5712 10.9874 19.4679 10.8843 19.34L7.6668 15.3545C7.56481 15.2268 7.43506 15.1236 7.28724 15.0527C7.13943 14.9818 6.97737 14.945 6.8132 14.945H4.05C2.2218 14.945 0.75 13.484 0.75 11.6692V4.02577C0.75 2.211 2.2218 0.75 4.05 0.75H19.45C21.2793 0.75 22.75 2.211 22.75 4.02577V11.6692C22.75 13.484 21.2793 14.945 19.45 14.945Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /* Filter tabs map onto the `type` enum of the testimonial-item component.
    "all" is a synthetic key that shows everything. */
 const FILTERS = [
   { key: "all", label: "All" },
-  { key: "video", label: "Video" },
-  { key: "text", label: "Text" },
+  { key: "video", label: "Video", Icon: VideoTabIcon },
+  { key: "text", label: "Text", Icon: TextTabIcon },
 ];
 
 function formatDate(value) {
@@ -97,7 +125,7 @@ function CardMeta({ t }) {
 function VideoCard({ t, idx }) {
   return (
     <article className="group flex h-full flex-col">
-      <div className="relative w-full aspect-[16/11] overflow-hidden rounded-[8px] lg:rounded-[0.52vw] bg-[#ece7e0]">
+      <div className="relative w-full h-[250px]  md:h-[25.625vw] md:w-[19.688vw] overflow-hidden rounded-[8px] lg:rounded-[0.52vw] bg-[#ece7e0]">
         {t.image && (
           <Image
             src={t.image}
@@ -377,7 +405,7 @@ export default function TestimonialsListing({ heading, sectionLabel, items = [] 
         {/* Filter tabs — All / Video / Text */}
         <div className="mt-[32px] md:mt-[44px] lg:mt-[2.6vw] flex justify-center">
           <div className="flex flex-wrap items-center justify-center gap-[10px] lg:gap-[0.62vw]">
-            {availableFilters.map(({ key, label }) => {
+            {availableFilters.map(({ key, label, Icon }) => {
               const isActive = filter === key;
               return (
                 <button
@@ -398,11 +426,15 @@ export default function TestimonialsListing({ heading, sectionLabel, items = [] 
                               }`}
                   style={BODY_FONT}
                 >
-                  {isActive && (
+                  {/* Tabs with their own icon (Video / Text) skip the tick. */}
+                  {isActive && !Icon && (
                     <Check
                       className="w-[15px] h-[15px] lg:w-[0.94vw] lg:h-[0.94vw]"
                       strokeWidth={2.5}
                     />
+                  )}
+                  {Icon && (
+                    <Icon className="h-[14px] w-auto lg:h-[0.88vw] shrink-0" />
                   )}
                   {label}
                 </button>

@@ -653,3 +653,112 @@ select {
   color: #333;
   font-weight: 600;
 }
+
+/* ------------------------------------------------------------------
+   Legal documents (Privacy Policy, Terms & Conditions)
+
+   The body of these pages is a Strapi richtext field injected via
+   dangerouslySetInnerHTML, so Tailwind classes can't reach the nodes —
+   the editor's headings, lists, tables and links are styled here.
+   ------------------------------------------------------------------ */
+.legal-content > *:first-child {
+  margin-top: 0;
+}
+.legal-content p {
+  margin: 0 0 1.15em;
+}
+.legal-content h1,
+.legal-content h2,
+.legal-content h3,
+.legal-content h4 {
+  font-family: "Tartuffo_Trial_Regular", "Tartuffo Trial", "Cormorant Garamond",
+    "Playfair Display", serif;
+  font-weight: 300;
+  color: #333;
+  line-height: 1.28;
+}
+.legal-content h1 {
+  font-size: 1.75em;
+  margin: 1.6em 0 0.6em;
+}
+.legal-content h2 {
+  font-size: 1.5em;
+  margin: 1.6em 0 0.55em;
+}
+.legal-content h3 {
+  font-size: 1.25em;
+  margin: 1.4em 0 0.5em;
+}
+.legal-content h4 {
+  font-family: Montserrat, sans-serif;
+  font-weight: 600;
+  font-size: 1.05em;
+  margin: 1.2em 0 0.45em;
+}
+.legal-content ul,
+.legal-content ol {
+  margin: 0 0 1.15em;
+  padding-left: 1.4em;
+}
+.legal-content ul {
+  list-style: disc;
+}
+.legal-content ol {
+  list-style: decimal;
+}
+.legal-content li {
+  margin: 0.45em 0;
+}
+.legal-content li > ul,
+.legal-content li > ol {
+  margin: 0.45em 0 0.2em;
+}
+.legal-content a {
+  color: #ef493d;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+.legal-content strong {
+  color: #333;
+  font-weight: 600;
+}
+.legal-content blockquote {
+  margin: 1.4em 0;
+  padding: 0.4em 0 0.4em 1.1em;
+  border-left: 3px solid #ef493d;
+  color: #333;
+  font-style: italic;
+}
+.legal-content hr {
+  border: 0;
+  border-top: 1px solid #e7e7e7;
+  margin: 2em 0;
+}
+.legal-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 1.4em 0;
+}
+/* Tables are the one block that can overflow a phone — let them scroll
+   inside their own wrapper instead of pushing the page sideways. */
+.legal-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.4em 0;
+  white-space: nowrap;
+}
+.legal-content th,
+.legal-content td {
+  border: 1px solid #e7e7e7;
+  padding: 0.65em 0.9em;
+  text-align: left;
+  vertical-align: top;
+}
+.legal-content th {
+  background: #faf8f5;
+  color: #333;
+  font-weight: 600;
+}

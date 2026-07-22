@@ -410,7 +410,7 @@ export default function ProjectInquiry({
                             fontWeight: 600,
                           }}
                         >
-                          MahaRERA No.:
+                          {/* MahaRERA No.: */}
                         </p>
                         <p
                           className="text-[#333]

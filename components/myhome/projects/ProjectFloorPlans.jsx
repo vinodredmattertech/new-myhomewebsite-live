@@ -209,7 +209,8 @@ export default function ProjectFloorPlans({
                    px-[16px] py-[16px] sm:px-[24px] sm:py-[22px] lg:px-[1.927vw] lg:py-[1.771vw]"
       >
         <div className="flex items-center gap-[10px] sm:gap-[14px] lg:gap-[0.833vw]">
-          <span
+          {plan.bhk && (
+            <span
             className="inline-flex items-center justify-center rounded-full bg-white
                        border-[1.068px] border-[#333] text-[#333]
                        h-[34px] sm:h-[42px] lg:h-[2.656vw]
@@ -219,7 +220,9 @@ export default function ProjectFloorPlans({
           >
             {plan.bhk}
           </span>
-          <span
+          )}
+    {plan.label &&(
+      <span
             className="inline-flex items-center justify-center rounded-full bg-white
                        border-[1.068px] border-[#333] text-[#333]
                        h-[34px] sm:h-[42px] lg:h-[2.656vw]
@@ -229,6 +232,8 @@ export default function ProjectFloorPlans({
           >
             {plan.label}
           </span>
+    )}      
+          
         </div>
         <div className="mt-[14px] sm:mt-[20px] lg:mt-[1.667vw] relative w-full h-[calc(100%-58px)] sm:h-[calc(100%-72px)] lg:h-[calc(100%-4.323vw)]">
           <Image
