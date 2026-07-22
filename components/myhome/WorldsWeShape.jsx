@@ -159,7 +159,7 @@ export default function WorldsWeShape({ data }) {
       ref={rootRef}
       id="verticals"
       data-section="verticals"
-      className="relative w-full bg-[#fff] text-[#333] overflow-hidden
+      className="relative w-full bg-[#fff] text-[#333] lg:mt-[-8vw] overflow-hidden
                  min-h-[960px]
                  lg:h-[56.25vw] lg:min-h-[700px] lg:max-h-[1080px]"
     >

@@ -28,8 +28,9 @@ import {
  *
  * Data comes straight from the `media-galleries` collection — the tabs are the
  * `category` enum, and a tile's click behaviour follows its category:
- * Print opens `externalLink`, Magazines opens `pdfFile`, Electronics plays the
- * video in a Fancybox lightbox.
+ * Print opens `externalLink` — or, when the record has none, the cutting image
+ * itself in a Fancybox lightbox. Magazines opens `pdfFile`, Electronics plays
+ * the video in a Fancybox lightbox.
  */
 
 /* Tabs map 1:1 onto the `category` enum on the Media Gallery content type. */
@@ -109,7 +110,15 @@ function normalise(item) {
   };
 
   if (category === "Print") {
-    tile.href = item.externalLink?.trim() || null;
+    const link = item.externalLink?.trim();
+    if (link) {
+      tile.href = link;
+    } else {
+      // No article link on the record — the cutting itself is the content, so
+      // open the artwork in the Fancybox lightbox instead of rendering a dead tile.
+      tile.href = tile.image;
+      tile.fancyType = tile.image ? "image" : null;
+    }
   } else if (category === "Magazines") {
     tile.href = mediaUrl(item.pdfFile);
   } else if (category === "Electronics") {
@@ -128,6 +137,7 @@ function normalise(item) {
 function tileLabel(tile) {
   if (tile.category === "Electronics") return `Play video — ${tile.title}`;
   if (tile.category === "Magazines") return `Open PDF — ${tile.title}`;
+  if (tile.fancyType === "image") return `View cutting — ${tile.title}`;
   return `Read article — ${tile.title}`;
 }
 
@@ -144,7 +154,11 @@ function TileLink({ tile, className = "", children }) {
       aria-label={tileLabel(tile)}
       className={className}
       {...(tile.fancyType
-        ? { "data-fancybox": "news-listing", "data-type": tile.fancyType }
+        ? {
+            "data-fancybox": "news-listing",
+            "data-type": tile.fancyType,
+            ...(tile.title ? { "data-caption": tile.title } : null),
+          }
         : { target: "_blank", rel: "noopener noreferrer" })}
     >
       {children}

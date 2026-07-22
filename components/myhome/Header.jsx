@@ -279,9 +279,9 @@ export default function MyHomeHeader() {
                 <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
               </span>
             )}
-            <span className="font-montserrat text-[14px] lg:text-[0.833vw] tracking-[0.08em] capitalize">
+            {/* <span className="font-montserrat text-[14px] lg:text-[0.833vw] tracking-[0.08em] capitalize">
               {MENU_LABEL}
-            </span>
+            </span> */}
           </button>
 
           <Link
