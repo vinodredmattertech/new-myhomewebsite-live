@@ -61,6 +61,27 @@ export default function MyHomeHeader() {
     };
   }, [open]);
 
+  // On desktop the page scrolls behind the open menu (mobile is scroll-locked
+  // above). Close the panel on real scroll so the header/close button isn't
+  // left stranded when the header auto-hides on scroll-down. Only the native
+  // `scroll` event is used (not `wheel`): a click never changes scroll
+  // position, whereas a stray wheel tick would close the panel the instant it
+  // opens — which read as "needs a double click". Attach is deferred a beat so
+  // the opening gesture can't trip it.
+  useEffect(() => {
+    if (!open) return;
+    if (window.matchMedia("(max-width: 767px)").matches) return;
+
+    const close = () => setOpen(false);
+    const id = window.setTimeout(() => {
+      window.addEventListener("scroll", close, { passive: true });
+    }, 150);
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener("scroll", close);
+    };
+  }, [open]);
+
   const NAV_ITEMS =
     Array.isArray(cms?.navItems) && cms.navItems.length > 0
       ? cms.navItems.map((n) => ({
@@ -73,6 +94,37 @@ export default function MyHomeHeader() {
   const MENU_LABEL = cms?.menuLabel || "Menu";
   const CONTACT_CTA_LABEL = cms?.contactCtaLabel || "Contact Us";
   const CONTACT_CTA_LINK = cms?.contactCtaLink || "/contact-us";
+
+  // Group the flat nav list into labelled columns (matches the mega-menu
+  // reference). hrefs/openInNewTab are resolved from the CMS-or-fallback list
+  // by label so CMS-driven links keep working; second arg is the fallback.
+  const resolveNav = (label, fallback) => {
+    const found = NAV_ITEMS.find(
+      (n) => n.label?.toLowerCase() === label.toLowerCase()
+    );
+    return { label, href: found?.href || fallback, openInNewTab: !!found?.openInNewTab };
+  };
+  const NAV_GROUPS = [
+    {
+      heading: "Our Company",
+      items: [
+        resolveNav("About Us", "/about-us"),
+        resolveNav("Our Projects", "/projects"),
+        resolveNav("NRI", "/nri"),
+        resolveNav("CSR", "/csr"),
+      ],
+    },
+    {
+      heading: "Quick Links",
+      items: [
+        resolveNav("Blogs", "/blogs"),
+        resolveNav("News & Media", "/news"),
+        resolveNav("Testimonials", "/testimonials"),
+        resolveNav("Career", "/career"),
+        
+      ],
+    },
+  ];
 
   useGSAP(() => {
     registerGsap();
@@ -168,7 +220,7 @@ export default function MyHomeHeader() {
       >
         <div className="relative h-[66px] md:h-[80px] lg:h-[5.77vw] flex items-center px-5 md:px-10 lg:px-[8.333vw]">
           {/* ===== Mobile (<md): logo LEFT, Menu RIGHT (matches Figma 3189:5437) ===== */}
-          <Link href="/" className="md:hidden block">
+          <Link href="/" className="block md:hidden">
             <Image
               src={LOGO}
               alt="My Home Group"
@@ -184,39 +236,57 @@ export default function MyHomeHeader() {
             type="button"
             aria-label="Menu"
             aria-expanded={open}
-            onClick={() => setOpen(true)}
+            onClick={() => setOpen((o) => !o)}
             className="md:hidden ml-auto flex h-[42px] w-[42px] items-center justify-center text-white
                        bg-white/10 backdrop-blur-md border border-white/25 rounded-full
                        shadow-[0_2px_10px_rgba(0,0,0,0.18)]
                        active:scale-95 active:bg-white/20 transition-all duration-300"
           >
-            <span className="flex flex-col items-center gap-[5px] w-[18px]">
-              <span className="block h-[1.5px] w-full rounded-full bg-white" />
-              <span className="block h-[1.5px] w-full rounded-full bg-white" />
-              <span className="block h-[1.5px] w-[60%] mr-auto rounded-full bg-white" />
-            </span>
+            {open ? (
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+                <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            ) : (
+              <span className="flex flex-col items-center gap-[5px] w-[18px]">
+                <span className="block h-[1.5px] w-full rounded-full bg-white" />
+                <span className="block h-[1.5px] w-full rounded-full bg-white" />
+                <span className="block h-[1.5px] w-[60%] mr-auto rounded-full bg-white" />
+              </span>
+            )}
           </button>
 
           {/* ===== Desktop (md+): Menu LEFT, Logo CENTER, Contact RIGHT ===== */}
           <button
             type="button"
             aria-label="Menu"
-            onClick={() => setOpen(true)}
+            aria-expanded={open}
+            onClick={() => setOpen((o) => !o)}
             className="hidden md:flex group items-center gap-3 lg:gap-[0.781vw] text-white
                        bg-white/10 backdrop-blur-md border border-white/20 rounded-full
                        px-[18px] py-[10px] lg:px-[1.042vw] lg:py-[0.625vw]
                        hover:bg-white/20 transition-colors duration-300"
           >
-            <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
-              <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
-              <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
+            {open ? (
+              <span className="relative flex items-center justify-center w-[24px] lg:w-[1.459vw] h-[12px]">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+              </span>
+            ) : (
+              <span className="relative flex flex-col gap-[3px] w-[24px] lg:w-[1.459vw] h-[12px] justify-center">
+                <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:translate-y-[1px]" />
+                <span className="block h-[1.5px] w-[70%] bg-white transition-all duration-500 group-hover:w-full" />
+                <span className="block h-[1.5px] w-full bg-white transition-transform duration-500 group-hover:-translate-y-[1px]" />
+              </span>
+            )}
+            <span className="font-montserrat text-[14px] lg:text-[0.833vw] tracking-[0.08em] capitalize">
+              {MENU_LABEL}
             </span>
           </button>
 
           <Link
             href="/"
-            className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+            className="absolute hidden -translate-x-1/2 -translate-y-1/2 md:block left-1/2 top-1/2"
           >
             <Image
               src={LOGO}
@@ -237,14 +307,14 @@ export default function MyHomeHeader() {
                        hover:bg-white/20 transition-colors duration-300"
           >
             <span>{CONTACT_CTA_LABEL}</span>
-            <span className="ml-2 block w-0 h-px bg-white transition-all duration-500 group-hover:w-6" />
+            <span className="block w-0 h-px ml-2 transition-all duration-500 bg-white group-hover:w-6" />
           </Link>
         </div>
       </header>
 
-      {/* Slide-in mega menu */}
+      {/* Slide-down mega menu (full-width, drops from the top) */}
       <div
-        className={`fixed inset-0 z-[80] pointer-events-none ${
+        className={`fixed inset-0 z-[55] pointer-events-none ${
           open ? "pointer-events-auto" : ""
         }`}
       >
@@ -255,74 +325,72 @@ export default function MyHomeHeader() {
           }`}
         />
         <aside
-          className={`absolute top-0 right-0 h-full flex flex-col overflow-hidden
-                      w-[88%] max-w-[360px] rounded-l-[24px] shadow-[-20px_0_60px_rgba(0,0,0,0.45)]
-                      sm:w-[440px] sm:max-w-none md:rounded-none md:shadow-none
-                      bg-[#2a2828] text-white transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            open ? "translate-x-0" : "translate-x-full"
+          className={`absolute inset-x-0 top-0 overflow-hidden flex flex-col
+                      h-screen md:h-auto
+                      bg-[#2a2828] text-white shadow-[0_30px_60px_rgba(0,0,0,0.45)]
+                      transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            open ? "translate-y-0" : "-translate-y-full"
           }`}
         >
-          {/* Soft brand glow — mobile only, keeps the tall panel from reading flat */}
+          {/* Spacer so content clears the fixed header bar above */}
+          <div className="h-[66px] md:h-[80px] lg:h-[5.77vw]" />
+          <div className="border-t border-white/10" />
+
+          {/* Soft brand glow — keeps the wide panel from reading flat */}
           <span
             aria-hidden
-            className="md:hidden pointer-events-none absolute -bottom-24 -right-16 h-[260px] w-[260px] rounded-full bg-mh-red/20 blur-[80px]"
+            className="pointer-events-none absolute -bottom-24 -right-16 h-[320px] w-[320px] rounded-full bg-mh-red/20 blur-[90px]"
           />
 
-          <div className="relative flex items-center justify-between shrink-0 px-6 pt-[max(20px,env(safe-area-inset-top))] pb-5 border-b border-white/10 md:border-0 md:px-12 md:py-8">
-            <Image
-              src={LOGO}
-              alt="My Home Group"
-              width={110}
-              height={58}
-              unoptimized
-              className="h-auto w-[76px] md:w-[100px]"
-            />
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Close"
-              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center active:scale-95 hover:bg-mh-red hover:border-mh-red transition-all duration-300"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
-            </button>
-          </div>
+          <div className="relative flex flex-1 flex-col overflow-y-auto overscroll-contain px-5 md:px-10 lg:px-[8.333vw] py-10 md:py-14 lg:py-[3.5vw]">
+            <div className="flex flex-col gap-10 md:flex-row md:gap-[6vw] lg:gap-[8vw]">
+              {NAV_GROUPS.map((group, gi) => (
+                <div key={group.heading} className="flex flex-col min-w-0">
+                  <h3 className="font-montserrat text-[13px] lg:text-[0.833vw] uppercase tracking-[0.15em] text-white/40 mb-5 md:mb-[1.5vw]">
+                    {group.heading}
+                  </h3>
+                  <ul className="flex flex-col gap-3 md:gap-[0.9vw]">
+                    {group.items.map((item, i) => (
+                      <li
+                        key={item.label}
+                        style={{
+                          transitionDelay: open ? `${0.12 + (gi * 4 + i) * 0.05}s` : "0s",
+                          transform: open ? "translateY(0)" : "translateY(-24px)",
+                          opacity: open ? 1 : 0,
+                          transitionProperty: "opacity, transform",
+                          transitionDuration: "0.7s",
+                          transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                        }}
+                      >
+                        <Link
+                          href={item.href}
+                          target={item.openInNewTab ? "_blank" : undefined}
+                          rel={item.openInNewTab ? "noopener noreferrer" : undefined}
+                          onClick={() => setOpen(false)}
+                          className="group inline-flex items-center gap-2 font-tartuffo text-[20px] md:text-[22px] lg:text-[1.25vw] capitalize tracking-wide hover:text-mh-red active:text-mh-red transition-colors duration-500"
+                        >
+                          <span>{item.label}</span>
+                          <span className="transition-all duration-500 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+                            →
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
 
-          <nav className="relative flex-1 overflow-y-auto overscroll-contain px-6 py-4 flex flex-col gap-1 md:flex-none md:overflow-visible md:px-12 md:py-6">
-            {NAV_ITEMS.map((item, i) => (
+            {/* Mobile-only CTA — pinned to the bottom of the full-height panel */}
+            <div className="mt-auto pt-10 md:hidden">
               <Link
-                key={item.label}
-                href={item.href}
-                target={item.openInNewTab ? "_blank" : undefined}
-                rel={item.openInNewTab ? "noopener noreferrer" : undefined}
+                href={CONTACT_CTA_LINK}
                 onClick={() => setOpen(false)}
-                className="group inline-flex items-center justify-between border-b border-white/10 py-[14px] md:py-[10px] font-tartuffo text-[20px] md:text-[22px] capitalize tracking-wide active:text-mh-red hover:text-mh-red transition-colors duration-500"
-                style={{
-                  transitionDelay: open ? `${0.1 + i * 0.04}s` : "0s",
-                  transform: open ? "translateX(0)" : "translateX(30px)",
-                  opacity: open ? 1 : 0,
-                  transitionProperty: "opacity, transform, color",
-                  transitionDuration: "0.7s",
-                  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                }}
+                className="flex w-full items-center justify-center rounded-full bg-mh-red py-[14px] font-montserrat text-[14px] font-medium capitalize tracking-[0.08em] text-white active:scale-[0.98] transition-transform duration-300"
               >
-                <span>{item.label}</span>
-                <span className="text-white/35 md:opacity-0 md:-translate-x-2 md:text-inherit group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-inherit transition-all duration-500">
-                  →
-                </span>
+                {CONTACT_CTA_LABEL}
               </Link>
-            ))}
-          </nav>
-
-          {/* Mobile-only footer CTA — the mobile header has no Contact button */}
-          <div className="md:hidden relative shrink-0 px-6 pt-4 pb-[max(20px,env(safe-area-inset-bottom))] border-t border-white/10">
-            <Link
-              href={CONTACT_CTA_LINK}
-              onClick={() => setOpen(false)}
-              className="flex w-full items-center justify-center rounded-full bg-mh-red py-[14px] font-montserrat text-[14px] font-medium capitalize tracking-[0.08em] text-white active:scale-[0.98] transition-transform duration-300"
-            >
-              {CONTACT_CTA_LABEL}
-            </Link>
+            </div>
           </div>
         </aside>
       </div>

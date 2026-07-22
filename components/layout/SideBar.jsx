@@ -52,17 +52,17 @@ export const itemFadeUp = {
 
 export const sidebarVariants = {
   hidden: {
-    x: "100%",
+    y: "-100%",
   },
   show: {
-    x: 0,
+    y: 0,
     transition: {
       duration: 1, // smoother
       ease: [0.76, 0, 0.24, 1],
     },
   },
   exit: {
-    x: "100%",
+    y: "-100%",
     transition: {
       duration: 1,
       ease: [0.76, 0, 0.24, 1],
