@@ -38,15 +38,17 @@ export default function AboutLeadership({ data }) {
 
   const portrait = mediaUrl(data.portraitImage);
   const leaderImg = mediaUrl(data.LeaderImg);
+  // Mobile-only image (falls back to the desktop portrait if not provided)
+  const mobileImg = mediaUrl(data.mobileImage) || portrait;
 
   return (
     <section
       ref={rootRef}
       className="relative w-full overflow-hidden bg-[#1d1d1d]
-                 min-h-[640px] lg:h-[48.7vw]"
+                 lg:h-[48.7vw]"
     >
-      {/* Background portrait */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Background portrait — desktop only */}
+      <div className="absolute inset-0 pointer-events-none max-lg:hidden">
         {portrait && (
           <Image
             src={portrait}
@@ -59,6 +61,20 @@ export default function AboutLeadership({ data }) {
         )}
         {/* <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/15 to-black/55 lg:from-black/25 lg:via-transparent lg:to-black/70" /> */}
       </div>
+
+      {/* Mobile-only portrait — sits at the top, content flows below */}
+      {mobileImg && (
+        <div className="max-lg:hidden lg:hidden relative w-full aspect-[4/5]">
+          <Image
+            src={mobileImg}
+            alt={`${data.name || "Chairman"} — ${data.role || "Chairman, My Home Group"}`}
+            fill
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-center select-none"
+          />
+        </div>
+      )}
 
       {/* Side label */}
       <div
@@ -80,7 +96,7 @@ export default function AboutLeadership({ data }) {
       </div>
 
       {/* Content: LeaderImg (left on desktop / bottom on mobile) + card (right on desktop / top on mobile) */}
-      <div className="relative z-[2] h-full min-h-[640px] lg:min-h-0 lg:h-[48.7vw]
+      <div className="relative z-[2] lg:h-[48.7vw]
                       flex flex-col lg:flex-row items-center lg:justify-end
                       gap-10 md:gap-12 lg:gap-[3vw]
                       px-5 md:px-10 lg:px-[8.75vw] py-[60px] md:py-[80px] lg:py-0 max-sm:pl-[20px]">
@@ -88,7 +104,7 @@ export default function AboutLeadership({ data }) {
         {leaderImg && (
           <div className="order-2 lg:order-1 relative shrink-0
                           w-full max-w-[420px] sm:max-w-[480px] lg:w-[26vw] lg:max-w-none
-                          aspect-[4/5] lg:aspect-auto lg:h-[34vw]
+                          aspect-[4/5] lg:aspect-auto lg:h-[34vw] lg:hidden
                           rounded-[10px] lg:rounded-[0.625vw] overflow-hidden">
             <Image
               src={leaderImg}
