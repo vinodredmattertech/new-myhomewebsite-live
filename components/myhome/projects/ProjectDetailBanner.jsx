@@ -9,6 +9,7 @@ import SectionHeading from "@/components/common/SectionHeading";
 
 export default function ProjectDetailBanner({
   imageSrc = "/assets/myhome/projects/akrida-banner.jpg",
+  mobileImageSrc,
   imageAlt = "My Home Akrida",
   title = "My Home Akrida",
   location = "Gopanpally, Hyderabad",
@@ -88,13 +89,23 @@ export default function ProjectDetailBanner({
       data-section="project-detail-banner"
     >
       <div ref={imgRef} className="absolute inset-0 overflow-hidden will-change-transform">
+        {/* Mobile crop (below lg) — falls back to the desktop image when unset. */}
+        <Image
+          src={mobileImageSrc || imageSrc}
+          alt={imageAlt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center select-none lg:hidden"
+        />
+        {/* Desktop crop (lg and up). */}
         <Image
           src={imageSrc}
           alt={imageAlt}
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center select-none"
+          className="object-cover object-center select-none hidden lg:block"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent from-[56.759%] to-black to-[119.35%]" />
       </div>

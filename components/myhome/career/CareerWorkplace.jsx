@@ -125,12 +125,12 @@ export default function CareerWorkplace({ section }) {
       ref={rootRef}
       data-section="career-workplace"
       className="relative w-full overflow-hidden bg-white text-[#333]
-                 pt-[40px] pb-[56px] lg:pt-[3.646vw] lg:pb-[5.208vw]"
+                 pt-[60px] pb-[56px] lg:pt-[3.646vw] lg:pb-[5.208vw]"
     >
       {/* Vertical side label */}
       <div
         className="absolute z-[5] flex flex-col items-center
-                   left-[8px] top-[44px] w-[18px] gap-[10px]
+                   left-[8px] top-[-10px] w-[18px] gap-[10px]
                    lg:left-[4.166vw] lg:top-[3.646vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
         style={{ color: RED }}
       >

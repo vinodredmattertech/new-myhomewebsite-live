@@ -1,10 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y } from "swiper/modules";
+import { Navigation, Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
@@ -56,6 +56,23 @@ export default function ProjectAmenities({
   const sliderRef = useRef(null);
   const prevRef = useRef(null);
   const nextRef = useRef(null);
+  const [swiper, setSwiper] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Autoplay is enabled on mobile/tablet only (below the lg breakpoint).
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (!swiper?.autoplay) return;
+    if (isMobile) swiper.autoplay.start();
+    else swiper.autoplay.stop();
+  }, [swiper, isMobile]);
 console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
   useGSAP(
     () => {
@@ -150,13 +167,19 @@ console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
       </div>
       <div ref={sliderRef} className="mt-[40px] lg:mt-[3.802vw] w-full">
         <Swiper
-          modules={[Navigation, Keyboard, A11y]}
+          modules={[Navigation, Keyboard, A11y, Autoplay]}
           slidesPerView={1.05}
           spaceBetween={16}
           centeredSlides
           loop={amenities.length > 3}
           keyboard={{ enabled: true }}
           speed={700}
+          autoplay={
+            isMobile
+              ? { delay: 3500, disableOnInteraction: false }
+              : false
+          }
+          onSwiper={setSwiper}
           onBeforeInit={(swiper) => {
             swiper.params.navigation.prevEl = prevRef.current;
             swiper.params.navigation.nextEl = nextRef.current;

@@ -80,7 +80,7 @@ export default function NriTrustedName({ data }) {
         <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
-                     text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
+                     text-[32px] xs:text-[40px] max-md:px-3 sm:text-[52px] md:text-[64px] lg:text-[5vw]"
         >
           {data.heading}
         </SectionHeading>

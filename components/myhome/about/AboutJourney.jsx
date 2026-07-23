@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Keyboard, A11y, Controller, EffectFade } from "swiper/modules";
+import { Keyboard, A11y, Controller, EffectFade, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -30,6 +30,22 @@ export default function AboutJourney({ data }) {
   const [active, setActive] = useState(0);
   const [imageSwiper, setImageSwiper] = useState(null);
   const [contentSwiper, setContentSwiper] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Autoplay is enabled on mobile/tablet only (below the lg breakpoint).
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (!contentSwiper?.autoplay) return;
+    if (isMobile) contentSwiper.autoplay.start();
+    else contentSwiper.autoplay.stop();
+  }, [contentSwiper, isMobile]);
 
   useGSAP(
     () => {
@@ -177,12 +193,17 @@ export default function AboutJourney({ data }) {
           {/* ============ RIGHT: Content Swiper ============ */}
           <div className="lg:col-span-5 relative lg:h-[33.75vw]">
             <Swiper
-              modules={[Controller, Keyboard, A11y]}
+              modules={[Controller, Keyboard, A11y, Autoplay]}
               slidesPerView={1}
               spaceBetween={32}
               speed={700}
               loop
               keyboard={{ enabled: true }}
+              autoplay={
+                isMobile
+                  ? { delay: 3500, disableOnInteraction: false }
+                  : false
+              }
               onSwiper={setContentSwiper}
               onSlideChange={(s) => setActive(s.realIndex)}
               controller={{ control: imageSwiper }}

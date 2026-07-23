@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y } from "swiper/modules";
+import { Navigation, Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
@@ -45,6 +45,20 @@ const DEFAULT_TABS = [
   },
 ];
 
+// Build the correct Fancybox attributes for a walkthrough source.
+// YouTube/Vimeo watch URLs MUST NOT be forced to `iframe` — YouTube blocks
+// raw-iframe embedding of /watch URLs (X-Frame-Options), so the lightbox opens
+// blank. Letting Fancybox auto-detect makes it build the proper embed URL.
+function videoFancyboxAttrs(src, type) {
+  if (!src) return {};
+  const isYouTube = /(?:youtube\.com|youtu\.be)/i.test(src);
+  const isVimeo = /vimeo\.com/i.test(src);
+  if (isYouTube || isVimeo) return {}; // Fancybox detects and embeds correctly.
+  if (/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(src)) return { "data-type": "html5video" };
+  // Fall back to the CMS-provided type (e.g. a real iframe embed / Matterport tour).
+  return type ? { "data-type": type } : {};
+}
+
 export default function ProjectGallery({
   sidebarLabel = "A Visual Odyssey",
   heading = "Step Into Your Future Home",
@@ -62,6 +76,16 @@ export default function ProjectGallery({
   // navigation once the conditionally-rendered arrows are actually mounted.
   const [prevEl, setPrevEl] = useState(null);
   const [nextEl, setNextEl] = useState(null);
+  // Autoplay is enabled on mobile only; desktop behaviour stays unchanged.
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   // Bind Fancybox to the section so every [data-fancybox] walkthrough
   // tile opens its video in a lightbox modal.
@@ -235,13 +259,18 @@ export default function ProjectGallery({
           </div>
         ) : isVideoTab ? (
           <Swiper
-            key={activeTab}
-            modules={[Navigation, Keyboard, A11y]}
+            key={`${activeTab}-${isMobile ? "m" : "d"}`}
+            modules={[Navigation, Keyboard, A11y, Autoplay]}
             slidesPerView={hasMultiple ? 1.05 : 1}
             spaceBetween={16}
             speed={650}
             keyboard={{ enabled: true }}
             loop={hasMultiple}
+            autoplay={
+              isMobile && hasMultiple
+                ? { delay: 3500, disableOnInteraction: false }
+                : false
+            }
             centeredSlides={!hasMultiple}
             centerInsufficientSlides
             onSwiper={(s) => {
@@ -281,7 +310,7 @@ export default function ProjectGallery({
                       <a
                         href={item.videoSrc}
                         data-fancybox={`walkthrough-${activeTab}`}
-                        data-type={item.videoType}
+                        {...videoFancyboxAttrs(item.videoSrc, item.videoType)}
                         data-caption={item.title || ""}
                         aria-label={`Play walkthrough — ${item.title || "video"}`}
                         className="absolute inset-0 flex items-center justify-center"
@@ -334,13 +363,18 @@ export default function ProjectGallery({
           </Swiper>
         ) : (
           <Swiper
-            key={activeTab}
-            modules={[Navigation, Keyboard, A11y]}
+            key={`${activeTab}-${isMobile ? "m" : "d"}`}
+            modules={[Navigation, Keyboard, A11y, Autoplay]}
             slidesPerView={1}
             spaceBetween={16}
             speed={650}
             keyboard={{ enabled: true }}
             loop={activeItems.length > 1}
+            autoplay={
+              isMobile && activeItems.length > 1
+                ? { delay: 3500, disableOnInteraction: false }
+                : false
+            }
             onSwiper={(s) => {
               swiperRef.current = s;
             }}

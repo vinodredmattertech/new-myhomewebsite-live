@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger, splitToWords } from "@/lib/gsapSetup";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade } from "swiper/modules";
+import { EffectFade, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import { mediaUrl } from "@/lib/strapi";
@@ -42,6 +42,16 @@ export default function WhyMyHome({ data }) {
   const labelRef = useRef(null);
   const swiperRef = useRef(null);
   const [active, setActive] = useState(0);
+  // Enable Swiper touch/swipe on mobile only; desktop stays scroll-driven.
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   /** GSAP word-mask reveal fired every time the active slide index changes */
   const animateActive = () => {
@@ -127,19 +137,9 @@ export default function WhyMyHome({ data }) {
         return () => st.kill();
       });
 
-      // ----- mobile/tablet: no pin (layout is a tall static stack), so the
-      // section's own scroll travel drives the slides instead. Autoplay used
-      // to do this job; scroll is now the only driver on every breakpoint.
-      mm.add("(max-width: 1023px)", () => {
-        const st = ScrollTrigger.create({
-          trigger: rootRef.current,
-          start: "top 70%",
-          end: "bottom bottom",
-          onUpdate: syncToProgress,
-        });
-
-        return () => st.kill();
-      });
+      // ----- mobile/tablet: no pin and no scroll-driving. The slider is
+      // driven by native Swiper touch/swipe (allowTouchMove enabled on mobile)
+      // plus the pagination buttons, so scroll no longer fights the swipe.
     },
     { scope: rootRef }
   );
@@ -234,11 +234,18 @@ export default function WhyMyHome({ data }) {
           the pagination buttons — no autoplay, and no loop so `activeIndex`
           maps 1:1 onto the scroll progress index. */}
       <Swiper
-        modules={[EffectFade]}
+        key={isMobile ? "swiper-mobile" : "swiper-desktop"}
+        modules={[EffectFade, Autoplay]}
         effect="fade"
         fadeEffect={{ crossFade: true }}
         speed={900}
-        allowTouchMove={false}
+        allowTouchMove={isMobile}
+        autoplay={
+          isMobile
+            ? { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: false }
+            : false
+        }
+        rewind={isMobile}
         onSwiper={(s) => (swiperRef.current = s)}
         onSlideChange={(s) => {
           setActive(s.activeIndex);

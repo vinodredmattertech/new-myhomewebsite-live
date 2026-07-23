@@ -403,7 +403,7 @@ export default function ProjectFloorPlans({
                        pointer-events-none"
           >
             <div
-              className="pointer-events-auto bg-white/95 backdrop-blur-md border border-[rgba(51,51,51,0.12)]
+              className="pointer-events-none bg-white/95 backdrop-blur-md border border-[rgba(51,51,51,0.12)]
                          rounded-[12px] shadow-[0_30px_60px_-25px_rgba(0,0,0,0.3)]
                          px-[24px] py-[20px] sm:px-[32px] sm:py-[26px] lg:px-[2.083vw] lg:py-[1.563vw]
                          flex flex-col items-center text-center gap-[12px] lg:gap-[0.781vw]
@@ -438,7 +438,7 @@ export default function ProjectFloorPlans({
               <button
                 type="button"
                 onClick={() => setModalOpen(true)}
-                className="group relative inline-flex items-center justify-center
+                className="pointer-events-auto group relative inline-flex items-center justify-center
                            whitespace-nowrap overflow-hidden mt-[6px] lg:mt-[0.417vw]
                            h-[44px] sm:h-[48px] lg:h-[2.708vw]
                            px-[24px] lg:px-[1.563vw]
@@ -465,7 +465,8 @@ export default function ProjectFloorPlans({
               ref={prevRef}
               type="button"
               aria-label="Previous plan"
-              className={`absolute z-[5] top-1/2 -translate-y-1/2
+              onClick={() => swiperRef.current?.slidePrev()}
+              className={`absolute z-[7] top-1/2 -translate-y-1/2
                          left-[12px] md:left-[24px] lg:left-[1.354vw]
                          inline-flex items-center justify-center rounded-full
                          bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]
@@ -479,7 +480,8 @@ export default function ProjectFloorPlans({
               ref={nextRef}
               type="button"
               aria-label="Next plan"
-              className={`absolute z-[5] top-1/2 -translate-y-1/2
+              onClick={() => swiperRef.current?.slideNext()}
+              className={`absolute z-[7] top-1/2 -translate-y-1/2
                          right-[12px] md:right-[24px] lg:right-[1.354vw]
                          inline-flex items-center justify-center rounded-full
                          bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.18)]

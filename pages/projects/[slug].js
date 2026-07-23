@@ -70,6 +70,8 @@ export default function ProjectDetailPage({ project }) {
 
   const db = project.detailBanner || {};
   const bannerImg = mediaUrl(db.desktopImage) || mediaUrl(project.image);
+  // Fall back to the desktop image when no dedicated mobile crop is set.
+  const bannerImgMobile = mediaUrl(db.mobileImage) || bannerImg;
   const bannerLogo = mediaUrl(db.logo);
 
   const ov = project.overview || {};
@@ -231,6 +233,7 @@ export default function ProjectDetailPage({ project }) {
       {hasBanner && (
         <ProjectDetailBanner
           imageSrc={bannerImg}
+          mobileImageSrc={bannerImgMobile}
           imageAlt={db.imageAlt || project.title}
           title={project.title}
           location={project.location || project.subTitle}

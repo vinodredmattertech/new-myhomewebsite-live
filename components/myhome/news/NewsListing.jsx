@@ -534,7 +534,7 @@ export default function NewsListing({
       )}
 
       {/* Rotated "Media Presence" rail */}
-      <div className="absolute left-[16px] top-[56px] lg:left-[4.167vw] lg:top-[4.688vw] z-10">
+      <div className="absolute left-[16px] top-[36px] lg:left-[4.167vw] lg:top-[4.688vw] z-10">
         <SectionLabel>{sectionLabel || "Media Presence"}</SectionLabel>
       </div>
 

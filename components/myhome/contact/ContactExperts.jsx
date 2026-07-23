@@ -53,7 +53,7 @@ export default function ContactExperts({ data }) {
         <SectionHeading
           ref={headingRef}
           className="text-[#333] text-center capitalize will-change-transform leading-[1.05] tracking-[0.02em]  !font-[300]
-                     text-[34px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[4.1vw]"
+                     text-[34px] max-md:px-3 xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[4.1vw]"
         >
           {data.heading}
         </SectionHeading>

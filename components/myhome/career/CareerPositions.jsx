@@ -80,7 +80,7 @@ export default function CareerPositions({ section }) {
       {/* Vertical side label */}
       <div
         className="absolute z-[5] flex flex-col items-center
-                   left-[8px] top-[44px] w-[18px] gap-[10px]
+                   left-[8px] top-[-10px] w-[18px] gap-[10px]
                    lg:left-[4.166vw] lg:top-[4.688vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
         style={{ color: RED }}
       >
