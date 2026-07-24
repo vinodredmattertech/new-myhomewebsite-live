@@ -222,10 +222,11 @@ export default function ProjectSpecifications({
                     role="tab"
                     aria-selected={isActive}
                     onClick={() => setActiveIndex(idx)}
-                    className={`group relative flex items-center justify-center
-                                px-[10px] py-[20px] sm:px-[14px] sm:py-[28px]
-                                lg:px-[1.042vw] lg:py-[2.396vw]
-                                min-h-[86px] sm:min-h-[104px] lg:min-h-[7.5vw]
+                    /* No padding here — each face carries its own, so the
+                       back can use the tile's full height instead of the
+                       leftover box inside a large padded button. */
+                    className={`group relative flex items-stretch justify-center
+                                min-h-[104px] sm:min-h-[120px] lg:min-h-[8.5vw]
                                 border-r border-b border-[#333]/12
                                 transition-colors duration-300
                                 ${
@@ -250,6 +251,8 @@ export default function ProjectSpecifications({
                       {/* FRONT — the title */}
                       <span
                         className={`block text-center capitalize transition-colors duration-300
+                                    px-[10px] py-[20px] sm:px-[14px] sm:py-[28px]
+                                    lg:px-[1.042vw] lg:py-[2.396vw]
                                     text-[13px] leading-[20px]
                                     sm:text-[15px] sm:leading-[22px]
                                     lg:text-[0.938vw] lg:leading-[1.25vw]
@@ -267,11 +270,23 @@ export default function ProjectSpecifications({
                       {/* BACK — the CMS detail, sitting on the flipped face */}
                       {canFlip && (
                         <span
-                          className="absolute inset-0 flex items-center justify-center
-                                     overflow-hidden text-center text-[#6d6d6d]
+                          /* Tailwind's preflight resets `list-style` to none,
+                             so CKEditor's <ul>/<ol> arrive with no markers.
+                             Restore them here (inside, so bullets stay with
+                             the centred text rather than hanging outside the
+                             tile's padding). */
+                          className="absolute inset-0 flex flex-col items-start justify-center
+                                     overflow-hidden text-left text-[#6d6d6d]
+                                     px-[14px] py-[10px] lg:px-[1.042vw] lg:py-[0.729vw]
                                      text-[11px] leading-[16px]
                                      sm:text-[12px] sm:leading-[18px]
-                                     lg:text-[0.729vw] lg:leading-[1.042vw]"
+                                     lg:text-[0.729vw] lg:leading-[1.146vw]
+                                     [&>*]:w-full
+                                     [&_ul]:list-disc [&_ol]:list-decimal
+                                     [&_ul]:pl-[1.1em] [&_ol]:pl-[1.2em]
+                                     [&_li]:marker:text-[#ef493d]
+                                     [&_li+li]:mt-[3px]
+                                     [&_strong]:font-medium [&_strong]:text-[#333]"
                           style={{
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: 400,
