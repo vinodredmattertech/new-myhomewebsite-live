@@ -61,6 +61,8 @@ const DEFAULT_CARDS = [
     category: "education",
     categoryLabel: "Education",
     date: "10 Jan, 2026",
+    excerpt:
+      "Scholarships, school infrastructure and digital classrooms that help students in and around our communities stay in learning.",
     externalUrl: "/csr",
     image: "/assets/myhome/csr/card-1.jpg",
   },
@@ -69,6 +71,8 @@ const DEFAULT_CARDS = [
     category: "rural-development",
     categoryLabel: "Rural Development",
     date: "10 Jan, 2026",
+    excerpt:
+      "Clean water, sanitation and village infrastructure programmes carried out alongside local bodies in Telangana and Andhra Pradesh.",
     externalUrl: "/csr",
     image: "/assets/myhome/csr/card-2.jpg",
   },
@@ -77,6 +81,8 @@ const DEFAULT_CARDS = [
     category: "healthcare",
     categoryLabel: "Healthcare",
     date: "10 Jan, 2026",
+    excerpt:
+      "Medical camps, hospital support and long-term care partnerships that bring treatment closer to the families who need it.",
     externalUrl: "/csr",
     image: "/assets/myhome/csr/card-3.jpg",
   },
@@ -169,6 +175,142 @@ function CardArrow({ href }) {
     <Link href={href} aria-label="Open initiative" className={cls}>
       {icon}
     </Link>
+  );
+}
+
+/**
+ * InitiativeCard — image on the front, editorial copy on the back.
+ *
+ * The card flips on hover (and on keyboard focus, so the copy is reachable
+ * without a pointer). Touch devices never fire hover, so a tap toggles the
+ * flip instead — the guard on `pointerType` keeps a desktop click from
+ * fighting the hover state.
+ */
+function InitiativeCard({ card }) {
+  const [flipped, setFlipped] = useState(false);
+
+  return (
+    <article
+      className="snap-start shrink-0 w-full sm:w-[46%] lg:w-[calc((100%-4.166vw)/3)]"
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onFocus={() => setFlipped(true)}
+      onBlur={(e) => {
+        // Keep the back visible while focus moves *inside* it (to the arrow).
+        if (!e.currentTarget.contains(e.relatedTarget)) setFlipped(false);
+      }}
+      onPointerUp={(e) => {
+        if (e.pointerType === "touch" || e.pointerType === "pen") {
+          setFlipped((v) => !v);
+        }
+      }}
+    >
+      <div
+        className="relative w-full aspect-[494/492]"
+        style={{ perspective: "1400px" }}
+      >
+        <div
+          className="relative h-full w-full transition-transform duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+          }}
+        >
+          {/* ---- front: photo ---- */}
+          <div
+            className="absolute inset-0 overflow-hidden rounded-[8px] lg:rounded-[0.417vw]"
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+            }}
+          >
+            <Image
+              src={card.image}
+              alt={card.title}
+              fill
+              unoptimized
+              sizes="(max-width: 640px) 82vw, (max-width: 1024px) 46vw, 26vw"
+              className="object-cover object-center"
+            />
+            {card.categoryName && (
+              <span
+                className="absolute left-[14px] top-[14px] lg:left-[1.042vw] lg:top-[1.042vw]
+                           rounded-full bg-white/90 px-[12px] py-[5px] lg:px-[0.833vw] lg:py-[0.26vw]
+                           font-montserrat font-medium capitalize text-[#333]
+                           text-[11px] lg:text-[0.729vw] leading-none"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                {card.categoryName}
+              </span>
+            )}
+          </div>
+
+          {/* ---- back: date, title, excerpt, arrow ---- */}
+          <div
+            className="absolute inset-0 flex flex-col overflow-hidden rounded-[8px] lg:rounded-[0.417vw]
+                       border border-[#e7e7e7] bg-[#faf9f7]
+                       p-[22px] lg:p-[1.667vw]"
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+            }}
+          >
+            <span
+              className="block h-px w-[36px] lg:w-[2.083vw]"
+              style={{ background: RED }}
+            />
+
+            {card.date && (
+              <p
+                className="mt-[14px] lg:mt-[0.833vw] font-montserrat font-medium text-[#33333359]
+                           text-[13px] lg:text-[0.781vw] leading-[1.6]"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                {card.date}
+              </p>
+            )}
+
+            <h4
+              className="mt-[6px] lg:mt-[0.417vw] capitalize text-[#333]
+                         text-[19px] sm:text-[21px] lg:text-[1.354vw]
+                         leading-[1.25] tracking-[0.01em]"
+              style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
+            >
+              {card.title}
+            </h4>
+
+            {card.excerpt && (
+              <p
+                className="mt-[12px] lg:mt-[0.833vw] font-montserrat text-[#6d6d6d]
+                           text-[13px] sm:text-[14px] lg:text-[0.833vw]
+                           leading-[22px] sm:leading-[24px] lg:leading-[1.5vw]"
+                style={{
+                  fontFamily: "Montserrat, sans-serif",
+                  display: "-webkit-box",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 6,
+                  overflow: "hidden",
+                }}
+              >
+                {card.excerpt}
+              </p>
+            )}
+
+            <div className="mt-auto pt-[16px] lg:pt-[1.042vw] flex items-end justify-between gap-[16px] lg:gap-[1.04vw]">
+              <span
+                className="font-montserrat capitalize text-[#333]
+                           text-[13px] lg:text-[0.781vw] leading-none"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                {card.categoryName || card.projectLabel}
+              </span>
+              {/* <CardArrow href={card.externalUrl} /> */}
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -370,7 +512,7 @@ export default function CsrInitiatives({ section }) {
                   style={{ fontFamily: "Montserrat, sans-serif" }}
                 >
                   {featured.excerpt}{" "}
-                  {(featured.ctaUrl || featured.ctaLabel) && (
+                  {/* {(featured.ctaUrl || featured.ctaLabel) && (
                     <Link
                       href={featured.ctaUrl || "#"}
                       className="font-medium hover:underline"
@@ -378,7 +520,7 @@ export default function CsrInitiatives({ section }) {
                     >
                       {featured.ctaLabel}
                     </Link>
-                  )}
+                  )} */}
                 </p>
               )}
 
@@ -390,7 +532,7 @@ export default function CsrInitiatives({ section }) {
                     className="text-[#333] text-[18px] lg:text-[1.146vw]"
                     style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
                   >
-                    {featured.projectLabel}
+                    {/* {featured.projectLabel} */}
                   </span>
                   {featured.date && (
                     <span
@@ -440,44 +582,7 @@ export default function CsrInitiatives({ section }) {
                        [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             {cards.map((c) => (
-              <article
-                key={c.id}
-                className="snap-start shrink-0 w-full sm:w-[46%]
-                           lg:w-[calc((100%-4.166vw)/3)]"
-              >
-                <div className="relative w-full overflow-hidden rounded-[8px] lg:rounded-[0.417vw] aspect-[494/492]">
-                  <Image
-                    src={c.image}
-                    alt={c.title}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 640px) 82vw, (max-width: 1024px) 46vw, 26vw"
-                    className="object-cover object-center"
-                  />
-                </div>
-
-                <div className="mt-[16px] lg:mt-[1.042vw] flex items-end justify-between gap-[16px] lg:gap-[1.04vw]">
-                  <div className="min-w-0">
-                    {c.date && (
-                      <p
-                        className="font-montserrat font-medium text-[#33333359]
-                                   text-[13px] lg:text-[0.781vw] leading-[1.6]"
-                        style={{ fontFamily: "Montserrat, sans-serif" }}
-                      >
-                        {c.date}
-                      </p>
-                    )}
-                    <h4
-                      className="mt-[6px] lg:mt-[0.417vw] capitalize text-[#333] font-montserrat font-normal
-                                 text-[15px] lg:text-[0.833vw] leading-[22px] lg:leading-[1.354vw]"
-                      style={{ fontFamily: "Montserrat, sans-serif" }}
-                    >
-                      {c.title}
-                    </h4>
-                  </div>
-                  <CardArrow href={c.externalUrl} />
-                </div>
-              </article>
+              <InitiativeCard key={c.id} card={c} />
             ))}
           </div>
 
