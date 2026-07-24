@@ -5,6 +5,8 @@ import WhyMyHome from "@/components/myhome/WhyMyHome";
 import Statistics from "@/components/myhome/Statistics";
 import WorldsWeShape from "@/components/myhome/WorldsWeShape";
 import WhereStoriesBegin from "@/components/myhome/WhereStoriesBegin";
+import Lifestyle from "@/components/myhome/Lifestyle";
+import CommunityLiving from "@/components/myhome/CommunityLiving";
 import Testimonials from "@/components/myhome/Testimonials";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import { getHomeData } from "@/lib/strapi";
@@ -19,6 +21,8 @@ export default function Home({ home }) {
       <Statistics data={home?.statistics} />
       <WorldsWeShape data={home?.worldsWeShape} />
       <WhereStoriesBegin data={home?.featuredProjects} />
+      <Lifestyle data={home?.lifestyle} />
+      <CommunityLiving data={home?.communityLiving} />
       <Testimonials data={home?.testimonials} />
     </>
   );
