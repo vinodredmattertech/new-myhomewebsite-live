@@ -212,7 +212,7 @@ export default function WhoWeAre({ data }) {
           Mobile  — in normal flow above the photograph, dark text on white.
           Desktop — right-anchored absolute column at top 6.25vw, right-aligned content. */}
       <div className="relative order-1 w-full pt-[56px] sm:pt-[64px] pb-[32px] sm:pb-[40px] px-5 md:px-12 lg:absolute lg:order-none lg:py-0 lg:top-[6.25vw] lg:px-0 lg:left-auto lg:right-[10.4vw] xl:right-[10.4vw] lg:w-[28.33vw] z-[5]">
-        <div className="flex flex-col items-start lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
+        <div className="flex flex-col items-center lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
           {/* Horizontal label "Our Story" — MOBILE / TABLET ONLY, centered above heading */}
           <div
             ref={mobileLabelRef}

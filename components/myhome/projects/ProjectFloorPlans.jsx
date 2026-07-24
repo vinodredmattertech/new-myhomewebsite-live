@@ -86,8 +86,11 @@ export default function ProjectFloorPlans({
   const hideNavOnDesktop = activePlans.length <= 2;
 
   // ===== Unlock state =====
+  // Lead-gating is disabled for now — floor plans are visible to everyone.
+  // To re-enable, flip `unlocked` back to useState(false) and uncomment the
+  // localStorage init, the locked overlay, and the unlock modal below.
   const storageKey = `${STORAGE_PREFIX}${projectName}`;
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -99,10 +102,10 @@ export default function ProjectFloorPlans({
   } = useForm({ mode: "onBlur" });
 
   // Initialise unlock state from localStorage on the client (SSR-safe).
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.localStorage.getItem(storageKey) === "1") setUnlocked(true);
-  }, [storageKey]);
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
+  //   if (window.localStorage.getItem(storageKey) === "1") setUnlocked(true);
+  // }, [storageKey]);
 
   const onUnlockSubmit = async (data) => {
     setSubmitting(true);
@@ -394,7 +397,7 @@ export default function ProjectFloorPlans({
           </Swiper>
         )}
 
-        {/* Locked overlay — single CTA over the whole slider while gated */}
+        {/* Locked overlay — disabled, plans are open to everyone
         {!unlocked && (
           <div
             className="absolute inset-0 z-[6] flex items-center justify-center
@@ -455,6 +458,7 @@ export default function ProjectFloorPlans({
             </div>
           </div>
         )}
+        */}
 
         {/* Side nav buttons — more than one plan, and (on desktop) more than two */}
         {!isSingle && (
@@ -493,7 +497,7 @@ export default function ProjectFloorPlans({
         )}
       </div>
 
-      {/* ===== Unlock modal ===== */}
+      {/* ===== Unlock modal — disabled, no form needed to view plans =====
       <Dialog
         open={modalOpen}
         onClose={() => (submitting ? null : setModalOpen(false))}
@@ -621,7 +625,7 @@ export default function ProjectFloorPlans({
                 )}
               </div>
 
-              {/* Hidden project name — sent with the lead */}
+              // Hidden project name — sent with the lead
               <input type="hidden" value={projectName} readOnly />
 
               {submitError && (
@@ -663,6 +667,7 @@ export default function ProjectFloorPlans({
           </Dialog.Panel>
         </div>
       </Dialog>
+      */}
     </section>
   );
 }
