@@ -170,8 +170,8 @@ export default function Testimonials({ data }) {
       id="testimonials"
       data-section="testimonials"
       className="relative w-full bg-white overflow-hidden
-                 pt-[10px] pb-[64px]
-                 lg:pt-[1vw] lg:pb-[4.166vw]"
+                 pt-[20px] pb-[64px]
+                 lg:pt-[4vw] lg:pb-[4.166vw]"
     >
       {/* ============================================================
            HEADER (Figma 3152:3508 + 3152:3511 + 3152:3541)
