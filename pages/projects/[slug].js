@@ -141,6 +141,7 @@ export default function ProjectDetailPage({ project }) {
     .map((it, i) => ({
       key: `spec-${i}`,
       title: it.title,
+      body: it.body || "",
       image: mediaUrl(it.image),
     }))
     .filter((it) => it.image);
@@ -177,6 +178,16 @@ export default function ProjectDetailPage({ project }) {
   const ba = project.beforeAfter || {};
   const beforeSrc = mediaUrl(ba?.beforeImage) || "";
   const afterSrc = mediaUrl(ba?.afterImage) || "";
+  // Let the before/after frame follow the uploaded artwork's own shape, so a
+  // portrait site photo isn't centre-cropped into a wide frame.
+  const mediaRatio = (m) => {
+    const a = m?.data?.attributes || m?.attributes || m || {};
+    const w = Number(a.width);
+    const h = Number(a.height);
+    return w > 0 && h > 0 ? w / h : 0;
+  };
+  const beforeAfterRatio =
+    mediaRatio(ba?.beforeImage) || mediaRatio(ba?.afterImage) || 0;
 
   const iq = project.inquiry || {};
 
@@ -335,7 +346,23 @@ export default function ProjectDetailPage({ project }) {
           />
         </div>
       )}
-
+ {hasBeforeAfter && (
+        <div id="transformation">
+          <ProjectBeforeAfter
+            sidebarLabel={txt(ba.sidebarLabel)}
+            heading={txt(ba.heading)}
+            description={txt(ba.description)}
+            beforeLabel={txt(ba.beforeLabel)}
+            afterLabel={txt(ba.afterLabel)}
+            beforeSrc={beforeSrc}
+            afterSrc={afterSrc}
+            beforeCaption={txt(ba.beforeCaption)}
+            afterCaption={txt(ba.afterCaption)}
+            aspect={beforeAfterRatio}
+            projectName={project.title}
+          />
+        </div>
+      )}
       {hasBrochure && (
         <ProjectBrochure
           sidebarLabel={txt(br.sidebarLabel)}
@@ -360,22 +387,7 @@ export default function ProjectDetailPage({ project }) {
         </div>
       )}
 
-      {hasBeforeAfter && (
-        <div id="transformation">
-          <ProjectBeforeAfter
-            sidebarLabel={txt(ba.sidebarLabel)}
-            heading={txt(ba.heading)}
-            description={txt(ba.description)}
-            beforeLabel={txt(ba.beforeLabel)}
-            afterLabel={txt(ba.afterLabel)}
-            beforeSrc={beforeSrc}
-            afterSrc={afterSrc}
-            beforeCaption={txt(ba.beforeCaption)}
-            afterCaption={txt(ba.afterCaption)}
-            projectName={project.title}
-          />
-        </div>
-      )}
+     
 
       {hasInquiry && (
         <ProjectInquiry

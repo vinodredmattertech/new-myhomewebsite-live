@@ -169,7 +169,7 @@ export default function ProjectBeforeAfter({
                      shadow-[0_30px_70px_-40px_rgba(0,0,0,0.55)]
                      will-change-transform"
         >
-          <div className="relative w-full aspect-[1280/830] overflow-hidden rounded-[10px] lg:rounded-[0.625vw]">
+          <div className="relative w-full aspect-[1180/630] overflow-hidden rounded-[10px] lg:rounded-[0.625vw]">
             {STAGES.map((s) => (
               <Image
                 key={s.key}

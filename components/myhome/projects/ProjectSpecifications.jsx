@@ -213,6 +213,8 @@ export default function ProjectSpecifications({
             >
               {specs.map((spec, idx) => {
                 const isActive = idx === activeIndex;
+                // A tile only flips when there's something on the back of it.
+                const canFlip = Boolean(spec.body);
                 return (
                   <button
                     key={spec.key}
@@ -223,6 +225,7 @@ export default function ProjectSpecifications({
                     className={`group relative flex items-center justify-center
                                 px-[10px] py-[20px] sm:px-[14px] sm:py-[28px]
                                 lg:px-[1.042vw] lg:py-[2.396vw]
+                                min-h-[86px] sm:min-h-[104px] lg:min-h-[7.5vw]
                                 border-r border-b border-[#333]/12
                                 transition-colors duration-300
                                 ${
@@ -230,16 +233,56 @@ export default function ProjectSpecifications({
                                     ? "bg-[rgba(239,73,61,0.06)]"
                                     : "bg-transparent hover:bg-[rgba(239,73,61,0.04)]"
                                 }`}
+                    style={{ perspective: "1000px" }}
                   >
+                    {/* Flip shell — rotates on hover, front and back share the
+                        same box so the tile keeps its grid cell exactly. */}
                     <span
-                      className={`text-center capitalize transition-colors duration-300
-                                  text-[13px] leading-[20px]
-                                  sm:text-[15px] sm:leading-[22px]
-                                  lg:text-[0.938vw] lg:leading-[1.25vw]
-                                  ${isActive ? "text-[#ef493d]" : "text-[#333] group-hover:text-[#ef493d]"}`}
-                      style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+                      className={`relative flex w-full self-stretch items-center justify-center
+                                  transition-transform
+                                  duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)]
+                                  ${canFlip ? "group-hover:[transform:rotateY(180deg)]" : ""}`}
+                      style={{
+                        transformStyle: "preserve-3d",
+                        WebkitTransformStyle: "preserve-3d",
+                      }}
                     >
-                      {spec.title}
+                      {/* FRONT — the title */}
+                      <span
+                        className={`block text-center capitalize transition-colors duration-300
+                                    text-[13px] leading-[20px]
+                                    sm:text-[15px] sm:leading-[22px]
+                                    lg:text-[0.938vw] lg:leading-[1.25vw]
+                                    ${isActive ? "text-[#ef493d]" : "text-[#333] group-hover:text-[#ef493d]"}`}
+                        style={{
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 400,
+                          backfaceVisibility: "hidden",
+                          WebkitBackfaceVisibility: "hidden",
+                        }}
+                      >
+                        {spec.title}
+                      </span>
+
+                      {/* BACK — the CMS detail, sitting on the flipped face */}
+                      {canFlip && (
+                        <span
+                          className="absolute inset-0 flex items-center justify-center
+                                     overflow-hidden text-center text-[#6d6d6d]
+                                     text-[11px] leading-[16px]
+                                     sm:text-[12px] sm:leading-[18px]
+                                     lg:text-[0.729vw] lg:leading-[1.042vw]"
+                          style={{
+                            fontFamily: "Montserrat, sans-serif",
+                            fontWeight: 400,
+                            transform: "rotateY(180deg)",
+                            backfaceVisibility: "hidden",
+                            WebkitBackfaceVisibility: "hidden",
+                          }}
+                        >
+                          <RichText>{spec.body}</RichText>
+                        </span>
+                      )}
                     </span>
                   </button>
                 );

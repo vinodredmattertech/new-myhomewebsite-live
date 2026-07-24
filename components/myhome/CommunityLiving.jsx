@@ -103,17 +103,6 @@ function HighlightCard({ index, title, body, value, image }) {
                      transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
         />
 
-        {/* Light sweep — a single slow pass across the image on hover */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 -left-full w-1/2
-                     bg-gradient-to-r from-transparent via-white/25 to-transparent
-                     skew-x-[-18deg]
-                     transition-transform duration-[1300ms]
-                     ease-[cubic-bezier(0.22,1,0.36,1)]
-                     group-hover:translate-x-[400%]"
-        />
-
         {/* Index — quiet ordinal, brightens with the card */}
         <span
           aria-hidden="true"
