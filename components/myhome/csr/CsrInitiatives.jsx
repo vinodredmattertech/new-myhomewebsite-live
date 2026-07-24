@@ -289,7 +289,7 @@ function InitiativeCard({ card }) {
                   fontFamily: "Montserrat, sans-serif",
                   display: "-webkit-box",
                   WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 6,
+                  WebkitLineClamp: 10,
                   overflow: "hidden",
                 }}
               >

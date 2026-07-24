@@ -31,13 +31,27 @@ const CARD_LAYOUT = [
 export default function WorldsWeShape({ data }) {
   // Source is the `verticals` relation (collection type) — flatten the
   // v4 envelope and map to the shape the rest of the section expects.
+  // Strapi returns a relation in join/id order, not by `number`, so sort
+  // explicitly — otherwise the stack reads 01, 03, 04, 06, 05. Entries with
+  // no usable number keep their original position at the end.
   const rawVerticals = relationList(data?.verticals);
-  const SLIDES = rawVerticals.map((v) => ({
-    id: v.number || "",
-    title: v.title || "",
-    body: v.body || "",
-    image: mediaUrl(v.image),
-  }));
+  const SLIDES = rawVerticals
+    .map((v, i) => ({
+      id: v.number || "",
+      title: v.title || "",
+      body: v.body || "",
+      image: mediaUrl(v.image),
+      _order: Number.parseInt(v.number, 10),
+      _i: i,
+    }))
+    .sort((a, b) => {
+      const aNum = Number.isNaN(a._order);
+      const bNum = Number.isNaN(b._order);
+      if (aNum && bNum) return a._i - b._i;
+      if (aNum) return 1;
+      if (bNum) return -1;
+      return a._order - b._order || a._i - b._i;
+    });
 
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -325,9 +339,12 @@ export default function WorldsWeShape({ data }) {
             </div>
           </div>
 
-          {/* Front card (Figma 3152:3795) — full 426×256, no rotation */}
+          {/* Front card (Figma 3152:3795) — full 426×256, no rotation.
+              No cardsRef here: both breakpoints render into the DOM, so this
+              used to overwrite cardsRef.current[0] and leave the DESKTOP front
+              card out of the nav timeline (it swapped with no crossfade). The
+              parent mobileImageRef already fades this whole stack. */}
           <div
-            ref={(el) => (cardsRef.current[0] = el)}
             className="relative w-full aspect-[426.643/256.556] rounded-[4px] overflow-hidden
                        will-change-transform shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] z-[3]"
           >
