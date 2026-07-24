@@ -217,7 +217,7 @@ export default function ProjectDetailPage({ project }) {
     { id: "amenities", label: "Amenities", show: hasAmenities },
     { id: "plans", label: "Plans", show: hasFloorPlans },
     { id: "gallery", label: "Gallery", show: hasGallery },
-    { id: "specification", label: "Specification", show: hasSpecifications },
+    { id: "specification", label: "Specifications", show: hasSpecifications },
     {
       id: "construction-updates",
       label: "Construction Updates",

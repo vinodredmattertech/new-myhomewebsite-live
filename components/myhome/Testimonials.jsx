@@ -55,31 +55,54 @@ function PlayIcon({ className = "" }) {
   );
 }
 
+/**
+ * Normalise one Strapi `home.testimonial-item` entry into the shape the slide
+ * markup expects. Shared by both tabs so Community and Blockbuster render
+ * identically — only the source list differs.
+ */
+function mapItems(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((t) => {
+    const videoFileUrl = mediaUrl(t.videoFile);
+    // isVideo=true → play the uploaded videoFile; else → use videoUrl
+    const videoSrc = t.isVideo ? videoFileUrl : t.videoUrl || "";
+    // Decide which Fancybox content type to use. Uploaded files and
+    // direct .mp4/.webm/.mov URLs play as html5video. For YouTube/Vimeo
+    // we leave the type undefined so Fancybox v5 auto-detects the
+    // provider and builds the correct embed (forcing "iframe" would load
+    // the raw watch page, which YouTube refuses to frame).
+    const isDirectVideo =
+      t.isVideo || /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(videoSrc || "");
+    return {
+      quote: t.quote || "",
+      name: t.name || "",
+      image: mediaUrl(t.image),
+      badge: BADGE_COLORS[t.badgeColor] || BADGE_COLORS.red,
+      videoSrc,
+      videoType: isDirectVideo ? "html5video" : undefined,
+    };
+  });
+}
+
 export default function Testimonials({ data }) {
-  const TESTIMONIALS =
-    Array.isArray(data?.items) && data.items.length
-      ? data.items.map((t) => {
-          const videoFileUrl = mediaUrl(t.videoFile);
-          // isVideo=true → play the uploaded videoFile; else → use videoUrl
-          const videoSrc = t.isVideo ? videoFileUrl : t.videoUrl || "";
-          // Decide which Fancybox content type to use. Uploaded files and
-          // direct .mp4/.webm/.mov URLs play as html5video. For YouTube/Vimeo
-          // we leave the type undefined so Fancybox v5 auto-detects the
-          // provider and builds the correct embed (forcing "iframe" would load
-          // the raw watch page, which YouTube refuses to frame).
-          const isDirectVideo =
-            t.isVideo ||
-            /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(videoSrc || "");
-          return {
-            quote: t.quote || "",
-            name: t.name || "",
-            image: mediaUrl(t.image),
-            badge: BADGE_COLORS[t.badgeColor] || BADGE_COLORS.red,
-            videoSrc,
-            videoType: isDirectVideo ? "html5video" : undefined,
-          };
-        })
-      : [];
+  // Two tabs, each backed by its own repeatable component in Strapi:
+  //   Community   → testimonials.items
+  //   Blockbuster → testimonials.blockbusterItems
+  const COMMUNITY = mapItems(data?.items);
+  const BLOCKBUSTER = mapItems(data?.blockbusterItems);
+
+  const TABS = [
+    {
+      key: "community",
+      label: data?.communityTabLabel || "Community",
+      items: COMMUNITY,
+    },
+    {
+      key: "blockbuster",
+      label: data?.blockbusterTabLabel || "Blockbuster",
+      items: BLOCKBUSTER,
+    },
+  ];
 
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -87,6 +110,24 @@ export default function Testimonials({ data }) {
   const labelRef = useRef(null);
   const swiperRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [activeTab, setActiveTab] = useState("community");
+
+  // Only offer a tab that actually has entries behind it, so Blockbuster stays
+  // hidden until stories are added in Strapi. If the selected tab drops to
+  // empty (content unpublished), fall back to the first tab that still has
+  // slides instead of rendering an empty carousel.
+  const availableTabs = TABS.filter((t) => t.items.length);
+  const effectiveTab = availableTabs.some((t) => t.key === activeTab)
+    ? activeTab
+    : availableTabs[0]?.key;
+  const TESTIMONIALS =
+    availableTabs.find((t) => t.key === effectiveTab)?.items || [];
+
+  const onTabChange = (key) => {
+    if (key === activeTab) return;
+    setActiveTab(key);
+    setActiveIdx(0);
+  };
 
   // Bind Fancybox to the section so every [data-fancybox] play button opens
   // its testimonial video in a lightbox modal.
@@ -171,6 +212,43 @@ export default function Testimonials({ data }) {
                    lg:pl-[11.146vw] lg:pr-[4.166vw]
                    max-w-[805px] lg:max-w-[61.927vw]"
       >
+        {/* Tabs — Community / Blockbuster. Each switches the carousel to its
+            own set of testimonials managed in Strapi. Rendered only when both
+            tabs have content; a single populated tab needs no switcher. */}
+        {availableTabs.length > 1 && (
+          <div
+            role="tablist"
+            aria-label="Testimonial categories"
+            className="flex flex-wrap items-center gap-[10px] lg:gap-[0.833vw]"
+          >
+            {availableTabs.map((t) => {
+              const isActive = t.key === effectiveTab;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => onTabChange(t.key)}
+                  className={`font-montserrat font-medium capitalize rounded-full border
+                              px-[18px] py-[9px] md:px-[22px] md:py-[11px]
+                              lg:px-[1.302vw] lg:py-[0.625vw]
+                              text-[13px] sm:text-[15px] lg:text-[0.938vw]
+                              transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+                              ${
+                                isActive
+                                  ? "bg-[#ef493d] text-white border-[#ef493d]"
+                                  : "bg-transparent text-[#454545] border-[#e7e7e7] hover:border-[#ef493d] hover:text-[#ef493d]"
+                              }`}
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <SectionHeading
           ref={headingRef}
           className="capitalize text-[#333] tracking-[2px]
@@ -233,6 +311,9 @@ export default function Testimonials({ data }) {
          ============================================================ */}
       <div className="relative z-[2] mt-[36px] lg:mt-[5vw]">
         <Swiper
+          /* Remount on tab change — loop mode caches its slide clones, so
+             swapping the children in place leaves stale duplicates behind. */
+          key={effectiveTab}
               modules={[Navigation, A11y, Autoplay]}
           slidesPerView="auto"
           spaceBetween={24}
@@ -248,7 +329,7 @@ export default function Testimonials({ data }) {
           className="!px-5 md:!px-8 lg:!px-[7.448vw] !overflow-visible"
         >
           {TESTIMONIALS.map((t, i) => (
-            <SwiperSlide key={`${t.name}-${i}`}      className="!h-auto !w-[calc(100vw-40px)] md:!w-[calc(100vw-64px)] lg:!w-[45.052vw]">
+            <SwiperSlide key={`${effectiveTab}-${t.name}-${i}`}      className="!h-auto !w-[calc(100vw-40px)] md:!w-[calc(100vw-64px)] lg:!w-[45.052vw]">
               {/* Per-testimonial layout (Figma 3152:3515 / 3152:3528):
                   Mobile — stack: image then text below
                   Desktop — flex row, text left (385 wide), image right (360x541) */}
@@ -327,7 +408,7 @@ export default function Testimonials({ data }) {
                   {t.videoSrc ? (
                     <a
                       href={t.videoSrc}
-                      data-fancybox={`testimonial-${i}`}
+                      data-fancybox={`testimonial-${effectiveTab}-${i}`}
                       {...(t.videoType ? { "data-type": t.videoType } : {})}
                       aria-label={`Play video testimonial — ${t.name}`}
                       className="absolute inset-0 m-auto inline-flex items-center justify-center
