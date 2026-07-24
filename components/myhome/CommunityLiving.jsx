@@ -10,17 +10,21 @@ import SectionHeading from "@/components/common/SectionHeading";
 /**
  * Community Living
  *
- * Sits between the Lifestyle section and Testimonials. Left column carries the
- * community imagery, right column the copy plus the "What Makes My Home
- * Exceptional" list (on-time delivery, quality construction, brand trust).
+ * Sits between the Lifestyle section and Testimonials. Two blocks:
+ *   1. Intro — community imagery on the left, copy on the right.
+ *   2. "What Makes My Home Exceptional" — a full-width band with a centred
+ *      heading over a 3-up row of visuals (on-time delivery, quality
+ *      construction, brand trust), each with its name below the image.
  *
  * Strapi-driven (home.community-living):
  *   • the section renders only when a heading or at least one highlight exists
- *   • the highlights block renders only when highlights were added
- *   • the image column collapses cleanly when no image was uploaded
+ *   • the highlights band renders only when highlights were added
+ *   • the intro image column collapses cleanly when no image was uploaded
+ *   • a highlight with no image falls back to a numbered tile
  *
  * Desktop sizing is vw-based (1920 reference); mobile/tablet use fixed
- * Tailwind steps and stack image → copy → highlights.
+ * Tailwind steps — the intro stacks image → copy, and the 3-up row becomes a
+ * single column below the `sm` breakpoint.
  */
 
 const TITLE_FONT = {
@@ -29,74 +33,75 @@ const TITLE_FONT = {
 };
 const BODY_FONT = { fontFamily: "Montserrat, sans-serif" };
 
-function HighlightRow({ index, title, body, value, icon, isLast }) {
+/**
+ * One "What Makes My Home Exceptional" card — visual on top, name underneath,
+ * mirroring the reference layout (3 across on desktop, stacked on mobile).
+ */
+function HighlightCard({ index, title, body, value, image }) {
   return (
-    <li
-      data-highlight
-      className={`flex items-start gap-[14px] lg:gap-[1.25vw]
-                  py-[18px] lg:py-[1.354vw]
-                  ${isLast ? "" : "border-b border-[#333]/10"}`}
-    >
-      {/* Icon when one was uploaded, otherwise the 01 / 02 / 03 index */}
-      <span
-        className="shrink-0 inline-flex items-center justify-center rounded-full
-                   border border-[#ef493d]/30 text-[#ef493d]
-                   w-[42px] h-[42px] lg:w-[3.125vw] lg:h-[3.125vw]"
+    <li data-highlight className="group flex flex-col">
+      <div
+        className="relative w-full aspect-[420/300] overflow-hidden
+                   rounded-[6px] lg:rounded-[0.416vw]
+                   shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)]"
       >
-        {icon ? (
-          <span className="relative block w-[20px] h-[20px] lg:w-[1.458vw] lg:h-[1.458vw]">
-            <Image
-              src={icon}
-              alt=""
-              fill
-              unoptimized
-              sizes="(min-width:1024px) 2vw, 20px"
-              className="object-contain"
-            />
-          </span>
+        {image ? (
+          <Image
+            src={image}
+            alt={title}
+            fill
+            unoptimized
+            sizes="(min-width:1024px) 25vw, (min-width:640px) 32vw, calc(100vw - 40px)"
+            className="object-cover object-center transition-transform duration-700
+                       ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+          />
         ) : (
-          <span
-            className="font-montserrat font-medium text-[13px] lg:text-[0.833vw]"
-            style={BODY_FONT}
-          >
-            {String(index + 1).padStart(2, "0")}
-          </span>
-        )}
-      </span>
-
-      <div className="flex flex-col">
-        <span className="flex flex-wrap items-baseline gap-x-[10px] lg:gap-x-[0.625vw]">
-          <h4
-            className="capitalize text-[#333] leading-[1.2]
-                       text-[19px] sm:text-[21px] md:text-[24px] lg:text-[1.354vw]"
-            style={TITLE_FONT}
-          >
-            {title}
-          </h4>
-          {value && (
+          /* No visual uploaded yet — a quiet numbered tile keeps the row even */
+          <div className="absolute inset-0 flex items-center justify-center bg-[#f1efec]">
             <span
-              className="font-montserrat font-medium text-[#ef493d]
-                         text-[12px] md:text-[13px] lg:text-[0.729vw]
-                         tracking-[0.08em] uppercase"
+              className="font-montserrat font-medium text-[#ef493d]/50
+                         text-[34px] lg:text-[2.604vw]"
               style={BODY_FONT}
             >
-              {value}
+              {String(index + 1).padStart(2, "0")}
             </span>
-          )}
-        </span>
-
-        {body && (
-          <p
-            className="font-montserrat font-normal text-[#6d6d6d]
-                       mt-[6px] lg:mt-[0.416vw]
-                       text-[13px] sm:text-[14px] md:text-[15px] lg:text-[0.833vw]
-                       leading-[22px] sm:leading-[24px] md:leading-[26px] lg:leading-[1.458vw]"
-            style={BODY_FONT}
-          >
-            <RichText>{body}</RichText>
-          </p>
+          </div>
         )}
       </div>
+
+      {/* Name below the image (reference layout) */}
+      <h4
+        className="text-center capitalize text-[#333] leading-[1.25]
+                   mt-[14px] lg:mt-[1.041vw]
+                   text-[18px] sm:text-[20px] md:text-[22px] lg:text-[1.25vw]"
+        style={TITLE_FONT}
+      >
+        {title}
+      </h4>
+
+      {value && (
+        <span
+          className="text-center font-montserrat font-medium text-[#ef493d] uppercase
+                     mt-[6px] lg:mt-[0.416vw]
+                     tracking-[0.12em] text-[11px] md:text-[12px] lg:text-[0.677vw]"
+          style={BODY_FONT}
+        >
+          {value}
+        </span>
+      )}
+
+      {body && (
+        <p
+          className="text-center font-montserrat font-normal text-[#6d6d6d]
+                     mt-[8px] lg:mt-[0.625vw] mx-auto
+                     max-w-[420px] lg:max-w-[21vw]
+                     text-[13px] sm:text-[14px] lg:text-[0.781vw]
+                     leading-[22px] sm:leading-[24px] lg:leading-[1.354vw]"
+          style={BODY_FONT}
+        >
+          <RichText>{body}</RichText>
+        </p>
+      )}
     </li>
   );
 }
@@ -107,7 +112,7 @@ export default function CommunityLiving({ data }) {
         title: h.title || "",
         body: h.body || "",
         value: h.value || "",
-        icon: mediaUrl(h.icon),
+        image: mediaUrl(h.image),
       }))
     : [];
 
@@ -294,33 +299,42 @@ export default function CommunityLiving({ data }) {
             </p>
           )}
 
-          {/* What Makes My Home Exceptional */}
-          {HIGHLIGHTS.length > 0 && (
-            <div ref={listRef} className="mt-[32px] lg:mt-[2.604vw]">
-              {data.highlightsHeading && (
-                <h3
-                  className="capitalize text-[#333] leading-[1.2]
-                             text-[22px] sm:text-[26px] md:text-[30px] lg:text-[1.875vw]"
-                  style={TITLE_FONT}
-                >
-                  {data.highlightsHeading}
-                </h3>
-              )}
-
-              <ul className="mt-[8px] lg:mt-[0.833vw] border-t border-[#333]/10">
-                {HIGHLIGHTS.map((h, i) => (
-                  <HighlightRow
-                    key={`${h.title}-${i}`}
-                    index={i}
-                    isLast={i === HIGHLIGHTS.length - 1}
-                    {...h}
-                  />
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* ============================================================
+           WHAT MAKES MY HOME EXCEPTIONAL
+           Full-width band under the intro: centred heading, then the
+           points as a 3-up row of visuals with the name below each
+           (stacked on mobile, 3 across from tablet up).
+         ============================================================ */}
+      {HIGHLIGHTS.length > 0 && (
+        <div
+          ref={listRef}
+          className="relative z-[3] mt-[48px] lg:mt-[4.687vw]
+                     px-5 md:px-10 lg:px-[11.146vw]"
+        >
+          {data.highlightsHeading && (
+            <h3
+              className="text-center capitalize text-[#333] leading-[1.2]
+                         text-[24px] xs:text-[26px] sm:text-[32px] md:text-[38px] lg:text-[2.291vw]"
+              style={TITLE_FONT}
+            >
+              {data.highlightsHeading}
+            </h3>
+          )}
+
+          <ul
+            className="mt-[28px] lg:mt-[2.604vw]
+                       grid grid-cols-1 sm:grid-cols-3
+                       gap-[28px] sm:gap-[20px] md:gap-[28px] lg:gap-[2.083vw]"
+          >
+            {HIGHLIGHTS.map((h, i) => (
+              <HighlightCard key={`${h.title}-${i}`} index={i} {...h} />
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }

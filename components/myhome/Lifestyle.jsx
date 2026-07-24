@@ -330,7 +330,10 @@ export default function Lifestyle({ data }) {
                 fill
                 unoptimized
                 sizes="(min-width:1024px) 18vw, 320px"
-                className="object-cover object-top"
+                /* Left-anchored: the Chairman portrait in the library is a wide
+                   2:1 environmental shot with the subject on the left third, so
+                   a centred crop would cut him out of this portrait slot. */
+                className="object-cover object-left"
               />
             </div>
           )}
