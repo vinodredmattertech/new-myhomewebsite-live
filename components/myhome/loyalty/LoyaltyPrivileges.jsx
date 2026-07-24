@@ -136,12 +136,12 @@ export default function LoyaltyPrivileges({ data }) {
       {(heading || paragraphs.length || image) && (
         <div className="relative pt-[64px] md:pt-[90px] lg:pt-[7.292vw]">
           {label && (
-            <div className="absolute left-[6px] top-[60px] lg:left-[4.167vw] lg:top-[4.688vw]">
+            <div className="lg:absolute left-[6px] top-[60px] lg:left-[4.167vw] lg:top-[4.688vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
               <SectionLabel>{label}</SectionLabel>
             </div>
           )}
 
-          <div className="pr-5 pl-[34px] md:px-10 lg:px-[9.896vw]">
+          <div className="pr-5 pl-5 md:px-10 lg:px-[9.896vw]">
             <div className="grid grid-cols-1 lg:grid-cols-[39.375vw_1fr] gap-y-[32px] gap-x-[40px] lg:gap-x-[4.635vw] items-start">
               {/* left: heading + copy */}
               <div className="flex flex-col">
@@ -193,7 +193,7 @@ export default function LoyaltyPrivileges({ data }) {
       {hasGallery && (
         <div className="relative mt-[64px] md:mt-[96px] lg:mt-[6.25vw] pb-[64px] md:pb-[96px] lg:pb-[6.25vw]">
           {galleryLabel && (
-            <div className="absolute left-[6px] top-[4px] lg:left-[4.167vw] lg:top-[9.5vw]">
+            <div className="lg:absolute left-[6px] top-[4px] lg:left-[4.167vw] lg:top-[9.5vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
               <SectionLabel>{galleryLabel}</SectionLabel>
             </div>
           )}

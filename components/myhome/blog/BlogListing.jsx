@@ -406,11 +406,11 @@ export default function BlogListing({
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden
-                 pt-[60px] md:pt-[80px] lg:pt-[4.687vw]
+                 pt-[20px] md:pt-[30px] lg:pt-[4.687vw]
                  pb-[60px] md:pb-[80px] lg:pb-[5.208vw]"
       data-section="blog-listing"
     >
-      <div className="absolute left-[20px] top-[40px] lg:left-[4.16vw] lg:top-[4.687vw] z-10">
+      <div className="lg:absolute left-[20px] top-[40px] lg:left-[4.16vw] lg:top-[4.687vw] z-10 max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{sectionLabel || "Our Blogs & Articles"}</SectionLabel>
       </div>
 

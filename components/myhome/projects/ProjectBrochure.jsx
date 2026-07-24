@@ -194,21 +194,19 @@ export default function ProjectBrochure({
   return (
     <section
       ref={rootRef}
-      className="relative w-full bg-[#2a2828] pt-[60px] pb-[60px] lg:pt-[4.167vw] lg:pb-[3.125vw] overflow-hidden"
+      className="relative w-full bg-[#2a2828] pt-[20px] pb-[60px] lg:pt-[4.167vw] lg:pb-[3.125vw] overflow-hidden"
       data-section="project-brochure"
     >
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="flex absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
+        className="flex lg:absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         aria-hidden="true"
       >
-        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-white/70" />
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-white/70 max-lg:!w-[28px] max-lg:!h-px" />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-white text-[12px] md:text-[14px] lg:text-[1.25vw]"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-white text-[12px] md:text-[14px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -216,7 +214,7 @@ export default function ProjectBrochure({
         </span>
       </div>
 
-      <div className="px-5 md:px-12 lg:pl-[9.375vw] lg:pr-[9.531vw] max-sm:pl-[40px]">
+      <div className="px-5 md:px-12 lg:pl-[9.375vw] lg:pr-[9.531vw]">
         <div className="grid grid-cols-1 lg:grid-cols-[32.5vw_1fr] gap-[36px] lg:gap-[5.573vw] items-center">
           {/* Image */}
           <div

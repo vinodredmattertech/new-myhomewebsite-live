@@ -78,16 +78,14 @@ export default function AboutLeadership({ data }) {
 
       {/* Side label */}
       <div
-        className="absolute max-md:hidden z-[5] flex flex-col items-center left-[12px] top-[30px] w-[28px] gap-[11px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-white"
+        className="lg:absolute z-[5] flex flex-col items-center left-[12px] top-[30px] w-[28px] gap-[11px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-white max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[35px] max-lg:mb-[-30px]"
 
         aria-hidden="true"
       >
-        <span className="block  w-px h-[60px] bg-white" />
+        <span className="block  w-px h-[60px] bg-white max-lg:!w-[28px] max-lg:!h-px" />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -99,7 +97,7 @@ export default function AboutLeadership({ data }) {
       <div className="relative z-[2] lg:h-[48.7vw]
                       flex flex-col lg:flex-row items-center lg:justify-end
                       gap-10 md:gap-12 lg:gap-[3vw]
-                      px-5 md:px-10 lg:px-[8.75vw] py-[60px] md:py-[80px] lg:py-0 max-sm:pl-[20px]">
+                      px-5 md:px-10 lg:px-[8.75vw] py-[60px] md:py-[80px] lg:py-0">
         {/* LeaderImg */}
         {leaderImg && (
           <div className="order-2 lg:order-1 relative shrink-0

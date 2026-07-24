@@ -227,7 +227,7 @@ export default function NewsDetail({ news, related = [] }) {
 
       {/* Body + sidebar */}
       <div className="relative px-5 md:px-12 lg:px-[9.323vw] pt-[36px] lg:pt-[2.604vw] pb-[60px] lg:pb-[5.208vw]">
-        <div className="absolute left-[4.16vw] top-[2.604vw] hidden lg:block">
+        <div className="lg:absolute left-[4.16vw] top-[2.604vw] lg:block max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
           <SectionLabel>News</SectionLabel>
         </div>
 

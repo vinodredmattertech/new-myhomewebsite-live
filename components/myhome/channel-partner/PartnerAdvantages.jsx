@@ -105,7 +105,7 @@ export default function PartnerAdvantages({ data }) {
     >
       {/* vertical side label */}
       {label && (
-        <div className="absolute left-[6px] top-[40px] lg:left-[4.167vw] lg:top-[5.208vw]">
+        <div className="lg:absolute left-[6px] top-[40px] lg:left-[4.167vw] lg:top-[5.208vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
           <SectionLabel>{label}</SectionLabel>
         </div>
       )}
@@ -124,7 +124,7 @@ export default function PartnerAdvantages({ data }) {
 
       {/* carousel */}
       {count > 0 && (
-        <div className="relative mt-[32px] md:mt-[48px] lg:mt-[3.646vw] max-sm:pr-[24px] max-sm:pl-[40px]">
+        <div className="relative mt-[32px] md:mt-[48px] lg:mt-[3.646vw] max-sm:px-[24px]">
           {/* peeking neighbours (desktop only) */}
           <div className="relative mx-auto h-[58vw] sm:h-[44vw] lg:h-[33.229vw] max-w-[1920px]">
             {prev && (

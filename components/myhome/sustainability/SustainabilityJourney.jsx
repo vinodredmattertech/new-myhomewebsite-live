@@ -76,10 +76,10 @@ export default function SustainabilityJourney({ journey }) {
       ref={rootRef}
       data-section="sustainability-journey"
       className="relative w-full overflow-hidden bg-white text-[#333]
-                 pt-[56px] pb-[56px] lg:pt-[4.166vw] lg:pb-[4.166vw]"
+                 pt-[26px] pb-[56px] lg:pt-[4.166vw] lg:pb-[4.166vw]"
     >
       <SectionLabel
-        className="absolute z-[5] left-[16px] top-[56px] lg:left-[4.166vw] lg:top-[4.166vw]"
+        className="lg:absolute z-[5] left-[16px] top-[56px] lg:left-[4.166vw] lg:top-[4.166vw] max-lg:static max-lg:w-full max-lg:mt-[15px] max-lg:mb-[18px]"
         color="#ef493d"
       >
         {label}

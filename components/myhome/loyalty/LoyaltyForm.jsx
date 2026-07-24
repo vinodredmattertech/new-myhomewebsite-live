@@ -181,7 +181,7 @@ export default function LoyaltyForm({
       </div>
 
       {/* vertical side label */}
-      <div className="hidden lg:block absolute left-[4.167vw] top-[6.25vw] z-[2]">
+      <div className="lg:block lg:absolute left-[4.167vw] top-[6.25vw] z-[2] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{label}</SectionLabel>
       </div>
 

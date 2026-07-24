@@ -66,7 +66,7 @@ export default function BuyersDiscover({ data }) {
         </div>
       )}
 
-      <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block z-[1]">
+      <div className="lg:absolute left-[4.16vw] top-[4.687vw] lg:block z-[1] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 

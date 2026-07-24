@@ -189,20 +189,18 @@ export default function EventsImageSection({ data }) {
     >
       {/* Vertical side label on the left rail */}
       <div
-        className="absolute z-[5] flex flex-col items-center
+        className="lg:absolute z-[5] flex flex-col items-center
                    left-[20px] top-[40px] gap-[11px] w-[28px] max-sm:top-[20px] max-sm:left-[10px]
-                   lg:left-[4.166vw] lg:top-[3.5vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
+                   lg:left-[4.166vw] lg:top-[3.5vw] lg:w-[2.812vw] lg:gap-[1.094vw] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         style={{ color: "rgb(239, 73, 61)" }}
       >
         <span
-          className="block w-px h-[31px] lg:h-[3.125vw]"
+          className="block w-px h-[31px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
           style={{ background: "rgb(239, 73, 61)" }}
         />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >

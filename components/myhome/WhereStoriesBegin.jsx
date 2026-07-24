@@ -95,7 +95,7 @@ export default function WhereStoriesBegin({ data }) {
       id="featured"
       data-section="featured"
       className="relative w-full bg-white overflow-hidden
-                 pt-[64px] pb-[64px]
+                 pt-[24px] pb-[-14px]
                  lg:pt-[4.687vw] lg:pb-[4.166vw]"
     >
       {/* ============================================================
@@ -107,26 +107,25 @@ export default function WhereStoriesBegin({ data }) {
          ============================================================ */}
       <div className="relative z-[3] grid grid-cols-12 gap-x-[1.25vw] items-start
                       px-5 md:px-10 lg:px-[4.166vw]
-                      pl-[64px] sm:pl-[80px] lg:pl-[4.166vw]">
+                      pl-5 sm:pl-10 lg:pl-[4.166vw]">
         {/* ===== Side label "Featured Projects"
             Mobile (Figma 3152:3810) — left:12 top:30 vertical 12px red, tick h:31, gap:11
             Desktop (Figma 3152:3467) — left:80 top:90 vertical 24px red, tick h:60, gap:21 */}
         <div
           ref={labelRef}
-          className="absolute z-[5] flex flex-col items-center
-                     left-[12px] top-[30px] gap-[11px] w-[28px]
-                     lg:relative lg:left-auto lg:top-auto lg:col-span-1 lg:w-[2.812vw] lg:gap-[1.094vw]"
+          className="z-[5] flex flex-col items-center
+                     gap-[11px] w-[28px]
+                     lg:relative lg:left-auto lg:top-auto lg:col-span-1 lg:w-[2.812vw] lg:gap-[1.094vw]
+                     max-lg:static max-lg:col-span-12 max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
           style={{ color: "#ef493d" }}
         >
           <span
-            className="block w-px h-[31px] lg:h-[3.125vw]"
+            className="block w-px h-[31px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
             style={{ background: "currentColor" }}
           />
           <span
-            className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+            className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
             style={{
-              writingMode: "vertical-rl",
-              transform: "rotate(180deg)",
               fontFamily: "Montserrat, sans-serif",
             }}
           >

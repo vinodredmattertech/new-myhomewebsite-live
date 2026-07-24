@@ -54,12 +54,12 @@ export default function AboutLegacy({ data }) {
       className="relative w-full bg-white overflow-hidden
                  py-[60px] md:py-[80px] lg:pt-[4.687vw] lg:pb-[5.208vw]"
     >
-      <div className="absolute left-[4.16vw] top-[4.687vw]">
+      <div className="lg:absolute left-[4.16vw] top-[4.687vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mb-[18px]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 
 
-      <div className="max-sm:pl-[80px] pr-5 md:px-10 lg:px-[11.146vw] grid grid-cols-1 lg:grid-cols-12 gap-y-[24px] gap-x-[40px] lg:gap-x-[4.166vw] items-start">
+      <div className="px-5 md:px-10 lg:px-[11.146vw] grid grid-cols-1 lg:grid-cols-12 gap-y-[24px] gap-x-[40px] lg:gap-x-[4.166vw] items-start">
         <SectionHeading
           ref={headingRef}
           className=" lg:pb-[10vw] lg:col-span-6 text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]

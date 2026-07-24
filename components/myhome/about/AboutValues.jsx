@@ -86,7 +86,7 @@ export default function AboutValues({ data }) {
       className="relative w-full bg-white overflow-hidden
                  py-[60px] md:py-[80px] lg:pt-[4.166vw] lg:pb-[6.51vw]"
     >
-      <div className="absolute left-[4.16vw] top-[4.166vw]">
+      <div className="lg:absolute left-[4.16vw] top-[4.166vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 

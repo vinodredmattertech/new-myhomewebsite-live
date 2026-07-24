@@ -120,17 +120,15 @@ export default function AboutVisionMission({ data }) {
     >
       {/* ===== Side label "Vission & mission" — Figma left:80 top:90 ===== */}
       <div
-        className="absolute z-[5] flex flex-col items-center left-[12px] top-[24px] gap-[11px] w-[28px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-[#2a2828] pointer-events-none"
+        className="lg:absolute z-[5] flex flex-col items-center left-[12px] top-[24px] gap-[11px] w-[28px] lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] text-[#2a2828] pointer-events-none max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[25px]  "
 
         style={{ left: "4.16vw", top: "8.33vh" }}
         aria-hidden="true"
       >
-        <span className="block w-px h-[31px] lg:h-[3.125vw] bg-[#2a2828]" />
+        <span className="block w-px h-[31px] lg:h-[3.125vw] bg-[#2a2828] max-lg:!w-[28px] max-lg:!h-px" />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -251,7 +249,7 @@ export default function AboutVisionMission({ data }) {
       {/* =======================================================
             MOBILE / TABLET — stacked vertical
          ======================================================= */}
-      <div className="relative z-[2] lg:hidden px-5 md:px-10 py-[64px] md:py-[88px] flex flex-col gap-[48px] md:gap-[64px]">
+      <div className="relative z-[2] lg:hidden px-5 md:px-10 py-[44px] md:py-[88px] flex flex-col gap-[48px] md:gap-[64px]">
         {[
           { title: data.visionHeading, body: data.visionBody },
           { title: data.missionHeading, body: data.missionBody },
@@ -259,7 +257,7 @@ export default function AboutVisionMission({ data }) {
           <div key={p.title || `vm-${idx}`} className="flex flex-col gap-[20px] md:gap-[28px]">
             <h2
               data-vm-heading
-              className="max-sm:pl-[80px] capitalize text-[#2a2828] leading-[0.95] tracking-[0.02em]
+              className="capitalize text-[#2a2828] leading-[0.95] tracking-[0.02em]
                          text-[44px] sm:text-[56px] md:text-[72px]"
               style={headingStyle}
             >
@@ -267,7 +265,7 @@ export default function AboutVisionMission({ data }) {
             </h2>
             <p
               data-vm-body
-              className="max-sm:pl-[80px] font-montserrat font-normal text-[#2a2828]/85 text-justify
+              className="font-montserrat font-normal text-[#2a2828]/85 text-justify
                          text-[14px] sm:text-[15px] md:text-[16px]
                          leading-[24px] sm:leading-[26px] md:leading-[28px]"
               style={bodyStyle}

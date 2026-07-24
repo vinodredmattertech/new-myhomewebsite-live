@@ -154,7 +154,7 @@ export default function ContactForm({ data }) {
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden
-                 py-[60px] md:py-[80px] lg:pt-[2.343vw] lg:pb-[4.583vw]"
+                 py-[30px] md:py-[80px] lg:pt-[2.343vw] lg:pb-[4.583vw]"
     >
       {/* full-section background image */}
       {backgroundImage && (
@@ -174,11 +174,11 @@ export default function ContactForm({ data }) {
       <div className="mx-auto h-px w-[calc(100%-40px)] sm:w-[calc(100%-64px)] lg:w-[89.896vw] bg-[#33333322]" />
 
       {/* vertical side label */}
-      <div className="absolute left-[4.16vw] top-[6.25vw]">
+      <div className="lg:absolute left-[4.16vw] top-[6.25vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[25px] max-lg:mb-[18px]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 
-      <div className="mt-[40px] md:mt-[64px] lg:mt-[2.604vw] px-5 md:px-10 lg:px-[9.375vw]">
+      <div className="mt-[20px] md:mt-[64px] lg:mt-[2.604vw] px-5 md:px-10 lg:px-[9.375vw]">
         <SectionHeading
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.02em]
@@ -187,7 +187,7 @@ export default function ContactForm({ data }) {
           {data.heading}
         </SectionHeading>
 
-        <div className="mt-[60px] md:mt-[56px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[10.208vw] items-center">
+        <div className="mt-[30px] md:mt-[56px] lg:mt-[3.385vw] grid grid-cols-1 lg:grid-cols-2 gap-y-[40px] gap-x-[40px] lg:gap-x-[10.208vw] items-center">
           {/* left: image */}
           <div className="relative w-full rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
                           aspect-[734/653] lg:aspect-auto lg:h-[34vw]">

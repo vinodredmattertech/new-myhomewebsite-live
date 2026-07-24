@@ -51,10 +51,10 @@ export default function SustainabilityEsg({ esg }) {
       ref={rootRef}
       data-section="sustainability-esg"
       className="relative w-full overflow-hidden bg-white text-[#333]
-                 pt-[56px] pb-[56px] lg:pt-[4.687vw] lg:pb-[4.687vw]"
+                 pt-[26px] pb-[26px] lg:pt-[4.687vw] lg:pb-[4.687vw]"
     >
       <SectionLabel
-        className="absolute z-[5] left-[16px] top-[56px] lg:left-[4.166vw] lg:top-[4.687vw]"
+        className="lg:absolute z-[5] left-[16px] top-[56px] lg:left-[4.166vw] lg:top-[4.687vw] max-lg:static max-lg:w-full max-lg:mt-[15px] max-lg:mb-[18px]"
         color="#ef493d"
       >
         {label}

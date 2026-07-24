@@ -115,10 +115,10 @@ export default function NriFeaturedProjects({ data }) {
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden
-                 py-[60px] md:py-[80px] lg:pt-[4.687vw] lg:pb-[5.208vw]"
+                 py-[30px] md:py-[80px] lg:pt-[4.687vw] lg:pb-[5.208vw]"
       data-section="nri-featured-projects"
     >
-      <div className="absolute left-[4.16vw] top-[4.687vw] z-[10] block">
+      <div className="lg:absolute left-[4.16vw] top-[4.687vw] z-[10] block max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 
@@ -131,7 +131,7 @@ export default function NriFeaturedProjects({ data }) {
           <SectionHeading
             ref={headingRef}
             className="text-[#333] capitalize will-change-transform leading-[1.05] tracking-[0.02em]
-                       text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw] max-sm:pl-[35px]"
+                       text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] lg:text-[5vw]"
           >
             {data.heading}
           </SectionHeading>

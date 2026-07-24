@@ -161,18 +161,16 @@ export default function WhyMyHome({ data }) {
           text container 15×90, Montserrat Medium 12px white -rotate-90 */}
       <div
         ref={labelRef}
-        className="absolute z-[6] left-[12px] top-[30px] w-[28px] flex flex-col items-center gap-[11px] md:left-[28px] md:top-[36px] md:w-auto md:gap-[14px] lg:left-[4.17vw] lg:top-[4.687vw] lg:gap-[1.094vw]"
+        className="absolute z-[6] left-[12px] max-md:mt-3 top-[30px] w-[28px] flex flex-col items-center gap-[11px] md:left-[28px] md:top-[36px] md:w-auto md:gap-[14px] lg:left-[4.17vw] lg:top-[4.687vw] lg:gap-[1.094vw] max-lg:flex-row max-lg:items-center max-lg:!gap-[8px] max-lg:!w-auto max-lg:!left-1/2 max-lg:-translate-x-1/2 max-lg:!top-[15px]"
         style={{ color: "#ffffff" }}
       >
         <span
-          className="block w-px h-[31px] md:h-[40px] lg:h-[3.125vw]"
+          className="block w-px h-[31px] md:h-[40px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
           style={{ background: "currentColor" }}
         />
         <span
-          className="font-montserrat font-medium capitalize text-[12px] md:text-[16px] lg:text-[1.25vw] whitespace-nowrap"
+          className="font-montserrat font-medium capitalize text-[12px] md:text-[16px] lg:text-[1.25vw] whitespace-nowrap max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >

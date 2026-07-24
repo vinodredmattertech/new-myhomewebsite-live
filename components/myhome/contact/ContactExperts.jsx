@@ -41,10 +41,10 @@ export default function ContactExperts({ data }) {
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden
-                 py-[60px] md:py-[80px] lg:pt-[4.687vw] lg:pb-[5.208vw]"
+                 py-[30px] md:py-[80px] lg:pt-[4.687vw] lg:pb-[5.208vw]"
     >
       {/* vertical side label */}
-      <div className="absolute left-[4.16vw] top-[4.687vw]">
+      <div className="lg:absolute left-[4.16vw] top-[4.687vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{data.label}</SectionLabel>
       </div>
 

@@ -65,7 +65,7 @@ export default function WhyPartner({ data }) {
     >
       {/* vertical side label */}
       {label && (
-        <div className="absolute left-[6px] top-[60px] lg:left-[4.167vw] lg:top-[4.688vw]">
+        <div className="lg:absolute left-[6px] top-[60px] lg:left-[4.167vw] lg:top-[4.688vw] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
           <SectionLabel>{label}</SectionLabel>
         </div>
       )}

@@ -48,24 +48,22 @@ export default function CsrOverview({ label, heading, description, image }) {
       ref={rootRef}
       data-section="csr-overview"
       className="relative w-full overflow-hidden bg-white text-[#1b1a1a]
-                 pt-[56px] pb-[48px] lg:pt-[5.208vw] lg:pb-[4.166vw]"
+                 pt-[26px] pb-[8px] lg:pt-[5.208vw] lg:pb-[4.166vw]"
     >
       {/* Vertical side label */}
       <div
-        className="absolute z-[5] flex flex-col items-center
+        className="lg:absolute z-[5] flex flex-col items-center
                    left-[20px] top-[64px] gap-[11px] w-[28px] max-sm:left-[10px]
-                   lg:left-[4.166vw] lg:top-[5.4vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
+                   lg:left-[4.166vw] lg:top-[5.4vw] lg:w-[2.812vw] lg:gap-[1.094vw] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         style={{ color: "rgb(239, 73, 61)" }}
       >
         <span
-          className="block w-px h-[31px] lg:h-[3.125vw]"
+          className="block w-px h-[31px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
           style={{ background: "rgb(239, 73, 61)" }}
         />
         <span
-          className="font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -74,7 +72,7 @@ export default function CsrOverview({ label, heading, description, image }) {
       </div>
 
       <div className="mx-auto w-full px-6 sm:px-10 lg:px-[11.146vw]">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.62fr] gap-[32px] lg:gap-[3.125vw] items-center max-sm:pl-[20px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.62fr] gap-[32px] lg:gap-[3.125vw] items-center">
           {/* Left — heading + copy */}
           <div>
             <h2

@@ -166,20 +166,18 @@ export default function FeaturedRecognition({ section }) {
 
       {/* Vertical side label */}
       <div
-        className="absolute z-[5] flex flex-col items-center
+        className="lg:absolute z-[5] flex flex-col items-center
                    left-[20px] top-[44px] gap-[11px] w-[28px] max-sm:left-[10px]
-                   lg:left-[4.166vw] lg:top-[3.4vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
+                   lg:left-[4.166vw] lg:top-[3.4vw] lg:w-[2.812vw] lg:gap-[1.094vw] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         style={{ color: RED }}
       >
         <span
-          className="block w-px h-[31px] lg:h-[3.125vw]"
+          className="block w-px h-[31px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
           style={{ background: RED }}
         />
         <span
-          className="font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -187,7 +185,7 @@ export default function FeaturedRecognition({ section }) {
         </span>
       </div>
 
-      <div className="relative z-[1] mx-auto w-full px-6 sm:px-10 lg:px-[11.146vw] max-sm:pl-[45px]">
+      <div className="relative z-[1] mx-auto w-full px-6 sm:px-10 lg:px-[11.146vw]">
         {/* Heading */}
         <SectionHeading
           ref={headingRef}

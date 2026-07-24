@@ -56,21 +56,19 @@ export default function CareerWhy({ section }) {
       ref={rootRef}
       data-section="career-why"
       className="relative w-full overflow-hidden bg-white text-[#333]
-                 pt-[48px] pb-[56px] lg:pt-[4.688vw] lg:pb-[4.688vw]"
+                 pt-[28px] pb-[26px] lg:pt-[4.688vw] lg:pb-[4.688vw]"
     >
       {/* Vertical side label */}
       <div
-        className="absolute z-[5] flex flex-col items-center
+        className="lg:absolute z-[5] flex flex-col items-center
                    left-[8px] top-[22px] w-[18px] gap-[10px]
-                   lg:left-[4.166vw] lg:top-[4.688vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
+                   lg:left-[4.166vw] lg:top-[4.688vw] lg:w-[2.812vw] lg:gap-[1.094vw] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         style={{ color: RED }}
       >
-        <span className="block w-px h-[26px] lg:h-[3.125vw]" style={{ background: RED }} />
+        <span className="block w-px h-[26px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px" style={{ background: RED }} />
         <span
-          className="font-medium capitalize whitespace-nowrap text-[11px] lg:text-[1.25vw]"
+          className="font-medium capitalize whitespace-nowrap text-[11px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >

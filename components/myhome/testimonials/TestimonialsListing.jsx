@@ -385,10 +385,10 @@ export default function TestimonialsListing({ heading, sectionLabel, items = [] 
       id="testimonials"
       data-section="testimonials-listing"
       className="relative w-full bg-white overflow-hidden
-                 pt-[56px] md:pt-[80px] lg:pt-[4.68vw]
+                 pt-[26px] md:pt-[40px] lg:pt-[4.68vw]
                  pb-[60px] md:pb-[80px] lg:pb-[5.2vw]"
     >
-      <div className="absolute left-[20px] top-[40px] lg:left-[4.16vw] lg:top-[4.68vw] z-10">
+      <div className="lg:absolute left-[20px] top-[40px] lg:left-[4.16vw] lg:top-[4.68vw] z-10 max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{sectionLabel || "Video Story"}</SectionLabel>
       </div>
 

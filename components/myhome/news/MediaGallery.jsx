@@ -327,7 +327,7 @@ export default function MediaGallery({
         </div>
       )}
 
-      <div className="absolute left-[20px] top-[40px] lg:left-[4.16vw] lg:top-[4.687vw] z-10">
+      <div className="lg:absolute left-[20px] top-[40px] lg:left-[4.16vw] lg:top-[4.687vw] z-10 max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{sectionLabel || "Media Presence"}</SectionLabel>
       </div>
 

@@ -69,11 +69,11 @@ export default function NriMindset({ data }) {
     <section
       ref={rootRef}
       className="relative w-full bg-[#2a2828] overflow-hidden
-                 py-[60px] md:py-[80px] lg:py-0 lg:h-[43.958vw]"
+                 py-[30px] md:py-[80px] lg:py-0 lg:h-[43.958vw]"
       data-section="nri-mindset"
     >
       {/* ---------- Side label (desktop) ---------- */}
-      <div className="absolute left-[4.17vw] top-[4.687vw] block z-[2]">
+      <div className="lg:absolute left-[4.17vw] top-[4.687vw] block z-[2] max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel color="#ffffff">{data.label}</SectionLabel>
       </div>
 
@@ -126,7 +126,7 @@ export default function NriMindset({ data }) {
       <div className="lg:hidden px-5 md:px-10 flex flex-col gap-[32px] md:gap-[40px]">
         <h2
           className="text-white capitalize tracking-[0.02em] leading-[1.15]
-                     text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px] max-sm:pl-[35px]"
+                     text-[32px] xs:text-[40px] sm:text-[52px] md:text-[64px]"
           style={{
             fontFamily:
               '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',

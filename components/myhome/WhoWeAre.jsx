@@ -25,6 +25,7 @@ export default function WhoWeAre({ data }) {
   const sketchLayerRef = useRef(null);
   const labelRef = useRef(null);
   const labelTickRef = useRef(null);
+  const mobileLabelRef = useRef(null);
   const headingRef = useRef(null);
   const paraRef = useRef(null);
   const btnRef = useRef(null);
@@ -59,7 +60,7 @@ export default function WhoWeAre({ data }) {
         ease: "expo.out",
         scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
       });
-      gsap.from(labelRef.current, {
+      gsap.from([labelRef.current, mobileLabelRef.current], {
         autoAlpha: 0,
         y: -20,
         duration: 0.9,
@@ -184,10 +185,10 @@ export default function WhoWeAre({ data }) {
         <div className="hidden lg:block absolute inset-0 bg-gradient-to-b from-black/30 via-black/15 to-black/45" />
       </div>
 
-      {/* ===== Vertical side label "Our Story" ===== */}
+      {/* ===== Vertical side label "Our Story" — DESKTOP ONLY ===== */}
       <div
         ref={labelRef}
-        className="absolute left-[12px] top-[30px] lg:left-[4.17vw] lg:top-[4.687vw] flex flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] z-[5] text-[#333333] lg:text-white"
+        className="hidden lg:flex absolute left-[12px] top-[30px] lg:left-[4.17vw] lg:top-[4.687vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] z-[5] text-[#333333] lg:text-white"
       >
         <span
           ref={labelTickRef}
@@ -211,7 +212,24 @@ export default function WhoWeAre({ data }) {
           Mobile  — in normal flow above the photograph, dark text on white.
           Desktop — right-anchored absolute column at top 6.25vw, right-aligned content. */}
       <div className="relative order-1 w-full pt-[56px] sm:pt-[64px] pb-[32px] sm:pb-[40px] px-5 md:px-12 lg:absolute lg:order-none lg:py-0 lg:top-[6.25vw] lg:px-0 lg:left-auto lg:right-[10.4vw] xl:right-[10.4vw] lg:w-[28.33vw] z-[5]">
-        <div className="max-sm:ml-[20px] flex flex-col items-start lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
+        <div className="flex flex-col items-start lg:items-end gap-[24px] md:gap-[28px] lg:gap-[2.083vw]">
+          {/* Horizontal label "Our Story" — MOBILE / TABLET ONLY, centered above heading */}
+          <div
+            ref={mobileLabelRef}
+            className="lg:hidden flex flex-row items-center justify-center gap-[8px] md:gap-[12px] w-full   text-[#333333]"
+          >
+            <span
+              className="block h-px w-[28px] md:w-[36px]"
+              style={{ background: "currentColor" }}
+            />
+            <span
+              className="font-montserrat font-medium capitalize text-[12px] md:text-[14px] whitespace-nowrap"
+              style={{ color: "inherit", fontFamily: "Montserrat, sans-serif" }}
+            >
+              {data.label}
+            </span>
+          </div>
+
           {/* Heading */}
           <SectionHeading
             ref={headingRef}

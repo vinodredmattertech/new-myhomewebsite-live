@@ -488,20 +488,18 @@ export default function Statistics({ data }) {
           Desktop — left:[4.166vw] top:[4.166vw] gap:[1.094vw] (24px) */}
       <div
         ref={labelRef}
-        className="absolute z-[5] flex flex-col items-center
-                   left-[12px] top-[30px] w-[28px] gap-[11px]
-                   lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
+        className="lg:absolute z-[5] flex flex-col items-center
+                   left-[12px] max-md:pt-3 top-[30px] w-[28px] gap-[11px]
+                   lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         style={{ color: "#ef493d" }}
       >
         <span
-          className="block w-px h-[31px] lg:h-[3.125vw]"
+          className="block w-px h-[31px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
           style={{ background: "currentColor" }}
         />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-montserrat  font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -514,18 +512,18 @@ export default function Statistics({ data }) {
            Drops Figma's 500-px absolute coordinates and uses padding +
            grid so it adapts to 320 / 360 / 375 / 414 / 768 px viewports.
          ============================================================ */}
-      <div className="lg:hidden relative z-[5] pt-[64px] sm:pt-[80px] pb-[36vh] sm:pb-[40vh]">
+      <div className="lg:hidden relative z-[5] pt-[19px] sm:pt-[80px] pb-[36vh] sm:pb-[40vh]">
         <SectionHeading
           ref={headingRef}
           data-heading
-          className="px-5 sm:px-8 pl-[52px] sm:pl-[72px] pr-5 sm:pr-8 capitalize text-[#333] tracking-[1.5px] leading-[1.18] text-[26px] xs:text-[30px] sm:text-[35px] will-change-transform"
+          className="px-5 sm:px-8 pr-5 sm:pr-8 capitalize text-[#333] tracking-[1.5px] leading-[1.18] text-[26px] xs:text-[30px] sm:text-[35px] will-change-transform"
         >
           {data.heading}
         </SectionHeading>
         <p
           ref={paraRef}
           data-body
-          className="mt-4 sm:mt-5 px-5 sm:px-8 pl-[52px] sm:pl-[72px] pr-5 sm:pr-8 font-montserrat font-normal text-[#333] text-justify text-[13px] xs:text-[14px] leading-[22px] xs:leading-[24px] max-w-[460px]"
+          className="mt-4 sm:mt-5 px-5 sm:px-8 pr-5 sm:pr-8 font-montserrat font-normal text-[#333] text-justify text-[13px] xs:text-[14px] leading-[22px] xs:leading-[24px] max-w-[460px]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
           <RichText>{data.body}</RichText>

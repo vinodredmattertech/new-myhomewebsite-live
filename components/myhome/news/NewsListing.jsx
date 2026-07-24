@@ -477,7 +477,7 @@ export default function NewsListing({
     <section
       ref={attachRoot}
       className="relative w-full bg-white overflow-hidden
-                 pt-[56px] md:pt-[72px] lg:pt-[4.688vw]
+                 pt-[20px] md:pt-[42px] lg:pt-[4.688vw]
                  pb-[56px] md:pb-[72px] lg:pb-[4.688vw]"
       data-section="news-listing"
     >
@@ -534,7 +534,7 @@ export default function NewsListing({
       )}
 
       {/* Rotated "Media Presence" rail */}
-      <div className="absolute left-[16px] top-[36px] lg:left-[4.167vw] lg:top-[4.688vw] z-10">
+      <div className="lg:absolute left-[16px] top-[36px] lg:left-[4.167vw] lg:top-[4.688vw] z-10 max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>{sectionLabel || "Media Presence"}</SectionLabel>
       </div>
 

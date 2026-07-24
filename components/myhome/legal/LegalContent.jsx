@@ -59,7 +59,7 @@ export default function LegalContent({ label, heading, lastUpdated, content }) {
     >
       {/* Vertical side label — desktop only, same rail as the other sections */}
       {label && (
-        <div className="absolute left-[4.166vw] top-[4.4vw] z-[5] hidden lg:block">
+        <div className="lg:absolute left-[4.166vw] top-[4.4vw] z-[5] lg:block max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
           <SectionLabel>{label}</SectionLabel>
         </div>
       )}

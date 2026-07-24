@@ -692,11 +692,11 @@ export default function ProjectsListing({ projects = [], heading }) {
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden
-                 pt-[60px] md:pt-[80px] lg:pt-[4.687vw]
+                 pt-[15px] md:pt-[20px] lg:pt-[4.687vw]
                  pb-[60px] md:pb-[80px] lg:pb-[5.208vw]"
       data-section="projects-listing"
     >
-      <div className="absolute left-[4.16vw] top-[4.687vw] hidden lg:block">
+      <div className="lg:absolute left-[4.16vw] top-[4.687vw] lg:block max-lg:static max-lg:w-full max-lg:flex max-lg:justify-center max-lg:mt-[15px] max-lg:mb-[18px]">
         <SectionLabel>Our Projects</SectionLabel>
       </div>
 

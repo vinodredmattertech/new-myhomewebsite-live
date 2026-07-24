@@ -164,21 +164,19 @@ export default function ProjectGallery({
   return (
     <section
       ref={attachFancy}
-      className="relative w-full bg-[#2a2828] pt-[80px] pb-[80px] lg:pt-[3.125vw] lg:pb-[4.688vw] overflow-hidden"
+      className="relative w-full bg-[#2a2828] pt-[20px] pb-[50px] lg:pt-[3.125vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-gallery"
     >
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="flex absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5]"
+        className="flex lg:absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         aria-hidden="true"
       >
-        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-white/70" />
+        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-white/70 max-lg:!w-[28px] max-lg:!h-px" />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-white text-[12px] md:text-[14px] lg:text-[1.25vw]"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-white text-[12px] md:text-[14px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -186,7 +184,7 @@ export default function ProjectGallery({
         </span>
       </div>
 
-      <div className="px-5 md:px-12 lg:px-[9.375vw] max-sm:pl-[40px]">
+      <div className="px-5 md:px-12 lg:px-[9.375vw]">
         <SectionHeading
           ref={headingRef}
           className="capitalize text-white leading-[1.08] tracking-[0.022em] text-center

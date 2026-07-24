@@ -184,20 +184,18 @@ export default function Testimonials({ data }) {
       {/* Side label */}
       <div
         ref={labelRef}
-        className="absolute z-[5] flex flex-col items-center
+        className="lg:absolute z-[5] flex flex-col items-center
                    left-[12px] top-[24px] gap-[11px] w-[28px]
-                   lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw]"
+                   lg:left-[4.166vw] lg:top-[4.166vw] lg:w-[2.812vw] lg:gap-[1.094vw] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
         style={{ color: "#ef493d" }}
       >
         <span
-          className="block w-px h-[31px] lg:h-[3.125vw]"
+          className="block w-px h-[31px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
           style={{ background: "currentColor" }}
         />
         <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw]"
+          className="font-montserrat font-medium capitalize whitespace-nowrap text-[12px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
             fontFamily: "Montserrat, sans-serif",
           }}
         >
@@ -208,7 +206,7 @@ export default function Testimonials({ data }) {
       {/* Heading + body block */}
       <div
         className="relative z-[3] flex flex-col gap-[16px] lg:gap-[1.563vw]
-                   pl-[64px] pr-5 sm:pl-[80px] sm:pr-8
+                   pl-5 pr-5 sm:pl-8 sm:pr-8
                    lg:pl-[11.146vw] lg:pr-[4.166vw]
                    max-w-[805px] lg:max-w-[61.927vw]"
       >
