@@ -30,7 +30,9 @@ import SectionHeading from "@/components/common/SectionHeading";
    - `image`  → real photo shown when slide is the active centre
    - `sketch` → b&w architectural sketch shown when slide sits on either
                 side (Figma 3152:3497 / 3152:3502 use the sketch artwork for
-                both flanking cards). Shared whoweare-sketch.png placeholder. */
+                both flanking cards). Comes from the project's own
+                `sketchImage`; when that's empty the section-level
+                `sideSketchImage` is used as a shared fallback. */
 export default function WhereStoriesBegin({ data }) {
   // `projects` is now a relation to the Project collection. Flatten the v4
   // envelope, sort by `order`, then map onto the shape this section expects.
@@ -40,6 +42,7 @@ export default function WhereStoriesBegin({ data }) {
     title: p.title || "",
     sub: p.subTitle || "",
     image: mediaUrl(p.image),
+    sketch: mediaUrl(p.sketchImage),
     ctaText: p.ctaText || "",
     ctaLink: p.ctaLink || (p.slug ? `/projects/${p.slug}` : ""),
   }));
@@ -227,6 +230,9 @@ export default function WhereStoriesBegin({ data }) {
             // hydration. `activeIdx` is initialised to 0 so slide 0 renders
             // active on the server too.
             const isActive = i === activeIdx;
+            // Per-project sketch wins; the section-level artwork is the
+            // fallback so projects without their own sketch still render.
+            const sketch = p.sketch || SIDE_SKETCH;
             return (
             <SwiperSlide
               key={`${p.title}-${i}`}
@@ -264,9 +270,9 @@ export default function WhereStoriesBegin({ data }) {
                     )}
                     {/* Desktop side card uses the b&w sketch (Figma 3152:3497).
                         Mobile keeps the real photo on every slide. */}
-                    {!isActive && SIDE_SKETCH && (
+                    {!isActive && sketch && (
                       <Image
-                        src={SIDE_SKETCH}
+                        src={sketch}
                         alt=""
                         fill
                         unoptimized
