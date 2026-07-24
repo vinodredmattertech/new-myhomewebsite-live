@@ -348,11 +348,11 @@ export default function Lifestyle({ data }) {
               </span>
             )}
 
-            <QuoteGlyph
-              className="text-[#ef493d] opacity-[0.23]
+            {/* <QuoteGlyph
+              className="text-[#ef493d] opacity-[0.93]
                          mt-[14px] lg:mt-[1.041vw]
                          w-[28px] h-[28px] lg:w-[1.875vw] lg:h-[1.875vw]"
-            />
+            /> */}
 
             <blockquote
               className="text-[#333] leading-[1.45]
@@ -391,6 +391,11 @@ export default function Lifestyle({ data }) {
                 </span>
               </footer>
             )}
+            <div className="flex items-end justify-end"><Image
+            src='/assets/myhome/about/comma.svg'
+            width={100}
+            height={100}
+            className="md:w-[6vw] md:h-[5vw] pt-4 h-10 md:pt-[1vw] w-10"/></div>
           </div>
         </div>
       )}

@@ -23,13 +23,13 @@ const LOCAL_TAB_ICONS = {
 
 /* Category-keyed fallback photos (used until real media is uploaded). */
 const FALLBACK_BY_CATEGORY = {
-  education: "/assets/myhome/csr/card-1.jpg",
-  healthcare: "/assets/myhome/csr/card-2.jpg",
-  "animal-welfare": "/assets/myhome/csr/card-2.jpg",
-  "rural-development": "/assets/myhome/csr/card-3.jpg",
-  "disaster-relief": "/assets/myhome/csr/featured.jpg",
+  education: "/assets/myhome/csr/clone.webp",
+  healthcare: "/assets/myhome/csr/clon2.webp",
+  "animal-welfare": "/assets/myhome/csr/clone.webp",
+  "rural-development": "/assets/myhome/csr/clon2.webp",
+  "disaster-relief": "/assets/myhome/csr/clone.webp",
 };
-const FALLBACK_DEFAULT = "/assets/myhome/csr/featured.jpg";
+const FALLBACK_DEFAULT = "/assets/myhome/csr/clone.webp";
 
 /* ---- Built-in defaults so the section renders the designed layout even
    before the CSR single type is populated in the admin. ---- */
