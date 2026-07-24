@@ -9,6 +9,7 @@ import ProjectSpecifications from "@/components/myhome/projects/ProjectSpecifica
 import ProjectProgress from "@/components/myhome/projects/ProjectProgress";
 import ProjectBrochure from "@/components/myhome/projects/ProjectBrochure";
 import ProjectTestimonials from "@/components/myhome/projects/ProjectTestimonials";
+import ProjectBeforeAfter from "@/components/myhome/projects/ProjectBeforeAfter";
 import ProjectInquiry from "@/components/myhome/projects/ProjectInquiry";
 import ProjectConnectivity from "@/components/myhome/projects/ProjectConnectivity";
 import ProjectFloatingActions from "@/components/myhome/projects/ProjectFloatingActions";
@@ -173,6 +174,10 @@ export default function ProjectDetailPage({ project }) {
     author: t.author,
   }));
 
+  const ba = project.beforeAfter || {};
+  const beforeSrc = mediaUrl(ba?.beforeImage) || "";
+  const afterSrc = mediaUrl(ba?.afterImage) || "";
+
   const iq = project.inquiry || {};
 
   // Each section renders only when it actually has content. A CMS component
@@ -207,6 +212,8 @@ export default function ProjectDetailPage({ project }) {
   // Inquiry is a functional lead-capture form (works with a default heading),
   // so it shows whenever the CMS component is present — not gated on text.
   const hasInquiry = Boolean(project.inquiry);
+  // Before/After needs at least one of the two stages uploaded.
+  const hasBeforeAfter = Boolean(beforeSrc || afterSrc);
 
   // Sticky section-nav tabs. Each entry is gated on the same `has*` flag that
   // gates its section, so a tab only ever exists when its section rendered.
@@ -349,6 +356,23 @@ export default function ProjectDetailPage({ project }) {
             heading={txt(tm.heading)}
             description={txt(tm.description)}
             testimonials={testimonials}
+          />
+        </div>
+      )}
+
+      {hasBeforeAfter && (
+        <div id="transformation">
+          <ProjectBeforeAfter
+            sidebarLabel={txt(ba.sidebarLabel)}
+            heading={txt(ba.heading)}
+            description={txt(ba.description)}
+            beforeLabel={txt(ba.beforeLabel)}
+            afterLabel={txt(ba.afterLabel)}
+            beforeSrc={beforeSrc}
+            afterSrc={afterSrc}
+            beforeCaption={txt(ba.beforeCaption)}
+            afterCaption={txt(ba.afterCaption)}
+            projectName={project.title}
           />
         </div>
       )}
