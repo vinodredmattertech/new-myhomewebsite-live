@@ -310,33 +310,34 @@ export default function Lifestyle({ data }) {
           className="relative z-[2] mt-[48px] lg:mt-[5.208vw]
                      mx-5 md:mx-10 lg:mx-[11.146vw]
                      bg-[#f7f5f2] rounded-[8px] lg:rounded-[0.416vw]
-                     px-5 py-[36px] md:px-10 md:py-[48px]
-                     lg:px-[3.645vw] lg:py-[3.125vw]
-                     flex flex-col lg:flex-row lg:items-center
-                     gap-[28px] lg:gap-[3.125vw]"
+                     overflow-hidden
+                     flex flex-col"
         >
           {visionImage && (
+            /* Image banner on top; the Chairman's message flows below it. A wide
+               environmental shot, so it's centred and top-anchored to keep him
+               (and his face) in frame across the banner ratios. */
             <div
-              className="relative shrink-0 overflow-hidden
-                         w-full max-w-[320px] mx-auto aspect-[4/5]
-                         lg:w-[17.708vw] lg:max-w-none lg:mx-0 lg:h-[22.135vw]
-                         rounded-[6px] lg:rounded-[0.416vw]"
+              className="relative w-full overflow-hidden
+                         aspect-[4/5] sm:aspect-[16/10] lg:aspect-[16/7]
+                         max-h-[560px]"
             >
               <Image
                 src={visionImage}
                 alt={data.visionName || "Chairman"}
                 fill
                 unoptimized
-                sizes="(min-width:1024px) 18vw, 320px"
-                /* Left-anchored: the Chairman portrait in the library is a wide
-                   2:1 environmental shot with the subject on the left third, so
-                   a centred crop would cut him out of this portrait slot. */
-                className="object-cover object-left"
+                sizes="100vw"
+                className="object-cover max-md:object-left"
               />
             </div>
           )}
 
-          <div className="flex flex-col lg:flex-1">
+          <div
+            className="flex flex-col
+                       px-5 py-[36px] md:px-10 md:py-[48px]
+                       lg:px-[3.645vw] lg:py-[3.125vw]"
+          >
             {data.visionLabel && (
               <span
                 className="font-montserrat font-medium uppercase text-[#ef493d]
@@ -348,23 +349,27 @@ export default function Lifestyle({ data }) {
               </span>
             )}
 
-            {/* <QuoteGlyph
-              className="text-[#ef493d] opacity-[0.93]
-                         mt-[14px] lg:mt-[1.041vw]
-                         w-[28px] h-[28px] lg:w-[1.875vw] lg:h-[1.875vw]"
-            /> */}
+            {/* Opening quote glyph — anchors the message as a quotation and
+                keeps the top of the column from feeling empty on long copy. */}
+            <Image
+              src="/assets/myhome/about/comma.svg"
+              width={100}
+              height={100}
+              aria-hidden="true"
+              className="mt-[16px] lg:mt-[1.041vw] w-9 h-9 md:w-[3.2vw] md:h-[3.2vw] rotate-180 opacity-90"
+            />
 
             <blockquote
-              className="text-[#333] leading-[1.45]
-                         mt-[14px] lg:mt-[1.041vw]
-                         text-[19px] sm:text-[22px] md:text-[26px] lg:text-[1.562vw]"
+              className="text-[#333] leading-[1.5]
+                         mt-[12px] lg:mt-[0.833vw]
+                         text-[18px] sm:text-[20px] md:text-[22px] lg:text-[1.354vw]"
               style={TITLE_FONT}
             >
               <RichText>{visionQuote}</RichText>
             </blockquote>
 
             {(data.visionName || data.visionRole) && (
-              <footer className="mt-[20px] lg:mt-[1.562vw] flex items-center gap-[12px] lg:gap-[0.833vw]">
+              <footer className="mt-[24px] lg:mt-[1.822vw] flex items-center gap-[12px] lg:gap-[0.833vw]">
                 <span
                   aria-hidden="true"
                   className="block h-px bg-[#ef493d] w-[28px] lg:w-[2.083vw]"
@@ -391,11 +396,6 @@ export default function Lifestyle({ data }) {
                 </span>
               </footer>
             )}
-            <div className="flex items-end justify-end"><Image
-            src='/assets/myhome/about/comma.svg'
-            width={100}
-            height={100}
-            className="md:w-[6vw] md:h-[5vw] pt-4 h-10 md:pt-[1vw] w-10"/></div>
           </div>
         </div>
       )}
