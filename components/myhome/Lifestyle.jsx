@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -139,6 +139,22 @@ export default function Lifestyle({ data }) {
   const labelRef = useRef(null);
   const cardsRef = useRef(null);
   const visionRef = useRef(null);
+
+  // Chairman's message — collapsed by default, "See more / See less" toggles it
+  // open with a smooth height transition on both mobile and desktop.
+  const quoteBodyRef = useRef(null);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  const [canCollapse, setCanCollapse] = useState(false);
+  const COLLAPSED_H = 270; // px of message shown while collapsed
+
+  useEffect(() => {
+    const el = quoteBodyRef.current;
+    if (!el) return;
+    const check = () => setCanCollapse(el.scrollHeight > COLLAPSED_H + 24);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [visionQuote]);
 
   useGSAP(
     () => {
@@ -359,14 +375,62 @@ export default function Lifestyle({ data }) {
               className="mt-[16px] lg:mt-[1.041vw] w-9 h-9 md:w-[3.2vw] md:h-[3.2vw] rotate-180 opacity-90"
             />
 
-            <blockquote
-              className="text-[#333] leading-[1.5]
-                         mt-[12px] lg:mt-[0.833vw]
-                         text-[18px] sm:text-[20px] md:text-[22px] lg:text-[1.354vw]"
-              style={TITLE_FONT}
-            >
-              <RichText>{visionQuote}</RichText>
-            </blockquote>
+            <div className="mt-[12px] lg:mt-[0.833vw]">
+              {/* Smoothly collapsing message body */}
+              <div
+                ref={quoteBodyRef}
+                className="relative overflow-hidden
+                           transition-[max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{
+                  maxHeight: quoteOpen
+                    ? `${quoteBodyRef.current?.scrollHeight ?? 4000}px`
+                    : `${COLLAPSED_H}px`,
+                }}
+              >
+                <blockquote
+                  className="text-[#333] leading-[1.5]
+                             text-[18px] sm:text-[20px] md:text-[22px] lg:text-[1.354vw]"
+                  style={TITLE_FONT}
+                >
+                  <RichText>{visionQuote}</RichText>
+                </blockquote>
+
+                {/* Fade hint — only while collapsed and there is more to read */}
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-x-0 bottom-0
+                              h-[64px] lg:h-[4vw] bg-gradient-to-t from-[#f7f5f2] to-transparent
+                              transition-opacity duration-300
+                              ${canCollapse && !quoteOpen ? "opacity-100" : "opacity-0"}`}
+                />
+              </div>
+
+              {canCollapse && (
+                <button
+                  type="button"
+                  onClick={() => setQuoteOpen((o) => !o)}
+                  aria-expanded={quoteOpen}
+                  className="mt-[14px] lg:mt-[1.041vw] inline-flex items-center
+                             gap-[6px] lg:gap-[0.416vw]
+                             font-montserrat font-medium uppercase tracking-[0.14em]
+                             text-[#ef493d] text-[11px] lg:text-[0.729vw]
+                             transition-colors hover:text-[#c9382e]"
+                  style={BODY_FONT}
+                >
+                  {quoteOpen ? "See less" : "See more"}
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className={`w-[14px] h-[14px] lg:w-[0.9vw] lg:h-[0.9vw]
+                                transition-transform duration-300 ${quoteOpen ? "rotate-180" : ""}`}
+                  >
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              )}
+            </div>
 
             {(data.visionName || data.visionRole) && (
               <footer className="mt-[24px] lg:mt-[1.822vw] flex items-center gap-[12px] lg:gap-[0.833vw]">
