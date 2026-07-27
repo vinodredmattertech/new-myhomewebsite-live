@@ -122,6 +122,7 @@ export default function MyHomeHeader() {
         resolveNav("Testimonials", "/testimonials"),
         resolveNav("Career", "/career"),
         resolveNav("Awards", "/awards"),
+        resolveNav("Sustainability", "/sustainability"),
         
       ],
     },
