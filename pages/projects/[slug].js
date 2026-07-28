@@ -153,10 +153,29 @@ export default function ProjectDetailPage({ project }) {
     sublabel: m.sublabel,
     value: typeof m.value === "number" ? m.value : Number(m.value) || 0,
   }));
-  const progressImages = (pr.images?.data || []).map((m) => ({
-    src: mediaUrl({ data: m }),
-    alt: m.attributes?.alternativeText || project.title,
-  }));
+  // Each progress image carries the photo and its printed caption as separate
+  // fields on the same repeatable entry. `progress.images` used to be a plain
+  // media list, so tolerate both shapes: a Strapi instance running the old
+  // schema still answers with `{ data: [...] }`, which is not an array.
+  const progressImages = (Array.isArray(pr.images)
+    ? pr.images
+    : Array.isArray(pr.images?.data)
+    ? pr.images.data
+    : []
+  )
+    .map((it) => {
+      const media = it.image || it.attributes || it; // component vs. bare media
+      return {
+        src: mediaUrl(it.image ? it.image : { data: it }),
+        caption: it.caption || media.caption || "",
+        alt:
+          it.altText ||
+          it.caption ||
+          media.alternativeText ||
+          project.title,
+      };
+    })
+    .filter((it) => it.src);
 
   const co = project.connectivity || {};
   const connectivityCategories = (co.categories || []).map((c) => ({
@@ -212,7 +231,11 @@ export default function ProjectDetailPage({ project }) {
   const hasFloorPlans = floorPlanTabs.some((t) => t.plans.length > 0);
   const hasGallery = galleryTabs.some((t) => t.items.length > 0);
   const hasSpecifications = specs.length > 0;
-  const hasProgress = progressMetrics.length > 0 || progressImages.length > 0;
+  // TEMP: forced on so the redesigned construction-update cards are visible
+  // with the component's dummy content while Progress > Images is still empty
+  // in Strapi. Restore the commented-out gate once the CMS has real cards.
+  const hasProgress = true;
+  // const hasProgress = progressMetrics.length > 0 || progressImages.length > 0;
   const hasBrochure = Boolean(
     hasText(br.heading) ||
       lines(br.highlights).length ||
@@ -337,10 +360,12 @@ export default function ProjectDetailPage({ project }) {
 
       {hasProgress && (
         <div id="construction-updates">
+          {/* `|| undefined` so an empty CMS field falls through to the
+              component's dummy copy instead of rendering a blank heading. */}
           <ProjectProgress
-            sidebarLabel={txt(pr.sidebarLabel)}
-            heading={txt(pr.heading)}
-            description={txt(pr.description)}
+            sidebarLabel={txt(pr.sidebarLabel) || undefined}
+            heading={txt(pr.heading) || undefined}
+            description={txt(pr.description) || undefined}
             metrics={progressMetrics}
             images={progressImages}
           />

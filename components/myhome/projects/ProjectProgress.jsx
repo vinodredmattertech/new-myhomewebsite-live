@@ -24,10 +24,30 @@ const DEFAULT_METRICS = [
   { key: "infrastructure", label: "Infrastructure", value: 3.58 },
 ];
 
+// Dummy content, shown until Progress > Images is filled in from Strapi. Each
+// card keeps the photo and its printed caption as separate fields, matching the
+// `projects.progress-image` component in the backend.
 const DEFAULT_IMAGES = [
-  { src: "/assets/myhome/projects/progress-1.jpg", alt: "On-site progress May 2026" },
-  { src: "/assets/myhome/projects/akrida-banner.jpg", alt: "Tower elevation" },
-  { src: "/assets/myhome/projects/akrida-entrance.jpg", alt: "Tower entrance" },
+  {
+    src: "/assets/myhome/projects/progress-1.jpg",
+    alt: "Tower 07 seen from the site entrance, roof slab cast",
+    caption: "Tower - 07 - 39th Floor Roof Slab Completed",
+  },
+  {
+    src: "/assets/myhome/projects/akrida-banner.jpg",
+    alt: "Tower 04 elevation with external plastering underway",
+    caption: "Tower - 04 - External Plastering In Progress",
+  },
+  {
+    src: "/assets/myhome/projects/akrida-entrance.jpg",
+    alt: "Clubhouse block with structural work finished",
+    caption: "Clubhouse - Structural Work Completed",
+  },
+  {
+    src: "/assets/myhome/projects/luxury-design.jpg",
+    alt: "Sample apartment interior with finishes in progress",
+    caption: "Tower - 02 - Sample Flat Finishing Works",
+  },
 ];
 
 function CircularProgress({
@@ -96,6 +116,17 @@ export default function ProjectProgress({
   metrics = DEFAULT_METRICS,
   images = DEFAULT_IMAGES,
 }) {
+  // Strapi sends an empty array, not `undefined`, before any card is added —
+  // fall back to the dummy cards so the layout stays visible. The per-caption
+  // fallback covers projects whose photos came from the old caption-less media
+  // field, which would otherwise render a blank strip under each photo.
+  // Drop both once Progress > Images is populated in the CMS.
+  const slides = (images?.length ? images : DEFAULT_IMAGES).map((img, i) => ({
+    ...img,
+    caption:
+      img.caption || DEFAULT_IMAGES[i % DEFAULT_IMAGES.length].caption,
+  }));
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const descRef = useRef(null);
@@ -275,8 +306,8 @@ export default function ProjectProgress({
                 pauseOnMouseEnter: true,
               }}
               keyboard={{ enabled: true }}
-              loop={images.length >= 4}
-              rewind={images.length > 1 && images.length < 4}
+              loop={slides.length >= 4}
+              rewind={slides.length > 1 && slides.length < 4}
               onBeforeInit={(swiper) => {
                 swiper.params.navigation.prevEl = prevRef.current;
                 swiper.params.navigation.nextEl = nextRef.current;
@@ -284,24 +315,46 @@ export default function ProjectProgress({
               navigation={{ prevEl: null, nextEl: null }}
               className="w-full !overflow-hidden rounded-[12px]"
             >
-              {images.map((img, idx) => (
+              {slides.map((img, idx) => (
                 <SwiperSlide key={`${img.src}-${idx}`} className="!h-auto">
-                  <div className="relative w-full aspect-[657/639] lg:aspect-auto lg:h-[27.604vw] rounded-[12px] overflow-hidden bg-[#eee]">
-                   <a
-  href={img.src}
-  data-fancybox="progress-gallery"
-  data-caption={img.alt || ""}
-  className="block w-full h-full"
->
-  <Image
-    src={img.src}
-    alt={img.alt || ""}
-    fill
-    sizes="(min-width:1024px) 40vw, 100vw"
-    className="object-cover object-center select-none"
-  />
-</a>
-                  </div>
+                  {/* Card: the photo and the caption under it are two separate
+                      blocks, each fed by its own field on the slide. */}
+                  <figure className="flex h-full flex-col bg-white">
+                    <div className="relative w-full aspect-[657/639] lg:aspect-auto lg:h-[27.604vw] rounded-[12px] overflow-hidden bg-[#eee] border border-[#e5e5e5]">
+                      <a
+                        href={img.src}
+                        data-fancybox="progress-gallery"
+                        data-caption={img.caption || img.alt || ""}
+                        className="block w-full h-full"
+                      >
+                        <Image
+                          src={img.src}
+                          alt={img.alt || img.caption || ""}
+                          fill
+                          sizes="(min-width:1024px) 40vw, 100vw"
+                          className="object-cover object-center select-none"
+                        />
+                      </a>
+                    </div>
+
+                    {/* Fixed caption height (CAPTION_BLOCK) so every card is the
+                        same height and the arrows stay centred on the photo. */}
+                    <figcaption
+                      className="mt-[12px] lg:mt-[0.938vw] h-[48px] lg:h-[3.23vw]
+                                 flex items-center justify-center px-[8px] lg:px-[0.625vw]
+                                 text-center !text-[#333] capitalize tracking-[0.02em]
+                                 text-[16px] leading-[22px]
+                                 sm:text-[18px] sm:leading-[26px]
+                                 lg:text-[1.146vw] lg:leading-[1.615vw]"
+                      style={{
+                        fontFamily:
+                          '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+                        fontWeight: 400,
+                      }}
+                    >
+                      {img.caption || ""}
+                    </figcaption>
+                  </figure>
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -310,7 +363,7 @@ export default function ProjectProgress({
               ref={prevRef}
               type="button"
               aria-label="Previous progress photo"
-              className="absolute z-[5] top-1/2 -translate-y-1/2
+              className="absolute z-[5] top-[calc((100%-60px)/2)] lg:top-[calc((100%-4.168vw)/2)] -translate-y-1/2
                          left-[10px] sm:left-[16px] lg:left-[1.354vw]
                          inline-flex items-center justify-center rounded-full
                          bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.25)]
@@ -323,7 +376,7 @@ export default function ProjectProgress({
               ref={nextRef}
               type="button"
               aria-label="Next progress photo"
-              className="absolute z-[5] top-1/2 -translate-y-1/2
+              className="absolute z-[5] top-[calc((100%-60px)/2)] lg:top-[calc((100%-4.168vw)/2)] -translate-y-1/2
                          right-[10px] sm:right-[16px] lg:right-[1.354vw]
                          inline-flex items-center justify-center rounded-full
                          bg-[#ef493d] text-white shadow-[0_6px_16px_rgba(0,0,0,0.25)]

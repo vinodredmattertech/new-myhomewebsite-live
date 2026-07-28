@@ -55,6 +55,9 @@ export default function ProjectSpecifications({
   const imageRef = useRef(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  // Which tile is pinned open. Hover handles the mouse; this covers taps (no
+  // hover on touch) and keyboard users, who otherwise can't reach the detail.
+  const [openIndex, setOpenIndex] = useState(null);
   const activeSpec = specs[activeIndex];
 
   useGSAP(
@@ -213,20 +216,43 @@ export default function ProjectSpecifications({
                 const isActive = idx === activeIndex;
                 // A tile only flips when there's something on the back of it.
                 const canFlip = Boolean(spec.body);
+                const isOpen = canFlip && openIndex === idx;
+                // The grid is always 3 columns, so the column index is known
+                // and the panel can be pulled left to span the whole row on
+                // narrow screens, where a third of the row is far too tight.
+                const col = idx % 3;
+                const panelSpan =
+                  col === 0
+                    ? "left-0"
+                    : col === 1
+                    ? "left-[-100%]"
+                    : "left-[-200%]";
+                // Tiles on the last row grow upwards, so a tall panel can't
+                // spill past the section's `overflow-hidden` edge.
+                const isLastRow =
+                  Math.floor(idx / 3) === Math.floor((specs.length - 1) / 3);
+                const panelAnchor = isLastRow ? "bottom-0" : "top-0";
                 return (
                   <button
                     key={spec.key}
                     type="button"
                     role="tab"
                     aria-selected={isActive}
-                    onClick={() => setActiveIndex(idx)}
+                    onClick={() => {
+                      setActiveIndex(idx);
+                      setOpenIndex(canFlip && openIndex !== idx ? idx : null);
+                    }}
                     /* No padding here — each face carries its own, so the
                        back can use the tile's full height instead of the
                        leftover box inside a large padded button. */
+                    /* The detail panel grows past the tile, so a hovered or
+                       pinned tile has to paint above its neighbours — grid
+                       items otherwise stack in DOM order. */
                     className={`group relative flex items-stretch justify-center
                                 min-h-[104px] sm:min-h-[120px] lg:min-h-[8.5vw]
                                 border-r border-b border-[#333]/12
                                 transition-colors duration-300
+                                hover:z-[6] focus-visible:z-[6] ${isOpen ? "z-[6]" : ""}
                                 ${
                                   isActive
                                     ? "bg-[rgba(239,73,61,0.06)]"
@@ -240,7 +266,8 @@ export default function ProjectSpecifications({
                       className={`relative flex w-full self-stretch items-center justify-center
                                   transition-transform
                                   duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)]
-                                  ${canFlip ? "group-hover:[transform:rotateY(180deg)]" : ""}`}
+                                  ${canFlip ? "lg:group-hover:[transform:rotateY(180deg)]" : ""}
+                                  ${isOpen ? "lg:[transform:rotateY(180deg)]" : ""}`}
                       style={{
                         transformStyle: "preserve-3d",
                         WebkitTransformStyle: "preserve-3d",
@@ -273,22 +300,46 @@ export default function ProjectSpecifications({
                              Restore them here (inside, so bullets stay with
                              the centred text rather than hanging outside the
                              tile's padding). */
-                          className="absolute inset-0 flex flex-col items-start justify-center
-                                     overflow-hidden text-left text-[#6d6d6d]
-                                     px-[14px] py-[10px] lg:px-[1.042vw] lg:py-[0.729vw]
-                                     text-[11px] leading-[16px]
+                          /* Below lg the tile is far too small to swing a
+                             row-wide panel through 3D space, so the flip is a
+                             desktop-only affordance and touch simply reveals
+                             the panel over the tile. */
+                          className={`absolute ${panelAnchor} min-h-full
+                                     w-[300%] ${panelSpan} lg:left-0 lg:w-full
+                                     transition-opacity duration-300
+                                     lg:!opacity-100 lg:pointer-events-auto
+                                     lg:[transform:rotateY(180deg)]
+                                     ${
+                                       isOpen
+                                         ? "opacity-100"
+                                         : "opacity-0 pointer-events-none"
+                                     }
+                                     max-h-[52vh] lg:max-h-[24vw]
+                                     overflow-y-auto overscroll-contain
+                                     flex flex-col items-start justify-start
+                                     rounded-[8px] border border-[#ef493d]/25 bg-white
+                                     shadow-[0_12px_30px_rgba(0,0,0,0.13)]
+                                     text-left text-[#6d6d6d]
+                                     px-[14px] py-[12px] lg:px-[1.042vw] lg:py-[0.833vw]
+                                     text-[12px] leading-[18px]
                                      sm:text-[12px] sm:leading-[18px]
                                      lg:text-[0.729vw] lg:leading-[1.146vw]
+                                     [scrollbar-width:thin] [scrollbar-color:rgba(239,73,61,0.45)_transparent]
+                                     [&::-webkit-scrollbar]:w-[4px]
+                                     [&::-webkit-scrollbar-thumb]:rounded-full
+                                     [&::-webkit-scrollbar-thumb]:bg-[#ef493d]/45
                                      [&>*]:w-full
                                      [&_ul]:list-disc [&_ol]:list-decimal
                                      [&_ul]:pl-[1.1em] [&_ol]:pl-[1.2em]
                                      [&_li]:marker:text-[#ef493d]
                                      [&_li+li]:mt-[3px]
-                                     [&_strong]:font-medium [&_strong]:text-[#333]"
+                                     [&_strong]:font-medium [&_strong]:text-[#333]`}
+                          /* The counter-rotation lives in the class list
+                             (lg-only) so the panel isn't mirrored on touch,
+                             where nothing flips. */
                           style={{
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: 400,
-                            transform: "rotateY(180deg)",
                             backfaceVisibility: "hidden",
                             WebkitBackfaceVisibility: "hidden",
                           }}
