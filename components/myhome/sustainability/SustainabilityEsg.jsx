@@ -1,10 +1,13 @@
 import React, { useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { ArrowUpRight } from "lucide-react";
 import { registerGsap } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
+import { pillarHrefFromTitle } from "@/lib/sustainabilityPillars";
 import SectionLabel from "@/components/myhome/SectionLabel";
 
 /**
@@ -91,6 +94,12 @@ export default function SustainabilityEsg({ esg }) {
           <div className="flex flex-col">
             {items.map((item, i) => {
               const iconUrl = mediaUrl(item?.icon);
+              // Each pillar opens its own detail page. Editors can point the
+              // button anywhere via `ctaUrl`; left blank, the slug is derived
+              // from the pillar title (e.g. "Environment · Build, Don't
+              // Burden" → /sustainability/environment). No match, no button.
+              const href = pillarHrefFromTitle(item?.title, item?.ctaUrl);
+              const ctaLabel = item?.ctaLabel || "Know More";
               return (
                 <div
                   key={i}
@@ -116,6 +125,27 @@ export default function SustainabilityEsg({ esg }) {
                       >
                         {item.description}
                       </p>
+                    ) : null}
+
+                    {href ? (
+                      <Link
+                        href={href}
+                        aria-label={`${ctaLabel} about ${item.title}`}
+                        className="group mt-[16px] lg:mt-[1.042vw] inline-flex items-center gap-[8px] lg:gap-[0.521vw]
+                                   rounded-full border border-[#e31f24] text-[#e31f24]
+                                   px-[20px] py-[10px] lg:px-[1.302vw] lg:py-[0.625vw]
+                                   font-montserrat font-medium capitalize
+                                   text-[12px] sm:text-[13px] lg:text-[0.781vw] leading-none
+                                   transition-colors duration-300 hover:bg-[#e31f24] hover:text-white"
+                        style={{ fontFamily: "Montserrat, sans-serif" }}
+                      >
+                        {ctaLabel}
+                        <ArrowUpRight
+                          className="w-[14px] h-[14px] lg:w-[0.781vw] lg:h-[0.781vw]
+                                     transition-transform duration-300 group-hover:translate-x-[2px] group-hover:-translate-y-[2px]"
+                          strokeWidth={1.6}
+                        />
+                      </Link>
                     ) : null}
                   </div>
                   {iconUrl ? (
