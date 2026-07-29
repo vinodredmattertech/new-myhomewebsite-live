@@ -24,7 +24,7 @@ export default function SustainabilityPage({ page }) {
       />
       <SustainabilityVision vision={page?.vision} />
       <SustainabilityEsg esg={page?.esg} />
-      <SustainabilityJourney journey={page?.journey} />
+      {/* <SustainabilityJourney journey={page?.journey} /> */}
       <SustainabilityMetrics metrics={page?.metrics} />
       <SustainabilityStrategy strategy={page?.strategy} />
       <SustainabilityPolicies policies={page?.policies} />
