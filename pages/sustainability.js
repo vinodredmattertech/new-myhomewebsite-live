@@ -8,6 +8,7 @@ import SustainabilityJourney from "@/components/myhome/sustainability/Sustainabi
 import SustainabilityMetrics from "@/components/myhome/sustainability/SustainabilityMetrics";
 import SustainabilityStrategy from "@/components/myhome/sustainability/SustainabilityStrategy";
 import SustainabilityPolicies from "@/components/myhome/sustainability/SustainabilityPolicies";
+import SustainabilityReports from "@/components/myhome/sustainability/SustainabilityReports";
 import { getSustainabilityData } from "@/lib/strapi";
 
 export default function SustainabilityPage({ page }) {
@@ -28,6 +29,7 @@ export default function SustainabilityPage({ page }) {
       <SustainabilityMetrics metrics={page?.metrics} />
       <SustainabilityStrategy strategy={page?.strategy} />
       <SustainabilityPolicies policies={page?.policies} />
+      <SustainabilityReports reports={page?.reports} />
     </>
   );
 }
