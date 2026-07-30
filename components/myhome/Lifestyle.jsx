@@ -131,6 +131,13 @@ export default function Lifestyle({ data }) {
 
   const visionQuote = data?.visionQuote || "";
   const visionImage = mediaUrl(data?.visionImage);
+  // `visionImage` is a wide environmental shot, so object-cover on the tall
+  // mobile box cropped the Chairman out of frame. `visionImageMobile` is a
+  // portrait crop authored for that box; fall back to the desktop asset (with
+  // the old object-left nudge) whenever the CMS field is left empty.
+  const visionImageMobile = mediaUrl(data?.visionImageMobile);
+  const mobileVisionImage = visionImageMobile || visionImage;
+  const hasMobileVisionImage = Boolean(visionImageMobile);
   const hasVision = Boolean(visionQuote);
 
   const rootRef = useRef(null);
@@ -330,21 +337,33 @@ export default function Lifestyle({ data }) {
                      flex flex-col"
         >
           {visionImage && (
-            /* Image banner on top; the Chairman's message flows below it. A wide
-               environmental shot, so it's centred and top-anchored to keep him
-               (and his face) in frame across the banner ratios. */
+            /* Image banner on top; the Chairman's message flows below it. Two
+               sources swapped in CSS (not JS) so the choice is stable through
+               SSR/hydration: the portrait mobile crop below `md`, the wide
+               desktop shot at `md` and up. The hidden one has no layout box, so
+               native lazy-loading keeps the browser from fetching both. */
             <div
               className="relative w-full overflow-hidden
                          aspect-[4/5] sm:aspect-[16/10] lg:aspect-[16/7]
                          max-h-[560px]"
             >
               <Image
+                src={mobileVisionImage}
+                alt={data.visionName || "Chairman"}
+                fill
+                unoptimized
+                sizes="100vw"
+                className={`md:hidden object-cover ${
+                  hasMobileVisionImage ? "object-center" : "object-left"
+                }`}
+              />
+              <Image
                 src={visionImage}
                 alt={data.visionName || "Chairman"}
                 fill
                 unoptimized
                 sizes="100vw"
-                className="object-cover max-md:object-left"
+                className="hidden md:block object-cover"
               />
             </div>
           )}

@@ -273,12 +273,23 @@ export default function SustainabilityReports({ reports }) {
           ) : null}
         </div>
 
+        {/* Centred flex line rather than a grid: a grid always reserves its
+            full column count, so 3 reports in a 4-column row left-aligned with
+            an empty 4th track. The widths below reproduce the old column sizes
+            exactly (container width minus the gaps, divided by the column
+            count), so a full row is pixel-identical — only short rows change,
+            and they now centre instead of hugging the left. */}
         <div
-          className="mt-[28px] lg:mt-[2.083vw] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
+          className="mt-[28px] lg:mt-[2.083vw] flex flex-wrap justify-center
                      gap-[16px] lg:gap-[1.25vw]"
         >
           {items.map((r) => (
-            <div key={r.id} data-reveal className="h-full">
+            <div
+              key={r.id}
+              data-reveal
+              className="flex-none w-[calc((100%-16px)/2)] sm:w-[calc((100%-32px)/3)]
+                         lg:w-[calc((100%-3.75vw)/4)]"
+            >
               <ReportCard report={r} />
             </div>
           ))}

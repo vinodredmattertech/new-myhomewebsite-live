@@ -375,6 +375,12 @@ export default function ProjectProgress({
     );
   }, [allSlides, selectedMonthKey]);
 
+  // A lone slide would sit in the left half of the 2-up track, so it gets its
+  // own single-column layout: the wrapper narrows to about one card's width
+  // (~40vw, matching a 2-up card inside the 9.375vw page gutters) and stays
+  // centred by the existing mx-auto.
+  const isSingleSlide = displayedSlides.length === 1;
+
   const handleSelectMonthKey = (key) => {
     setSelectedMonthKey(key);
   };
@@ -482,7 +488,9 @@ export default function ProjectProgress({
           {/* Image slider */}
           <div
             ref={sliderWrapRef}
-            className="relative w-full min-w-0 mx-auto max-w-[560px] lg:max-w-none"
+            className={`relative w-full min-w-0 mx-auto max-w-[560px] ${
+              isSingleSlide ? "lg:max-w-[40vw]" : "lg:max-w-none"
+            }`}
           >
             {displayedSlides.length === 0 ? (
               <div className="py-[40px] text-center text-[#777] font-montserrat text-[15px]">
@@ -497,14 +505,18 @@ export default function ProjectProgress({
               </div>
             ) : (
               <Swiper
-                key={`progress-swiper-${selectedMonthKey}`}
+                key={`progress-swiper-${selectedMonthKey}-${isSingleSlide ? "single" : "multi"}`}
                 modules={[Navigation, Keyboard, A11y, Autoplay]}
                 slidesPerView={1}
                 spaceBetween={16}
-                breakpoints={{
-                  768: { slidesPerView: 2, spaceBetween: 24 },
-                  1024: { slidesPerView: 2, spaceBetween: 28 },
-                }}
+                breakpoints={
+                  isSingleSlide
+                    ? undefined
+                    : {
+                        768: { slidesPerView: 2, spaceBetween: 24 },
+                        1024: { slidesPerView: 2, spaceBetween: 28 },
+                      }
+                }
                 speed={650}
                 autoplay={{
                   delay: 3000,

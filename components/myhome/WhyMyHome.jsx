@@ -149,12 +149,17 @@ export default function WhyMyHome({ data }) {
   // Decorative bottom-left bloom — managed in /public, not in the CMS.
   // const floralImage = "/assets/myhome/whymyhome-floral.png";
 
+  // --mh-img-h mirrors the mobile image box (w: min(460px,100vw-24px) at 460/395)
+  // so the mobile pagination bar and the section height track the image bottom
+  // instead of the old hardcoded 888/920, which left ~107px of dead space on
+  // phone widths where the image renders shorter than its 395px tablet size.
   return (
     <section
       ref={rootRef}
       id="why-my-home"
-      className="relative w-full bg-[#2a2828] text-white overflow-hidden h-auto min-h-[920px] lg:h-screen lg:min-h-[1024px] lg:max-h-[1080px]"
+      className="relative w-full bg-[#2a2828] text-white overflow-hidden h-auto min-h-[calc(467px_+_var(--mh-img-h)_+_56px)] lg:h-screen lg:min-h-[1024px] lg:max-h-[1080px]"
       data-section="why-my-home"
+      style={{ "--mh-img-h": "calc(min(460px, 100vw - 24px) * 395 / 460)" }}
     >
       {/* ---------- Vertical side label "Why My Home"
           Figma 3152:3744 — left:12 top:30, w:28, tick h:31, gap:11,
@@ -348,7 +353,8 @@ export default function WhyMyHome({ data }) {
           background line + red fill (54.074px ≈ 33.8% for slide 1 of 3) */}
       <div
         aria-hidden="true"
-        className="lg:hidden absolute z-[7] left-1/2 -translate-x-1/2 top-[888px] w-[160px] h-[2px]"
+        className="lg:hidden absolute z-[7] left-1/2 -translate-x-1/2 w-[160px] h-[2px]"
+        style={{ top: "calc(467px + var(--mh-img-h) + 24px)" }}
       >
         <span className="absolute inset-0 bg-white/25" />
         <span
@@ -358,7 +364,10 @@ export default function WhyMyHome({ data }) {
       </div>
 
       {/* Mobile clickable hit areas overlaid on the bar */}
-      <div className="lg:hidden absolute z-[8] left-1/2 -translate-x-1/2 top-[876px] w-[180px] h-6 flex items-center justify-between">
+      <div
+        className="lg:hidden absolute z-[8] left-1/2 -translate-x-1/2 w-[180px] h-6 flex items-center justify-between"
+        style={{ top: "calc(467px + var(--mh-img-h) + 12px)" }}
+      >
         {SLIDES.map((s, i) => (
           <button
             key={s.id}
