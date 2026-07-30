@@ -160,8 +160,8 @@ export default function ProjectDetailPage({ project }) {
   const progressImages = (Array.isArray(pr.images)
     ? pr.images
     : Array.isArray(pr.images?.data)
-    ? pr.images.data
-    : []
+      ? pr.images.data
+      : []
   )
     .map((it) => {
       const media = it.image || it.attributes || it; // component vs. bare media
@@ -173,9 +173,42 @@ export default function ProjectDetailPage({ project }) {
           it.caption ||
           media.alternativeText ||
           project.title,
+        date: it.date || media.date || "",
       };
     })
     .filter((it) => it.src);
+
+  // Extract repeatable progress entries (each with date & multiple images)
+  const progressEntries = (Array.isArray(pr.entries) ? pr.entries : []).flatMap((entry) => {
+    const date = entry.date || "";
+    const entryTitle = entry.title || "";
+    const rawImgs = Array.isArray(entry.images)
+      ? entry.images
+      : Array.isArray(entry.images?.data)
+        ? entry.images.data
+        : [];
+    if (rawImgs.length === 0 && (date || entryTitle)) {
+      return [{
+        src: "",
+        caption: entryTitle,
+        alt: entryTitle,
+        date,
+      }];
+    }
+    return rawImgs.map((imgItem) => {
+      const src = mediaUrl(imgItem.attributes ? { data: imgItem } : imgItem);
+      const caption = imgItem.caption || imgItem.attributes?.caption || entryTitle || "";
+      const alt = imgItem.altText || imgItem.attributes?.alternativeText || caption || project.title;
+      return {
+        src,
+        caption,
+        alt,
+        date,
+      };
+    });
+  });
+
+  const combinedProgressImages = progressEntries.length > 0 ? [...progressEntries, ...progressImages] : progressImages;
 
   const co = project.connectivity || {};
   const connectivityCategories = (co.categories || []).map((c) => ({
@@ -216,14 +249,14 @@ export default function ProjectDetailPage({ project }) {
   const hasBanner = Boolean(bannerImg);
   const hasOverview = Boolean(
     hasText(ov.heading) ||
-      hasText(ov.description) ||
-      overviewStats.length ||
-      mediaUrl(ov?.image)
+    hasText(ov.description) ||
+    overviewStats.length ||
+    mediaUrl(ov?.image)
   );
   const hasConnectivity = Boolean(
     connectivityCategories.length ||
-      hasText(co.mapEmbedUrl) ||
-      mediaUrl(co?.mapImage)
+    hasText(co.mapEmbedUrl) ||
+    mediaUrl(co?.mapImage)
   );
   const hasAmenities = Boolean(
     hasText(am.heading) || hasText(am.description) || amenities.length
@@ -238,9 +271,9 @@ export default function ProjectDetailPage({ project }) {
   // const hasProgress = progressMetrics.length > 0 || progressImages.length > 0;
   const hasBrochure = Boolean(
     hasText(br.heading) ||
-      lines(br.highlights).length ||
-      mediaUrl(br?.image) ||
-      brochureFileUrl !== "#"
+    lines(br.highlights).length ||
+    mediaUrl(br?.image) ||
+    brochureFileUrl !== "#"
   );
   const hasTestimonials = testimonials.some((t) => hasText(t.quote));
   // Inquiry is a functional lead-capture form (works with a default heading),
@@ -367,11 +400,12 @@ export default function ProjectDetailPage({ project }) {
             heading={txt(pr.heading) || undefined}
             description={txt(pr.description) || undefined}
             metrics={progressMetrics}
-            images={progressImages}
+            images={combinedProgressImages}
+            entries={pr.entries}
           />
         </div>
       )}
- {hasBeforeAfter && (
+      {hasBeforeAfter && (
         <div id="transformation">
           <ProjectBeforeAfter
             sidebarLabel={txt(ba.sidebarLabel)}
@@ -412,7 +446,7 @@ export default function ProjectDetailPage({ project }) {
         </div>
       )}
 
-     
+
 
       {hasInquiry && (
         <ProjectInquiry
