@@ -11,7 +11,7 @@ const FALLBACK_NAV_ITEMS = [
   { label: "Our Projects", href: "/projects" },
   { label: "Verticals", href: "#verticals" },
   { label: "Testimonials", href: "/testimonials" },
-  { label: "Career", href: "/careers" },
+  { label: "Careers", href: "/careers" },
   { label: "CSR", href: "/csr" },
   { label: "NRI", href: "/nri" },
   { label: "Blogs", href: "/blogs" },
@@ -100,9 +100,11 @@ export default function MyHomeHeader() {
   // by label so CMS-driven links keep working; second arg is the fallback.
   const resolveNav = (label, fallback) => {
     const found = NAV_ITEMS.find(
-      (n) => n.label?.toLowerCase() === label.toLowerCase()
+      (n) =>
+        n.label?.toLowerCase() === label.toLowerCase() ||
+        (label.toLowerCase().startsWith("career") && n.label?.toLowerCase().startsWith("career"))
     );
-    return { label, href: found?.href || fallback, openInNewTab: !!found?.openInNewTab };
+    return { label: found?.label || label, href: found?.href || fallback, openInNewTab: !!found?.openInNewTab };
   };
   const NAV_GROUPS = [
     {
@@ -120,7 +122,7 @@ export default function MyHomeHeader() {
         resolveNav("Blogs", "/blogs"),
         resolveNav("News & Media", "/news"),
         resolveNav("Testimonials", "/testimonials"),
-        resolveNav("Career", "/careers"),
+        resolveNav("Careers", "/careers"),
         resolveNav("Awards", "/awards"),
         resolveNav("Sustainability", "/sustainability"),
         

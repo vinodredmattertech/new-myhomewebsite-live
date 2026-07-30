@@ -59,7 +59,7 @@ const FALLBACK_QUICK_LINKS = [
   { label: "CSR", href: "/csr" },
   { label: "NRI", href: "/nri" },
   { label: "Channel Partner", href: "/channel-partners" },
-  { label: "Career", href: "/careers" },
+  { label: "Careers", href: "/careers" },
   { label: "Blogs", href: "/blogs" },
   { label: "Contact Us", href: "/contact-us" },
 ];

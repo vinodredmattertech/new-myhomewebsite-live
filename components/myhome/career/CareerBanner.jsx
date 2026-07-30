@@ -17,7 +17,7 @@ import SectionHeading from "@/components/common/SectionHeading";
  */
 export default function CareerBanner({ banner }) {
   const heading = banner?.heading || "Build What Comes Next";
-  const breadcrumbLabel = banner?.breadcrumbLabel || "Career";
+  const breadcrumbLabel = banner?.breadcrumbLabel || "Careers";
   const desktopImage =
     mediaUrl(banner?.desktopImage) ||
     "/assets/myhome/about/banner-cityscape.jpg";
