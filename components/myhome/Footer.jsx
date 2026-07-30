@@ -56,11 +56,11 @@ const CONTACT_ICON_MAP = {
 const FALLBACK_QUICK_LINKS = [
   { label: "About Us", href: "/about-us" },
   { label: "Our Projects", href: "/projects" },
-  { label: "CSR", href: "#footer" },
+  { label: "CSR", href: "/csr" },
   { label: "NRI", href: "/nri" },
-  { label: "Channel Partner", href: "#footer" },
-  { label: "Career", href: "#footer" },
-  { label: "Blogs", href: "#footer" },
+  { label: "Channel Partner", href: "/channel-partners" },
+  { label: "Career", href: "/careers" },
+  { label: "Blogs", href: "/blogs" },
   { label: "Contact Us", href: "/contact-us" },
 ];
 
