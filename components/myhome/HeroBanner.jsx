@@ -176,10 +176,10 @@ export default function HeroBanner({ data }) {
         {
           yPercent: 0,
           autoAlpha: 1,
-          duration: 1.4,
+          duration: 0.9,
           ease: "expo.out",
         },
-        0.5
+        0.25
       )
         // subtitle staggered just after
         .to(
@@ -187,20 +187,20 @@ export default function HeroBanner({ data }) {
           {
             yPercent: 0,
             autoAlpha: 1,
-            duration: 1.2,
+            duration: 0.8,
             ease: "expo.out",
           },
-          0.85
+          0.5
         )
         // Phase 2 — hold (let the eye breathe)
-        .addLabel("hold", "+=1.4")
+        .addLabel("hold", "+=0.55")
         // Phase 3 — text slides DOWN out of mask
         .to(
           welcomeRef.current,
           {
             yPercent: 115,
             autoAlpha: 0,
-            duration: 1.0,
+            duration: 0.6,
             ease: "power3.in",
           },
           "hold"
@@ -210,15 +210,15 @@ export default function HeroBanner({ data }) {
           {
             yPercent: 120,
             autoAlpha: 0,
-            duration: 0.9,
+            duration: 0.55,
             ease: "power3.in",
           },
-          "hold+=0.08"
+          "hold+=0.06"
         )
         // shimmer line fades out
         .to(
           shimmerRef.current,
-          { autoAlpha: 0, duration: 0.5 },
+          { autoAlpha: 0, duration: 0.35 },
           "hold"
         )
         // Phase 4 — dark loader slides UP off-screen + slight blur
@@ -226,10 +226,10 @@ export default function HeroBanner({ data }) {
           loaderRef.current,
           {
             yPercent: -101,
-            duration: 1.5,
+            duration: 0.9,
             ease: "expo.inOut",
           },
-          "hold+=0.85"
+          "hold+=0.45"
         )
         // image scales in & un-blurs simultaneously
         .to(
@@ -238,26 +238,26 @@ export default function HeroBanner({ data }) {
             scale: 1,
             autoAlpha: 1,
             filter: "blur(0px)",
-            duration: 1.8,
+            duration: 1.1,
             ease: "expo.out",
           },
-          "hold+=0.7"
+          "hold+=0.35"
         )
         // Phase 5 — notify header to slide in
         .add(() => {
           window.dispatchEvent(new CustomEvent("mh:loader-done"));
           setLoading(false);
-        }, "hold+=1.1")
-        // Phase 6 — bottom-left copy & button fade in (slow, premium)
+        }, "hold+=0.6")
+        // Phase 6 — bottom-left copy & button fade in
         .to(
           copyHeadingRef.current,
-          { y: 0, autoAlpha: 1, duration: 1.1, ease: "expo.out" },
-          "hold+=1.25"
+          { y: 0, autoAlpha: 1, duration: 0.8, ease: "expo.out" },
+          "hold+=0.7"
         )
         .to(
           copyBodyRef.current,
-          { y: 0, autoAlpha: 1, duration: 1.0, ease: "expo.out" },
-          "hold+=1.45"
+          { y: 0, autoAlpha: 1, duration: 0.7, ease: "expo.out" },
+          "hold+=0.85"
         );
 
       // The CTA is optional — when Strapi sends an empty `ctaText` the button
@@ -265,8 +265,8 @@ export default function HeroBanner({ data }) {
       if (btnRef.current) {
         tl.to(
           btnRef.current,
-          { y: 0, autoAlpha: 1, duration: 0.9, ease: "expo.out" },
-          "hold+=1.6"
+          { y: 0, autoAlpha: 1, duration: 0.65, ease: "expo.out" },
+          "hold+=0.95"
         );
       }
 

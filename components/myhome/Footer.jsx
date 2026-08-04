@@ -53,6 +53,11 @@ const CONTACT_ICON_MAP = {
  * existing useLeadStore wired up in pages/api.
  */
 
+/* "Home" always leads the Quick Links column. Kept out of the list below and
+   prepended at render time so it survives whatever the CMS quick-links list
+   contains (or omits). */
+const HOME_LINK = { label: "Home", href: "/" };
+
 const FALLBACK_QUICK_LINKS = [
   { label: "About Us", href: "/about-us" },
   { label: "Our Projects", href: "/projects" },
@@ -109,7 +114,7 @@ export default function MyHomeFooter() {
   const PHONE_PLACEHOLDER = cms?.phonePlaceholder || "Phone Number";
   const ADDRESS_HEADING = cms?.addressHeading || "Corporate Address";
   const QUICK_LINKS_HEADING = cms?.quickLinksHeading || "Quick Links";
-  const QUICK_LINKS =
+  const CMS_QUICK_LINKS =
     Array.isArray(cms?.quickLinks) && cms.quickLinks.length > 0
       ? cms.quickLinks.map((l) => ({
           label: l.label,
@@ -117,6 +122,16 @@ export default function MyHomeFooter() {
           openInNewTab: !!l.openInNewTab,
         }))
       : FALLBACK_QUICK_LINKS;
+  // Home first, and drop any editor-added Home so the column never shows two
+  // (the <li> key is the label, which would also collide).
+  const QUICK_LINKS = [
+    HOME_LINK,
+    ...CMS_QUICK_LINKS.filter(
+      (l) =>
+        l.href !== HOME_LINK.href &&
+        l.label?.trim().toLowerCase() !== HOME_LINK.label.toLowerCase()
+    ),
+  ];
   const CONTACT_ROWS = Array.isArray(cms?.contactRows) ? cms.contactRows : [];
   const SOCIALS = Array.isArray(cms?.socials) ? cms.socials : [];
   const LOGO = mediaUrl(cms?.logo) || FALLBACK_LOGO;

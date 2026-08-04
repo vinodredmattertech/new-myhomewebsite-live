@@ -106,10 +106,13 @@ export default function MyHomeHeader() {
     );
     return { label: found?.label || label, href: found?.href || fallback, openInNewTab: !!found?.openInNewTab };
   };
+  // "Home" leads both columns. Routed through resolveNav so a CMS-defined
+  // "Home" nav item (href / open-in-new-tab) still wins over the "/" fallback.
   const NAV_GROUPS = [
     {
       heading: "Our Company",
       items: [
+        resolveNav("Home", "/"),
         resolveNav("About Us", "/about-us"),
         resolveNav("Our Projects", "/projects"),
         resolveNav("NRI", "/nri"),
@@ -119,13 +122,14 @@ export default function MyHomeHeader() {
     {
       heading: "Quick Links",
       items: [
+        resolveNav("Home", "/"),
         resolveNav("Blogs", "/blogs"),
         resolveNav("News & Media", "/news"),
         resolveNav("Testimonials", "/testimonials"),
         resolveNav("Careers", "/careers"),
         resolveNav("Awards", "/awards"),
         resolveNav("Sustainability", "/sustainability"),
-        
+
       ],
     },
   ];
@@ -328,7 +332,16 @@ export default function MyHomeHeader() {
             open ? "opacity-60 backdrop-blur-[2px] md:backdrop-blur-none" : "opacity-0"
           }`}
         />
+        {/*
+          `data-lenis-prevent`: Lenis calls preventDefault() on every touchmove
+          on the page while it is stopped (see the mobile scroll-freeze effect
+          above), which otherwise kills swipe-scrolling inside this panel — only
+          dragging the native scrollbar still worked. This is Lenis's opt-out for
+          nested scrollers, and it is checked before the is-stopped branch, so
+          touches anywhere in the drawer fall through to native scrolling.
+        */}
         <aside
+          data-lenis-prevent
           className={`absolute inset-x-0 top-0 overflow-hidden flex flex-col
                       h-screen md:h-auto
                       bg-[#2a2828] text-white shadow-[0_30px_60px_rgba(0,0,0,0.45)]

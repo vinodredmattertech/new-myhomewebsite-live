@@ -149,32 +149,33 @@ export default function WhyMyHome({ data }) {
   // Decorative bottom-left bloom — managed in /public, not in the CMS.
   // const floralImage = "/assets/myhome/whymyhome-floral.png";
 
-  // --mh-img-h mirrors the mobile image box (w: min(460px,100vw-24px) at 460/395)
-  // so the mobile pagination bar and the section height track the image bottom
-  // instead of the old hardcoded 888/920, which left ~107px of dead space on
-  // phone widths where the image renders shorter than its 395px tablet size.
+  // Mobile/tablet (<lg) lays the section out in normal document flow — label,
+  // heading, then the slider (sub-heading, body, image) — all sharing the
+  // GUTTER below so every edge lines up. Only ≥lg uses the absolutely
+  // positioned, scroll-pinned Figma composition.
+  const GUTTER = "px-6 md:px-12 lg:px-0";
+
   return (
     <section
       ref={rootRef}
       id="why-my-home"
-      className="relative w-full bg-[#2a2828] text-white overflow-hidden h-auto min-h-[calc(467px_+_var(--mh-img-h)_+_56px)] lg:h-screen lg:min-h-[1024px] lg:max-h-[1080px]"
+      className="relative w-full bg-[#2a2828] text-white overflow-hidden pb-[40px] lg:pb-0 lg:h-screen lg:min-h-[1024px] lg:max-h-[1080px]"
       data-section="why-my-home"
-      style={{ "--mh-img-h": "calc(min(460px, 100vw - 24px) * 395 / 460)" }}
     >
       {/* ---------- Vertical side label "Why My Home"
-          Figma 3152:3744 — left:12 top:30, w:28, tick h:31, gap:11,
-          text container 15×90, Montserrat Medium 12px white -rotate-90 */}
+          Mobile: centred tick + label in flow at the top of the section.
+          Desktop (Figma 3152:3744): pinned left rail, rotated. */}
       <div
         ref={labelRef}
-        className="absolute z-[6] left-[12px] max-md:mt-3 top-[30px] w-[28px] flex flex-col items-center gap-[11px] md:left-[28px] md:top-[36px] md:w-auto md:gap-[14px] lg:left-[4.17vw] lg:top-[4.687vw] lg:gap-[1.094vw] max-lg:flex-row max-lg:items-center max-lg:!gap-[8px] max-lg:!w-auto max-lg:!left-1/2 max-lg:-translate-x-1/2 max-lg:!top-[15px]"
+        className="z-[6] flex flex-row items-center justify-center gap-[8px] w-full pt-[24px] md:pt-[32px] lg:absolute lg:left-[4.17vw] lg:top-[4.687vw] lg:w-[28px] lg:flex-col lg:justify-start lg:gap-[1.094vw] lg:pt-0"
         style={{ color: "#ffffff" }}
       >
         <span
-          className="block w-px h-[31px] md:h-[40px] lg:h-[3.125vw] max-lg:!w-[28px] max-lg:!h-px"
+          className="block w-[28px] h-px lg:w-px lg:h-[3.125vw]"
           style={{ background: "currentColor" }}
         />
         <span
-          className="font-montserrat font-medium capitalize text-[12px] md:text-[16px] lg:text-[1.25vw] whitespace-nowrap max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
+          className="font-montserrat font-medium capitalize text-[12px] md:text-[16px] lg:text-[1.25vw] whitespace-nowrap lg:[writing-mode:vertical-rl] lg:rotate-180"
           style={{
             fontFamily: "Montserrat, sans-serif",
           }}
@@ -184,12 +185,11 @@ export default function WhyMyHome({ data }) {
       </div>
 
       {/* ---------- Big heading "Choose Unrivaled Prestige"
-          Mobile (Figma 3152:3744): top:56 left:[calc(50%-180px)] w:337
-          text:35px tracking:2px leading:normal
+          Mobile: in flow under the label, full width inside the gutter.
           Desktop: top:[4.687vw] left:[11.15vw] w:[36.82vw] text:[5vw] */}
       <SectionHeading
         ref={headingRef}
-        className="absolute z-[5] capitalize text-white will-change-transform leading-[1.2] lg:leading-[1.05] tracking-[2px] lg:tracking-[0.1vw] left-[max(52px,calc(50%-180px))] md:left-12 lg:left-[11.15vw] top-[56px] md:top-[80px] lg:top-[4.687vw] w-[337px] max-w-[calc(100vw-64px)] md:w-auto md:max-w-none md:right-12 lg:right-auto lg:w-[36.82vw] text-[35px] md:text-[56px] lg:text-[5vw]"
+        className={`relative z-[5] ${GUTTER} mt-[20px] md:mt-[28px] capitalize text-white will-change-transform leading-[1.2] tracking-[1px] text-[32px] md:text-[52px] lg:absolute lg:mt-0 lg:left-[11.15vw] lg:top-[4.687vw] lg:w-[36.82vw] lg:leading-[1.05] lg:tracking-[0.1vw] lg:text-[5vw]`}
       >
         {data.heading}
       </SectionHeading>
@@ -254,24 +254,19 @@ export default function WhyMyHome({ data }) {
           setActive(s.activeIndex);
           animateActive();
         }}
-        style={{ position: "absolute", inset: 0, zIndex: 4, height: "100%" }}
+        // Mobile keeps the slider in flow so its content defines the section
+        // height; desktop pins it across the whole (scroll-pinned) viewport.
+        className="w-full !h-auto lg:!absolute lg:!inset-0 lg:!z-[4] lg:!h-full"
       >
         {SLIDES.map((slide, i) => (
-          <SwiperSlide
-            key={slide.id}
-            style={{ height: "100%", position: "relative" }}
-          >
-            {/* ===== MOBILE LAYOUT (<lg) — text first, image below =====
-                Sub-heading: top:250, body: top:307, image: top:467
-                (positions translated from Figma 3152:3744 to vh / px) */}
-
-            {/* ===== Mobile sub-heading
-                Figma: top:250 with -translate-y-1/2 + h:68
-                → visual top = 250 - 34 = 216
-                left:[calc(50%-180px)] w:329 text:22 leading:36 tracking:0.44 (= 0.02em) */}
+          <SwiperSlide key={slide.id} className="relative !h-auto lg:!h-full">
+            {/* ===== MOBILE LAYOUT (<lg) — sub-heading, body, then image, all
+                stacked in flow inside the shared gutter so their left/right
+                edges align with the heading above. Heights are intrinsic, so
+                a long body can no longer run into the image. ===== */}
             <h3
               ref={i === active ? subRef : null}
-              className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] max-lg:top-[170px] top-[216px] capitalize text-white tracking-[0.02em] leading-[36px] text-[22px] will-change-transform"
+              className={`lg:hidden ${GUTTER} mt-[28px] md:mt-[36px] capitalize text-white tracking-[0.02em] text-[22px] leading-[32px] md:text-[28px] md:leading-[40px] will-change-transform`}
               style={{
                 fontFamily:
                   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
@@ -280,29 +275,28 @@ export default function WhyMyHome({ data }) {
               {slide.sub}
             </h3>
 
-            {/* ===== Mobile body
-                Figma: top:307 left:[calc(50%-180px)] w:329 text:14 leading:24 text-justify */}
             <p
               ref={i === active ? bodyRef : null}
-              className="lg:hidden absolute z-[5] left-[max(52px,calc(50%-180px))] w-[329px] max-w-[calc(100vw-64px)] max-lg:top-[250px] top-[307px] font-montserrat font-normal text-white text-[14px] leading-[24px] text-justify"
+              className={`lg:hidden ${GUTTER} mt-[12px] md:mt-[16px] font-montserrat font-normal text-white/85 text-[14px] leading-[24px] md:text-[16px] md:leading-[28px] text-left`}
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               <RichText>{slide.body}</RichText>
             </p>
 
-            {/* ===== Mobile image
-                Figma: top:467 centered, w:460 h:395 (aspect 460/395 = 1.165) */}
+            {/* Figma image box: w:460 h:395 (aspect 460/395), centred. */}
             {slide.image && (
-              <div className="lg:hidden absolute z-[3] left-1/2 -translate-x-1/2 top-[467px] w-[min(460px,calc(100vw-24px))] aspect-[460/395]">
-                <Image
-                  src={slide.image}
-                  alt={slide.sub}
-                  fill
-                  unoptimized
-                  priority={i === 0}
-                  sizes="(min-width:480px) 460px, calc(100vw-24px)"
-                  className="object-cover object-center select-none"
-                />
+              <div className={`lg:hidden ${GUTTER} mt-[28px] md:mt-[36px]`}>
+                <div className="relative mx-auto w-full max-w-[460px] aspect-[460/395]">
+                  <Image
+                    src={slide.image}
+                    alt={slide.sub}
+                    fill
+                    unoptimized
+                    priority={i === 0}
+                    sizes="(min-width:520px) 460px, calc(100vw - 48px)"
+                    className="object-cover object-center select-none"
+                  />
+                </div>
               </div>
             )}
 
@@ -348,33 +342,29 @@ export default function WhyMyHome({ data }) {
         ))}
       </Swiper>
 
-      {/* ---------- Mobile pagination: horizontal red-fill bar
-          Figma 3152:3744 — top:888 left:[calc(50%-80px)] w:160 h:2
-          background line + red fill (54.074px ≈ 33.8% for slide 1 of 3) */}
-      <div
-        aria-hidden="true"
-        className="lg:hidden absolute z-[7] left-1/2 -translate-x-1/2 w-[160px] h-[2px]"
-        style={{ top: "calc(467px + var(--mh-img-h) + 24px)" }}
-      >
-        <span className="absolute inset-0 bg-white/25" />
+      {/* ---------- Mobile pagination: horizontal red-fill bar (Figma 3152:3744
+          — w:160 h:2) with the per-slide tap targets overlaid on top. Sits in
+          flow directly under the slider, so it follows the image instead of a
+          hardcoded offset. */}
+      <div className="lg:hidden relative z-[7] mx-auto mt-[28px] flex w-[180px] h-6 items-center justify-between">
         <span
-          className="absolute left-0 top-0 h-full bg-[#ef493d] transition-[width] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{ width: `${((active + 1) / SLIDES.length) * 100}%` }}
-        />
-      </div>
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[2px] overflow-hidden"
+        >
+          <span className="absolute inset-0 bg-white/25" />
+          <span
+            className="absolute left-0 top-0 h-full bg-[#ef493d] transition-[width] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{ width: `${((active + 1) / SLIDES.length) * 100}%` }}
+          />
+        </span>
 
-      {/* Mobile clickable hit areas overlaid on the bar */}
-      <div
-        className="lg:hidden absolute z-[8] left-1/2 -translate-x-1/2 w-[180px] h-6 flex items-center justify-between"
-        style={{ top: "calc(467px + var(--mh-img-h) + 12px)" }}
-      >
         {SLIDES.map((s, i) => (
           <button
             key={s.id}
             type="button"
             aria-label={`Go to slide ${i + 1}`}
             onClick={() => swiperRef.current?.slideTo(i, 700, false)}
-            className="w-12 h-6 -mx-2"
+            className="relative w-12 h-6 -mx-2"
           />
         ))}
       </div>

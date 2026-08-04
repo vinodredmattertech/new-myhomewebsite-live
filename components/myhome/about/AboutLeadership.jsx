@@ -93,14 +93,14 @@ export default function AboutLeadership({ data }) {
         </span>
       </div>
 
-      {/* Content: LeaderImg (left on desktop / bottom on mobile) + card (right on desktop / top on mobile) */}
+      {/* Content: LeaderImg (left on desktop / first on mobile) + card (right on desktop / second on mobile) */}
       <div className="relative z-[2] lg:h-[48.7vw]
                       flex flex-col lg:flex-row items-center lg:justify-end
                       gap-10 md:gap-12 lg:gap-[3vw]
                       px-5 md:px-10 lg:px-[8.75vw] py-[60px] md:py-[80px] lg:py-0">
         {/* LeaderImg */}
         {leaderImg && (
-          <div className="order-2 lg:order-1 relative shrink-0
+          <div className="order-1 lg:order-1 relative shrink-0
                           w-full max-w-[420px] sm:max-w-[480px] lg:w-[26vw] lg:max-w-none
                           aspect-[4/5] lg:aspect-auto lg:h-[34vw] lg:hidden
                           rounded-[10px] lg:rounded-[0.625vw] overflow-hidden">
@@ -118,7 +118,7 @@ export default function AboutLeadership({ data }) {
         {/* Card */}
         <div
           ref={cardRef}
-          className="order-1 lg:order-2 relative bg-white rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
+          className="order-2 lg:order-2 relative bg-white rounded-[10px] lg:rounded-[0.625vw] overflow-hidden
                      w-full max-w-[640px] lg:w-[41.66vw] lg:max-w-none
                      px-5 sm:px-8 md:px-12 lg:px-[3.333vw]
                      pt-[40px] md:pt-[56px] lg:pt-[4.687vw]

@@ -257,7 +257,7 @@ export default function AboutJourney({ data }) {
         {/* Bottom row — separate row, NOT part of the swiper grid.
             "40 Years of Experience" is horizontally centred on the section;
             prev/next arrows are pinned to the right. */}
-        <div className="mt-[16px] md:mt-[40px] lg:mt-[2.604vw] relative flex items-end justify-end gap-[24px]">
+        <div className="mt-[16px] md:mt-[40px] lg:mt-[2.604vw] relative flex items-end justify-end max-sm:justify-between gap-[24px]">
           <div
             className="flex items-end gap-[12px] lg:gap-[0.98vw]
                        lg:absolute lg:left-1/2 lg:bottom-0 lg:-translate-x-1/2"
