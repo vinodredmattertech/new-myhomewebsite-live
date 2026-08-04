@@ -115,16 +115,17 @@ function cardImageUrl(image) {
 /** Normalise a raw CSR card component into the flat shape the UI consumes. */
 function normaliseCard(raw, idx) {
   const catSlug = slugifyCategory(raw?.category);
+  const uploaded = cardImageUrl(raw?.image);
   return {
     id: raw?.id ?? `${catSlug}-${idx}`,
     title: raw?.title || "",
     excerpt: raw?.excerpt || "",
     categorySlug: catSlug,
     categoryName: raw?.categoryLabel || "",
-    image:
-      cardImageUrl(raw?.image) ||
-      FALLBACK_BY_CATEGORY[catSlug] ||
-      FALLBACK_DEFAULT,
+    // `hasImage` drives the card layout: without an upload there is no front
+    // face to flip to, so the card renders the editorial ("flipped") side only.
+    hasImage: !!uploaded,
+    image: uploaded || FALLBACK_BY_CATEGORY[catSlug] || FALLBACK_DEFAULT,
     date: raw?.date || "",
     projectLabel: raw?.projectLabel || "Our Project",
     ctaLabel: raw?.ctaLabel || "KNOW MORE",
@@ -178,6 +179,72 @@ function CardArrow({ href }) {
   );
 }
 
+/* The editorial face of a card: date, title, excerpt and category meta row.
+   Used as the back of a flipping card and — for cards with no uploaded image —
+   as the card's only face. */
+function CardBack({ card, style }) {
+  return (
+    <div
+      className="absolute inset-0 flex flex-col overflow-hidden rounded-[8px] lg:rounded-[0.417vw]
+                 border border-[#e7e7e7] bg-[#faf9f7]
+                 p-[22px] lg:p-[1.667vw]"
+      style={style}
+    >
+      <span
+        className="block h-px w-[36px] lg:w-[2.083vw]"
+        style={{ background: RED }}
+      />
+
+      {card.date && (
+        <p
+          className="mt-[14px] lg:mt-[0.833vw] font-montserrat font-medium text-[#33333359]
+                     text-[13px] lg:text-[0.781vw] leading-[1.6]"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          {card.date}
+        </p>
+      )}
+
+      <h4
+        className="mt-[6px] lg:mt-[0.417vw] capitalize text-[#333]
+                   text-[19px] sm:text-[21px] lg:text-[1.354vw]
+                   leading-[1.25] tracking-[0.01em]"
+        style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
+      >
+        {card.title}
+      </h4>
+
+      {card.excerpt && (
+        <p
+          className="mt-[12px] lg:mt-[0.833vw] font-montserrat text-[#6d6d6d]
+                     text-[13px] sm:text-[14px] lg:text-[0.833vw]
+                     leading-[22px] sm:leading-[24px] lg:leading-[1.5vw]"
+          style={{
+            fontFamily: "Montserrat, sans-serif",
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 10,
+            overflow: "hidden",
+          }}
+        >
+          {card.excerpt}
+        </p>
+      )}
+
+      <div className="mt-auto pt-[16px] lg:pt-[1.042vw] flex items-end justify-between gap-[16px] lg:gap-[1.04vw]">
+        <span
+          className="font-montserrat capitalize text-[#333]
+                     text-[13px] lg:text-[0.781vw] leading-none"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          {card.categoryName || card.projectLabel}
+        </span>
+        {/* <CardArrow href={card.externalUrl} /> */}
+      </div>
+    </div>
+  );
+}
+
 /**
  * InitiativeCard — image on the front, editorial copy on the back.
  *
@@ -185,13 +252,30 @@ function CardArrow({ href }) {
  * without a pointer). Touch devices never fire hover, so a tap toggles the
  * flip instead — the guard on `pointerType` keeps a desktop click from
  * fighting the hover state.
+ *
+ * Cards with no uploaded image have nothing to put on the front, so they skip
+ * the flip entirely and render the editorial face on its own.
  */
 function InitiativeCard({ card }) {
   const [flipped, setFlipped] = useState(false);
 
+  const wrapperClass =
+    "snap-start shrink-0 w-full sm:w-[46%] lg:w-[calc((100%-4.166vw)/3)]";
+
+  // No image → nothing to flip from; show the editorial face as the card.
+  if (!card.hasImage) {
+    return (
+      <article className={wrapperClass}>
+        <div className="relative w-full aspect-[494/492]">
+          <CardBack card={card} />
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
-      className="snap-start shrink-0 w-full sm:w-[46%] lg:w-[calc((100%-4.166vw)/3)]"
+      className={wrapperClass}
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
       onFocus={() => setFlipped(true)}
@@ -246,68 +330,14 @@ function InitiativeCard({ card }) {
           </div>
 
           {/* ---- back: date, title, excerpt, arrow ---- */}
-          <div
-            className="absolute inset-0 flex flex-col overflow-hidden rounded-[8px] lg:rounded-[0.417vw]
-                       border border-[#e7e7e7] bg-[#faf9f7]
-                       p-[22px] lg:p-[1.667vw]"
+          <CardBack
+            card={card}
             style={{
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
             }}
-          >
-            <span
-              className="block h-px w-[36px] lg:w-[2.083vw]"
-              style={{ background: RED }}
-            />
-
-            {card.date && (
-              <p
-                className="mt-[14px] lg:mt-[0.833vw] font-montserrat font-medium text-[#33333359]
-                           text-[13px] lg:text-[0.781vw] leading-[1.6]"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                {card.date}
-              </p>
-            )}
-
-            <h4
-              className="mt-[6px] lg:mt-[0.417vw] capitalize text-[#333]
-                         text-[19px] sm:text-[21px] lg:text-[1.354vw]
-                         leading-[1.25] tracking-[0.01em]"
-              style={{ fontFamily: TARTUFFO, fontWeight: 300 }}
-            >
-              {card.title}
-            </h4>
-
-            {card.excerpt && (
-              <p
-                className="mt-[12px] lg:mt-[0.833vw] font-montserrat text-[#6d6d6d]
-                           text-[13px] sm:text-[14px] lg:text-[0.833vw]
-                           leading-[22px] sm:leading-[24px] lg:leading-[1.5vw]"
-                style={{
-                  fontFamily: "Montserrat, sans-serif",
-                  display: "-webkit-box",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 10,
-                  overflow: "hidden",
-                }}
-              >
-                {card.excerpt}
-              </p>
-            )}
-
-            <div className="mt-auto pt-[16px] lg:pt-[1.042vw] flex items-end justify-between gap-[16px] lg:gap-[1.04vw]">
-              <span
-                className="font-montserrat capitalize text-[#333]
-                           text-[13px] lg:text-[0.781vw] leading-none"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                {card.categoryName || card.projectLabel}
-              </span>
-              {/* <CardArrow href={card.externalUrl} /> */}
-            </div>
-          </div>
+          />
         </div>
       </div>
     </article>

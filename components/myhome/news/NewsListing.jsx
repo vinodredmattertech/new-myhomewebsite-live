@@ -196,7 +196,7 @@ function FeaturedRow({ tile }) {
     <div className="flex flex-col lg:flex-row lg:items-start gap-[24px] lg:gap-[2.031vw]">
       <TileLink
         tile={tile}
-        className="group relative block w-full aspect-[1193/671] lg:aspect-auto lg:w-[62.135vw] lg:h-[34.948vw] overflow-hidden bg-[#f5f1eb]"
+        className="group relative block w-full aspect-[1193/671] lg:aspect-auto lg:w-full lg:h-[34.948vw] overflow-hidden bg-[#f5f1eb]"
       >
         {tile.image && (
           <Image
@@ -211,7 +211,7 @@ function FeaturedRow({ tile }) {
         )}
       </TileLink>
 
-      <article
+      {/* <article
         className="w-full lg:w-[20.208vw] lg:min-h-[19.271vw] shrink-0 bg-white
                    border-[0.8px] border-[rgba(69,69,69,0.5)]
                    px-[22px] pt-[24px] pb-[24px]
@@ -278,7 +278,7 @@ function FeaturedRow({ tile }) {
             />
           </>
         )}
-      </article>
+      </article> */}
     </div>
   );
 }
