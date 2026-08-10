@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y, Autoplay } from "swiper/modules";
+import { Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
@@ -54,8 +54,9 @@ export default function ProjectAmenities({
   const descRef = useRef(null);
   const sidebarRef = useRef(null);
   const sliderRef = useRef(null);
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
+  // The swiper instance is held in a ref as well as state: the click handlers
+  // read the ref so they never close over a stale (or not-yet-set) instance.
+  const swiperRef = useRef(null);
   const [swiper, setSwiper] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -73,7 +74,10 @@ export default function ProjectAmenities({
     if (isMobile) swiper.autoplay.start();
     else swiper.autoplay.stop();
   }, [swiper, isMobile]);
-console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
+
+  const slidePrev = () => swiperRef.current?.slidePrev();
+  const slideNext = () => swiperRef.current?.slideNext();
+
   useGSAP(
     () => {
       registerGsap();
@@ -165,7 +169,7 @@ console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
       </div>
       <div ref={sliderRef} className="mt-[40px] lg:mt-[3.802vw] w-full">
         <Swiper
-          modules={[Navigation, Keyboard, A11y, Autoplay]}
+          modules={[Keyboard, A11y, Autoplay]}
           slidesPerView={1.05}
           spaceBetween={16}
           centeredSlides
@@ -177,12 +181,10 @@ console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
               ? { delay: 3500, disableOnInteraction: false }
               : false
           }
-          onSwiper={setSwiper}
-          onBeforeInit={(swiper) => {
-            swiper.params.navigation.prevEl = prevRef.current;
-            swiper.params.navigation.nextEl = nextRef.current;
+          onSwiper={(s) => {
+            swiperRef.current = s;
+            setSwiper(s);
           }}
-          navigation={{ prevEl: null, nextEl: null }}
           breakpoints={{
             640: { slidesPerView: 1.3, spaceBetween: 18 },
             768: { slidesPerView: 1.6, spaceBetween: 20 },
@@ -247,8 +249,8 @@ console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
         {/* Nav buttons */}
         <div className="mt-[28px] lg:mt-[2.083vw] flex items-center justify-center gap-[12px] lg:gap-[0.833vw]">
           <button
-            ref={prevRef}
             type="button"
+            onClick={slidePrev}
             aria-label="Previous amenity"
             className="inline-flex items-center justify-center rounded-full
                        bg-[#ef493d] text-white
@@ -258,8 +260,8 @@ console.log(amenities[0]?.image?.data?.attributes?.url,"amenties")
             <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.276vw] lg:h-[1.276vw]" />
           </button>
           <button
-            ref={nextRef}
             type="button"
+            onClick={slideNext}
             aria-label="Next amenity"
             className="inline-flex items-center justify-center rounded-full
                        bg-[#ef493d] text-white

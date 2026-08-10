@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ArrowLeft, ArrowRight, Calendar, ChevronDown, X } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard, A11y, Autoplay } from "swiper/modules";
+import { Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
@@ -303,8 +303,10 @@ export default function ProjectProgress({
   const sidebarRef = useRef(null);
   const metricsRef = useRef(null);
   const sliderWrapRef = useRef(null);
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
+  // Held in a ref so the arrow handlers always reach the live instance —
+  // Swiper's navigation prop is re-applied on every re-render, so binding the
+  // buttons through params.navigation gets torn off as soon as state changes.
+  const swiperRef = useRef(null);
 
   const [fancyboxRoot] = useFancybox();
   const attachFancy = (el) => {
@@ -366,6 +368,21 @@ export default function ProjectProgress({
   }, [entries, images]);
 
   const [selectedMonthKey, setSelectedMonthKey] = useState("");
+
+  // The filter options are the dates authored in the CMS (progress.entries[].date)
+  // — one chip per distinct date, newest first — instead of a free month/year
+  // calendar that could offer months with no updates behind them.
+  const availableDates = useMemo(() => {
+    const seen = new Map();
+    allSlides.forEach((slide) => {
+      if (slide.date && !seen.has(slide.date)) {
+        seen.set(slide.date, slide.formattedDate || slide.date);
+      }
+    });
+    return Array.from(seen, ([key, label]) => ({ key, label })).sort((a, b) =>
+      String(b.key).localeCompare(String(a.key))
+    );
+  }, [allSlides]);
 
   // Dynamic slide filtering based on selected Year & Month
   const displayedSlides = useMemo(() => {
@@ -476,6 +493,7 @@ export default function ProjectProgress({
         ) : null}
 
         {/* Full Calendar Month & Year Date Picker Popover matching screenshot */}
+        {/*
         <div className="mt-[20px] lg:mt-[1.5vw] flex justify-center px-4">
           <MonthYearCalendarPicker
             selectedMonthKey={selectedMonthKey}
@@ -483,6 +501,23 @@ export default function ProjectProgress({
             onClear={handleClearFilter}
           />
         </div>
+        */}
+
+        {/* Update date — plain text, taken from the dates set on
+            progress.entries in Strapi */}
+        {availableDates.length > 0 && (
+          <div className="mt-[20px] lg:mt-[1.5vw] flex flex-wrap items-center justify-center gap-x-[16px] gap-y-[6px] lg:gap-x-[1.042vw] px-4 text-center text-[#333]">
+            {availableDates.map((d) => (
+              <span
+                key={d.key}
+                className="text-[14px] !font-medium text-[#ef493d] sm:text-[16px] lg:text-[0.938vw] leading-[24px] lg:leading-[1.563vw]"
+                style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+              >
+                {d.label}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-[32px] lg:mt-[2.5vw] flex flex-col items-center gap-[36px] lg:gap-[3.333vw]">
           {/* Image slider */}
@@ -506,7 +541,7 @@ export default function ProjectProgress({
             ) : (
               <Swiper
                 key={`progress-swiper-${selectedMonthKey}-${isSingleSlide ? "single" : "multi"}`}
-                modules={[Navigation, Keyboard, A11y, Autoplay]}
+                modules={[Keyboard, A11y, Autoplay]}
                 slidesPerView={1}
                 spaceBetween={16}
                 breakpoints={
@@ -526,11 +561,9 @@ export default function ProjectProgress({
                 keyboard={{ enabled: true }}
                 loop={displayedSlides.length >= 4}
                 rewind={displayedSlides.length > 1 && displayedSlides.length < 4}
-                onBeforeInit={(swiper) => {
-                  swiper.params.navigation.prevEl = prevRef.current;
-                  swiper.params.navigation.nextEl = nextRef.current;
+                onSwiper={(s) => {
+                  swiperRef.current = s;
                 }}
-                navigation={{ prevEl: null, nextEl: null }}
                 className="w-full !overflow-hidden rounded-[16px]"
               >
                 {displayedSlides.map((img, idx) => (
@@ -579,8 +612,8 @@ export default function ProjectProgress({
             {displayedSlides.length > 1 && (
               <>
                 <button
-                  ref={prevRef}
                   type="button"
+                  onClick={() => swiperRef.current?.slidePrev()}
                   aria-label="Previous progress photo"
                   className="absolute z-[5] top-1/2 -translate-y-1/2
                              left-[-12px] sm:left-[-20px] lg:left-[-1.5vw]
@@ -592,8 +625,8 @@ export default function ProjectProgress({
                   <ArrowLeft className="w-[18px] h-[18px] lg:w-[1.342vw] lg:h-[1.342vw]" />
                 </button>
                 <button
-                  ref={nextRef}
                   type="button"
+                  onClick={() => swiperRef.current?.slideNext()}
                   aria-label="Next progress photo"
                   className="absolute z-[5] top-1/2 -translate-y-1/2
                              right-[-12px] sm:right-[-20px] lg:right-[-1.5vw]

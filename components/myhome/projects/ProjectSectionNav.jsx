@@ -178,13 +178,13 @@ export default function ProjectSectionNav({ sections = [] }) {
               }}
               onClick={() => handleClick(s.id)}
               aria-current={isActive ? "true" : undefined}
-              className={`relative shrink-0 whitespace-nowrap font-medium uppercase
+              className={`relative shrink-0 whitespace-nowrap font-[700] uppercase
                           tracking-[0.12em] transition-colors duration-300
                           text-[11px] md:text-[12px] lg:text-[0.833vw]
                           py-[18px] md:py-[20px] lg:py-[1.25vw]
                           ${
                             isActive
-                              ? "text-mh-gold"
+                              ? "text-[#ef493d]"
                               : "text-mh-grey hover:text-mh-dark"
                           }`}
               style={{ fontFamily: "Montserrat, sans-serif" }}
@@ -192,7 +192,7 @@ export default function ProjectSectionNav({ sections = [] }) {
               {s.label}
               <span
                 aria-hidden="true"
-                className={`absolute left-0 right-0 bottom-0 h-[2px] bg-mh-gold
+                className={`absolute left-0 right-0 bottom-0 h-[2px] bg-[#ef493d]
                             transition-transform duration-300 ease-premium
                             ${isActive ? "scale-x-100" : "scale-x-0"}`}
               />

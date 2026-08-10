@@ -407,9 +407,9 @@ export default function Lifestyle({ data }) {
                 }}
               >
                 <blockquote
-                  className="text-[#333] leading-[1.5]
-                             text-[18px] sm:text-[20px] md:text-[22px] lg:text-[1.354vw]"
-                  style={TITLE_FONT}
+                  className="text-[#333] leading-[1.5] font-normal
+                             text-[18px] sm:text-[20px] md:text-[22px] lg:text-[1.054vw]"
+                  // style={TITLE_FONT}
                 >
                   <RichText>{visionQuote}</RichText>
                 </blockquote>
