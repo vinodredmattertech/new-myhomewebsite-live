@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
-import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { registerGsap } from "@/lib/gsapSetup";
 import { MapPin, ArrowUpRight } from "lucide-react";
+import JobApplyModal from "@/components/myhome/career/JobApplyModal";
 
 /* Number of positions shown before the user clicks "View More". */
 const INITIAL_COUNT = 4;
@@ -17,10 +17,10 @@ const DEFAULT_DESC =
   "We’re looking for a creative and analytical professional to plan, execute, and optimize marketing campaigns across multiple channels.";
 
 const DEFAULT_JOBS = [
-  { location: "Mumbai", title: "Senior Design Architect", experience: "5 Year", description: DEFAULT_DESC, applyLabel: "Apply Now", applyUrl: "/contact-us" },
-  { location: "Hyderabad", title: "Project Manager", experience: "8 Year", description: DEFAULT_DESC, applyLabel: "Apply Now", applyUrl: "/contact-us" },
-  { location: "Mumbai", title: "Civil Site Engineer", experience: "3 Year", description: DEFAULT_DESC, applyLabel: "Apply Now", applyUrl: "/contact-us" },
-  { location: "Bengaluru", title: "Sales & CRM Executive", experience: "4 Year", description: DEFAULT_DESC, applyLabel: "Apply Now", applyUrl: "/contact-us" },
+  { location: "Mumbai", title: "Senior Design Architect", experience: "5 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
+  { location: "Hyderabad", title: "Project Manager", experience: "8 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
+  { location: "Mumbai", title: "Civil Site Engineer", experience: "3 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
+  { location: "Bengaluru", title: "Sales & CRM Executive", experience: "4 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
 ];
 
 /**
@@ -30,12 +30,16 @@ const DEFAULT_JOBS = [
  * Layout mirrors the Figma design: a vertical "Position Overview" side-label, a
  * centred serif heading, then a divider-separated list of job rows (location +
  * title on the left, experience + description in the middle, an "Apply Now"
- * link on the right) and a centred "View More" link.
+ * button on the right) and a centred "View More" link.
+ *
+ * "Apply Now" opens the application modal with that position's title shown at
+ * the top, so the resume is submitted against the role it was meant for.
  *
  * Driven by the `positions` component on the Career single type; falls back to
- * built-in defaults so the section always renders.
+ * built-in defaults so the section always renders. `formCopy` is the page's
+ * `applicationForm` component — the modal reuses its labels.
  */
-export default function CareerPositions({ section }) {
+export default function CareerPositions({ section, formCopy }) {
   const sideLabel = section?.sideLabel || "Position Overview";
   const heading = section?.heading || "Vacant Positions";
   const viewMoreLabel = section?.viewMoreLabel || "View More";
@@ -48,6 +52,9 @@ export default function CareerPositions({ section }) {
   const [expanded, setExpanded] = useState(false);
   const hasMore = jobs.length > INITIAL_COUNT;
   const visibleJobs = expanded ? jobs : jobs.slice(0, INITIAL_COUNT);
+
+  // The position whose "Apply Now" was clicked; drives the modal.
+  const [activeJob, setActiveJob] = useState(null);
 
   const rootRef = useRef(null);
 
@@ -149,16 +156,18 @@ export default function CareerPositions({ section }) {
                 )}
               </div>
 
-              {/* apply */}
-              <Link
-                href={job.applyUrl || "/contact-us"}
+              {/* apply — opens the modal with this position pre-filled */}
+              <button
+                type="button"
+                onClick={() => setActiveJob(job)}
+                aria-label={`${job.applyLabel || "Apply Now"} — ${job.title}`}
                 className="inline-flex items-center gap-[6px] lg:gap-[0.26vw] capitalize whitespace-nowrap
                            text-[15px] lg:text-[0.938vw] hover:opacity-80 transition-opacity"
                 style={{ color: RED, fontFamily: "Montserrat, sans-serif" }}
               >
                 {job.applyLabel || "Apply Now"}
                 <ArrowUpRight className="w-[18px] h-[18px] lg:w-[1.198vw] lg:h-[1.198vw]" strokeWidth={1.6} />
-              </Link>
+              </button>
             </div>
             <div className="h-px w-full bg-[#0000001a]" />
           </div>
@@ -179,6 +188,14 @@ export default function CareerPositions({ section }) {
           </button>
         </div>
       )}
+
+      {/* Application modal — the clicked designation heads the form. */}
+      <JobApplyModal
+        open={!!activeJob}
+        job={activeJob}
+        copy={formCopy || {}}
+        onClose={() => setActiveJob(null)}
+      />
     </section>
   );
 }

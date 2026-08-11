@@ -5,6 +5,7 @@ import CareerWhy from "@/components/myhome/career/CareerWhy";
 import CareerWorkplace from "@/components/myhome/career/CareerWorkplace";
 import CareerPositions from "@/components/myhome/career/CareerPositions";
 import CareerLinkedin from "@/components/myhome/career/CareerLinkedin";
+import CareerApplyForm from "@/components/myhome/career/CareerApplyForm";
 import { getCareerData } from "@/lib/strapi";
 
 export default function CareerPage({ page }) {
@@ -14,8 +15,11 @@ export default function CareerPage({ page }) {
       <CareerBanner banner={page?.banner} />
       <CareerWhy section={page?.why} />
       <CareerWorkplace section={page?.workplace} />
-      <CareerPositions section={page?.positions} />
+      {/* The positions list shares the form copy — its "Apply Now" buttons open
+          the same application form in a modal, headed by the designation. */}
+      <CareerPositions section={page?.positions} formCopy={page?.applicationForm} />
       <CareerLinkedin section={page?.linkedin} />
+      <CareerApplyForm section={page?.applicationForm} />
     </>
   );
 }
