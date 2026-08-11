@@ -13,6 +13,21 @@ import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
 import SectionHeading from "@/components/common/SectionHeading";
 
+/* Desktop year-rail geometry (vw units, matched to the image column height).
+   The rail is a fixed-height window over the full year list. It starts pinned
+   to the first milestone and only scrolls once the active year would leave the
+   window — so the list can hold any number of milestones without spilling out
+   of the section, and the earliest year still reads from the top. */
+const RAIL_VW = 33.75; // rail height — same as the image column
+const ROW_VW = 3.125; // one year row (tall enough for the active pill)
+
+/** Fade only the edge that actually has more list behind it. */
+function railMask(fadeTop, fadeBottom) {
+  const top = fadeTop ? "transparent 0%, #000 14%" : "#000 0%";
+  const bottom = fadeBottom ? "#000 86%, transparent 100%" : "#000 100%";
+  return `linear-gradient(to bottom, ${top}, ${bottom})`;
+}
+
 export default function AboutJourney({ data }) {
   const JOURNEY = Array.isArray(data?.items)
     ? data.items
@@ -27,6 +42,7 @@ export default function AboutJourney({ data }) {
     : [];
   const rootRef = useRef(null);
   const headingRef = useRef(null);
+  const ribbonRef = useRef(null);
   const [active, setActive] = useState(0);
   const [imageSwiper, setImageSwiper] = useState(null);
   const [contentSwiper, setContentSwiper] = useState(null);
@@ -46,6 +62,17 @@ export default function AboutJourney({ data }) {
     if (isMobile) contentSwiper.autoplay.start();
     else contentSwiper.autoplay.stop();
   }, [contentSwiper, isMobile]);
+
+  // Keep the active chip centred in the mobile year ribbon.
+  useEffect(() => {
+    const wrap = ribbonRef.current;
+    const chip = wrap?.querySelectorAll("li")?.[active];
+    if (!wrap || !chip) return;
+    wrap.scrollTo({
+      left: chip.offsetLeft - wrap.clientWidth / 2 + chip.offsetWidth / 2,
+      behavior: "smooth",
+    });
+  }, [active]);
 
   useGSAP(
     () => {
@@ -73,13 +100,20 @@ export default function AboutJourney({ data }) {
   const goNext = () => contentSwiper?.slideNext();
 
   const total = JOURNEY.length;
-  // With justify-around each year sits in its own equal-height slot;
-  // slot height = 100/total %, year i centre is at (i + 0.5) / total of rail height.
-  // Make the indicator half a slot tall and centre it on the active year's slot centre.
-  const slotPct = 100 / total;
-  const indicatorHeightPct = slotPct / 2;
-  const yearCentrePct = (active + 0.5) * slotPct;
-  const indicatorTopPct = yearCentrePct - indicatorHeightPct / 2;
+  // Try to centre the active row, then clamp so the list can never scroll past
+  // its own ends: the first year stays pinned to the top of the rail until the
+  // active year has moved far enough down to push it off.
+  const minShiftVw = Math.min(0, RAIL_VW - total * ROW_VW);
+  const railShiftVw = Math.min(
+    0,
+    Math.max(minShiftVw, RAIL_VW / 2 - (active + 0.5) * ROW_VW)
+  );
+  const maskImage = railMask(railShiftVw < -0.01, railShiftVw > minShiftVw + 0.01);
+  // The track bar reads like a scrollbar: the thumb shows where the active
+  // year sits within the whole timeline, not just within the visible window.
+  const thumbHeightPct = Math.max(100 / total, 9);
+  const thumbTopPct =
+    total > 1 ? (active / (total - 1)) * (100 - thumbHeightPct) : 0;
 
   return (
     <section
@@ -136,58 +170,88 @@ export default function AboutJourney({ data }) {
             </Swiper>
           </div>
 
-          {/* ============ MIDDLE: Years list + 2px track bar (desktop) ============ */}
+          {/* ============ MIDDLE: Years rail + 2px track bar (desktop) ============ */}
           <div className="hidden lg:block lg:col-span-3 relative h-[33.75vw]">
             <div className="relative h-full flex items-stretch justify-end gap-[1.5vw]">
-              {/* Years stacked vertically — justify-around gives each year an equal slot
-                  so the indicator centres exactly on the active year's slot centre. */}
-              <ul className="flex flex-col justify-around h-full">
-                {JOURNEY.map((slide, i) => {
-                  const isActive = i === active;
-                  return (
-                    <li key={`yr-${slide.year}`} className="flex items-center justify-end">
-                      <button
-                        type="button"
-                        onClick={() => goTo(i)}
-                        aria-label={`Go to ${slide.year}`}
-                        className={
-                          isActive
-                            ? "inline-flex items-center justify-center rounded-full border border-[#ef493d] px-[1.302vw] py-[0.521vw] font-montserrat font-medium text-[#ef493d] text-[1.458vw] tracking-[0.04em] bg-white whitespace-nowrap transition-all duration-300"
-                            : "font-montserrat font-normal text-[#333]/25 text-[1.458vw] tracking-[0.04em] transition-all duration-300 cursor-pointer hover:text-[#ef493d]/60"
-                        }
-                        style={{ fontFamily: "Montserrat, sans-serif" }}
+              {/* Windowed rail: starts on the first year and translates to keep
+                  the active one in view; the fade hints at more timeline. */}
+              <div
+                className="relative h-full flex-1 overflow-hidden"
+                style={{ maskImage, WebkitMaskImage: maskImage }}
+              >
+                <ul
+                  className="absolute left-0 top-0 w-full transition-transform duration-500 ease-out will-change-transform"
+                  style={{ transform: `translateY(${railShiftVw.toFixed(3)}vw)` }}
+                >
+                  {JOURNEY.map((slide, i) => {
+                    const isActive = i === active;
+                    return (
+                      <li
+                        key={`yr-${i}-${slide.year}`}
+                        className="flex items-center justify-end h-[3.125vw]"
                       >
-                        {slide.year}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
+                        <button
+                          type="button"
+                          onClick={() => goTo(i)}
+                          aria-label={`Go to ${slide.year}`}
+                          aria-current={isActive ? "true" : undefined}
+                          className={
+                            isActive
+                              ? "inline-flex items-center justify-center rounded-full border border-[#ef493d] px-[1.302vw] py-[0.521vw] font-montserrat font-medium text-[#ef493d] text-[1.458vw] tracking-[0.04em] bg-white whitespace-nowrap transition-colors duration-300"
+                              : "font-montserrat font-normal text-[#333]/25 text-[1.458vw] tracking-[0.04em] transition-colors duration-300 cursor-pointer hover:text-[#ef493d]/60"
+                          }
+                          style={{ fontFamily: "Montserrat, sans-serif" }}
+                        >
+                          {slide.year}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
 
-              {/* 2px vertical track bar with moving indicator */}
-              <div className="relative h-full w-[2px] self-stretch">
+              {/* 2px vertical track bar with moving thumb */}
+              <div className="relative h-full w-[2px] shrink-0 self-stretch">
                 <div className="absolute inset-0 bg-[#33333322]" />
                 <div
                   className="absolute left-0 w-full bg-[#333] transition-all duration-500 ease-out"
                   style={{
-                    height: `${indicatorHeightPct}%`,
-                    top: `${indicatorTopPct}%`,
+                    height: `${thumbHeightPct}%`,
+                    top: `${thumbTopPct}%`,
                   }}
                 />
               </div>
             </div>
           </div>
 
-          {/* ============ Mobile/tablet year ribbon (only one shown, the active) ============ */}
-          <div className="lg:hidden flex items-center gap-[12px]">
-            <div className="inline-flex items-center justify-center border border-[#ef493d] rounded-full px-[20px] py-[8px]">
-              <span
-                className="font-montserrat font-medium text-[#ef493d] text-[20px] tracking-[0.84px]"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                {JOURNEY[active].year}
-              </span>
-            </div>
+          {/* ============ Mobile/tablet year ribbon — horizontally scrollable ============ */}
+          <div
+            ref={ribbonRef}
+            className="lg:hidden -mx-5 md:-mx-10 px-5 md:px-10 overflow-x-auto no-scrollbar"
+          >
+            <ul className="flex w-max items-center gap-[10px] py-[2px]">
+              {JOURNEY.map((slide, i) => {
+                const isActive = i === active;
+                return (
+                  <li key={`myr-${i}-${slide.year}`}>
+                    <button
+                      type="button"
+                      onClick={() => goTo(i)}
+                      aria-label={`Go to ${slide.year}`}
+                      aria-current={isActive ? "true" : undefined}
+                      className={
+                        isActive
+                          ? "inline-flex items-center justify-center rounded-full border border-[#ef493d] px-[20px] py-[8px] font-montserrat font-medium text-[#ef493d] text-[18px] md:text-[20px] tracking-[0.84px] whitespace-nowrap"
+                          : "inline-flex items-center justify-center rounded-full border border-transparent px-[10px] py-[8px] font-montserrat font-normal text-[#333]/30 text-[18px] md:text-[20px] tracking-[0.84px] whitespace-nowrap"
+                      }
+                      style={{ fontFamily: "Montserrat, sans-serif" }}
+                    >
+                      {slide.year}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
           {/* ============ RIGHT: Content Swiper ============ */}

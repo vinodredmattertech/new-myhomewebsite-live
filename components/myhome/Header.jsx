@@ -16,6 +16,7 @@ const FALLBACK_NAV_ITEMS = [
   { label: "NRI", href: "/nri" },
   { label: "Blogs", href: "/blogs" },
   { label: "News & Media", href: "/news" },
+  { label: "Investors", href: "/investors" },
 ];
 
 const FALLBACK_LOGO = "/assets/myhome/logo.svg";
@@ -129,7 +130,7 @@ export default function MyHomeHeader() {
         resolveNav("Careers", "/careers"),
         resolveNav("Awards", "/awards"),
         resolveNav("Sustainability", "/sustainability"),
-
+        resolveNav("Investors", "/investors"),
       ],
     },
   ];
