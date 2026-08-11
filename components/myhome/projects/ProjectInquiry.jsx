@@ -59,6 +59,8 @@ export default function ProjectInquiry({
   address = "My Home Akrida, Nallagandla - Tellapur Rd, Tellapur Village, Ramachandrapuram, Tellapur, Nallagandla, Hyderabad, Telangana 502034",
   disclaimer = "Images are for representation only. Specifications and details are subject to change. Please refer to the sanctioned plans and MahaRERA website for accurate project information.",
   reraNumber = "P02400005741",
+  // Optional line under the RERA number — renders only when set in the CMS.
+  buildingPermissionNo = "",
   reraUrl = "https://maharera.mahaonline.gov.in",
   qrSrc = "/assets/myhome/projects/akrida-qr.png",
   configOptions = CONFIG_OPTIONS,
@@ -380,7 +382,7 @@ export default function ProjectInquiry({
 
             {/* RERA block — each piece (QR, number, link) is optional in the
                 CMS, so render only the parts that actually have data. */}
-            {(qrSrc || reraNumber || reraUrl) && (
+            {(qrSrc || reraNumber || buildingPermissionNo || reraUrl) && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[20px] sm:gap-[30px] lg:gap-[1.563vw]">
                 {qrSrc && (
                   <div className="relative shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] lg:w-[10.625vw] lg:h-[10.833vw] bg-white">
@@ -396,7 +398,7 @@ export default function ProjectInquiry({
                     />
                   </div>
                 )}
-                {(reraNumber || reraUrl) && (
+                {(reraNumber || buildingPermissionNo || reraUrl) && (
                   <div className="flex flex-col gap-[4px] lg:gap-[0.156vw] min-w-0">
                     {reraNumber && (
                       <>
@@ -421,6 +423,22 @@ export default function ProjectInquiry({
                           {reraNumber}
                         </p>
                       </>
+                    )}
+                    {buildingPermissionNo && (
+                      <p
+                        className="text-[#333] break-words
+                           mt-[6px] sm:mt-[8px] lg:mt-[0.417vw]
+                           text-[13px] sm:text-[15px] lg:text-[1.094vw] leading-[1.4]"
+                        style={{
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Building Permission no.:{" "}
+                        <span style={{ fontWeight: 600 }}>
+                          {buildingPermissionNo}
+                        </span>
+                      </p>
                     )}
                     {reraUrl && (
                       <Link

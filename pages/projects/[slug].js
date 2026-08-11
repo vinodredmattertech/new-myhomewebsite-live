@@ -220,6 +220,11 @@ export default function ProjectDetailPage({ project }) {
   const brochureFileUrl = br.brochureFile?.data?.attributes?.url
     ? `${STRAPI_URL}${br.brochureFile.data.attributes.url}`
     : "#";
+  // Optional second download (e.g. the IGBC certificate). The button only
+  // renders when a file has actually been uploaded in the CMS.
+  const secondaryFileUrl = br.secondaryFile?.data?.attributes?.url
+    ? `${STRAPI_URL}${br.secondaryFile.data.attributes.url}`
+    : "";
 
   const tm = project.testimonials || {};
   const testimonials = (tm.items || []).map((t) => ({
@@ -273,7 +278,8 @@ export default function ProjectDetailPage({ project }) {
     hasText(br.heading) ||
     lines(br.highlights).length ||
     mediaUrl(br?.image) ||
-    brochureFileUrl !== "#"
+    brochureFileUrl !== "#" ||
+    secondaryFileUrl
   );
   const hasTestimonials = testimonials.some((t) => hasText(t.quote));
   // Inquiry is a functional lead-capture form (works with a default heading),
@@ -431,6 +437,8 @@ export default function ProjectDetailPage({ project }) {
           imageAlt={txt(br.imageAlt)}
           brochureHref={brochureFileUrl}
           buttonLabel={txt(br.buttonLabel) || "Download Brochure"}
+          secondaryHref={secondaryFileUrl}
+          secondaryButtonLabel={txt(br.secondaryButtonLabel) || "IGBC PDF"}
           projectName={project.title}
         />
       )}
@@ -456,6 +464,7 @@ export default function ProjectDetailPage({ project }) {
           address={txt(iq.address)}
           disclaimer={txt(iq.disclaimer)}
           reraNumber={txt(iq.reraNumber)}
+          buildingPermissionNo={txt(iq.buildingPermissionNo)}
           reraUrl={txt(iq.reraUrl)}
           qrSrc={mediaUrl(iq?.qrImage) || ""}
           projectName={project.title}

@@ -5,6 +5,7 @@ import AboutLegacy from "@/components/myhome/about/AboutLegacy";
 import AboutVisionMission from "@/components/myhome/about/AboutVisionMission";
 import AboutLeadership from "@/components/myhome/about/AboutLeadership";
 import AboutJourney from "@/components/myhome/about/AboutJourney";
+import AboutVideo from "@/components/myhome/about/AboutVideo";
 import AboutValues from "@/components/myhome/about/AboutValues";
 import { getAboutData, mediaUrl } from "@/lib/strapi";
 
@@ -25,6 +26,7 @@ export default function AboutUs({ about }) {
       <AboutVisionMission data={about?.visionMission} />
       <AboutLeadership data={about?.leadership} />
       <AboutJourney data={about?.journey} />
+      <AboutVideo data={about?.videoSection} />
       <AboutValues data={about?.values} />
     </>
   );

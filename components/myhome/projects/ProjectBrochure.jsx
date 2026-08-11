@@ -46,6 +46,10 @@ export default function ProjectBrochure({
   imageAlt = "My Home Akrida clubhouse",
   brochureHref = "/images/pdf-sample_0.pdf",
   buttonLabel = "Download Brochure",
+  // Optional second document (e.g. the IGBC certificate). Its button renders
+  // only when the CMS has a file for it, and it reuses the same unlock form.
+  secondaryHref = "",
+  secondaryButtonLabel = "IGBC PDF",
   projectName = "Project Brochure",
 }) {
   const rootRef = useRef(null);
@@ -56,8 +60,14 @@ export default function ProjectBrochure({
   const imageRef = useRef(null);
 
   const storageKey = `${STORAGE_PREFIX}${projectName}`;
+  // The second document unlocks separately, so its own lead is still captured
+  // even after the brochure has been downloaded.
+  const secondaryStorageKey = `${STORAGE_PREFIX}${projectName}:secondary`;
   const [unlocked, setUnlocked] = useState(false);
+  const [secondaryUnlocked, setSecondaryUnlocked] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  // Which document the open modal is collecting details for: "brochure" | "secondary".
+  const [activeDoc, setActiveDoc] = useState("brochure");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const {
@@ -67,19 +77,38 @@ export default function ProjectBrochure({
     formState: { errors },
   } = useForm({ mode: "onBlur" });
 
-  // Read unlocked flag from localStorage on the client (SSR-safe).
+  // Read unlocked flags from localStorage on the client (SSR-safe).
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.localStorage.getItem(storageKey) === "1") setUnlocked(true);
-  }, [storageKey]);
+    if (window.localStorage.getItem(secondaryStorageKey) === "1") {
+      setSecondaryUnlocked(true);
+    }
+  }, [storageKey, secondaryStorageKey]);
+
+  const isSecondary = activeDoc === "secondary";
+  const activeHref = isSecondary ? secondaryHref : brochureHref;
+  const activeStorageKey = isSecondary ? secondaryStorageKey : storageKey;
 
   const handleDownloadClick = (e) => {
     e.preventDefault();
     // Brochure file missing in CMS → don't open the modal; just show a no-op
     // (the button is also disabled visually below).
     if (!brochureHref || brochureHref === "/images/pdf-sample_0.pdf") return;
+    setActiveDoc("brochure");
     if (unlocked) {
       triggerBrochureDownload(brochureHref);
+    } else {
+      setModalOpen(true);
+    }
+  };
+
+  const handleSecondaryClick = (e) => {
+    e.preventDefault();
+    if (!secondaryHref || secondaryHref === "#") return;
+    setActiveDoc("secondary");
+    if (secondaryUnlocked) {
+      triggerBrochureDownload(secondaryHref);
     } else {
       setModalOpen(true);
     }
@@ -93,8 +122,12 @@ export default function ProjectBrochure({
       email: data.email,
       phone: `${data.countryCode || DEFAULT_COUNTRY_CODE} ${data.phone}`.trim(),
       project: projectName,
-      message: "Requested project brochure download",
-      formSource: "Project Brochure Download",
+      message: isSecondary
+        ? `Requested project ${secondaryButtonLabel} download`
+        : "Requested project brochure download",
+      formSource: isSecondary
+        ? `Project ${secondaryButtonLabel} Download`
+        : "Project Brochure Download",
     };
     try {
       const [crmRes, leadOk] = await Promise.all([
@@ -114,14 +147,15 @@ export default function ProjectBrochure({
       ]);
       if (crmRes.ok || leadOk) {
         if (typeof window !== "undefined") {
-          window.localStorage.setItem(storageKey, "1");
+          window.localStorage.setItem(activeStorageKey, "1");
         }
-        setUnlocked(true);
+        if (isSecondary) setSecondaryUnlocked(true);
+        else setUnlocked(true);
         setModalOpen(false);
         reset();
         // Kick off the download in the next tick so the modal close
         // animation isn't blocked by the file open dialog.
-        setTimeout(() => triggerBrochureDownload(brochureHref), 50);
+        setTimeout(() => triggerBrochureDownload(activeHref), 50);
       } else {
         setSubmitError("Couldn't save your details. Please try again.");
       }
@@ -190,6 +224,7 @@ export default function ProjectBrochure({
   );
 
   const noFile = !brochureHref || brochureHref === "/images/pdf-sample_0.pdf";
+  const hasSecondary = Boolean(secondaryHref && secondaryHref !== "#");
 
   return (
     <section
@@ -266,37 +301,101 @@ export default function ProjectBrochure({
             </ul>
             )}
 
-            <button
+            <div
               ref={buttonRef}
-              type="button"
-              onClick={handleDownloadClick}
-              disabled={noFile}
-              aria-label={
-                noFile
-                  ? "Brochure coming soon"
-                  : unlocked
-                  ? buttonLabel
-                  : `${buttonLabel} — fill form to download`
-              }
-              className="inline-flex items-center justify-between gap-[16px]
-                         border border-white text-white capitalize
-                         h-[48px] sm:h-[54px] lg:h-[3.021vw]
-                         w-[260px] sm:w-[290px] lg:w-[15.833vw]
-                         px-[20px] lg:px-[1.354vw]
-                         text-[14px] sm:text-[16px] lg:text-[0.938vw]
-                         transition-colors duration-300
-                         hover:bg-white hover:text-[#2a2828]
-                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white"
-              style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+              className="flex flex-wrap items-center gap-[12px] lg:gap-[1.042vw]"
             >
-              <span>{noFile ? "Brochure Coming Soon" : buttonLabel}</span>
-              <Download className="w-[18px] h-[18px] lg:w-[1.094vw] lg:h-[1.094vw]" strokeWidth={1.8} />
-            </button>
+              <button
+                type="button"
+                onClick={handleDownloadClick}
+                disabled={noFile}
+                aria-label={
+                  noFile
+                    ? "Brochure coming soon"
+                    : unlocked
+                    ? buttonLabel
+                    : `${buttonLabel} — fill form to download`
+                }
+                className="inline-flex items-center justify-between gap-[16px]
+                           border border-white text-white capitalize
+                           h-[48px] sm:h-[54px] lg:h-[3.021vw]
+                           w-[260px] sm:w-[290px] lg:w-[15.833vw]
+                           px-[20px] lg:px-[1.354vw]
+                           text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                           transition-colors duration-300
+                           hover:bg-white hover:text-[#2a2828]
+                           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white"
+                style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+              >
+                <span>{noFile ? "Brochure Coming Soon" : buttonLabel}</span>
+                <Download className="w-[18px] h-[18px] lg:w-[1.094vw] lg:h-[1.094vw]" strokeWidth={1.8} />
+              </button>
+
+              {hasSecondary && (
+                <button
+                  type="button"
+                  onClick={handleSecondaryClick}
+                  aria-label={
+                    secondaryUnlocked
+                      ? secondaryButtonLabel
+                      : `${secondaryButtonLabel} — fill form to download`
+                  }
+                  className="inline-flex items-center justify-between gap-[16px]
+                             border border-white text-white capitalize
+                             h-[48px] sm:h-[54px] lg:h-[3.021vw]
+                             w-[260px] sm:w-[290px] lg:w-[15.833vw]
+                             px-[20px] lg:px-[1.354vw]
+                             text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                             transition-colors duration-300
+                             hover:bg-white hover:text-[#2a2828]"
+                  style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+                >
+                  <span>{secondaryButtonLabel}</span>
+                  <Download className="w-[18px] h-[18px] lg:w-[1.094vw] lg:h-[1.094vw]" strokeWidth={1.8} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="mt-[36px] lg:mt-[3.385vw] h-px w-full bg-white/15" aria-hidden="true" />
       </div>
+
+      {/* ===== Sticky "Download Brochure" CTA =====
+          Pinned bottom-right for the whole project detail page. Opens the same
+          unlock form as the section button (handleDownloadClick), so there is
+          one modal and one lead flow.
+          On mobile it sits above ProjectFloatingActions' 56px bottom bar; on
+          lg+ that bar is hidden and the right-edge pills are vertically
+          centred, so the bottom-right corner is clear. */}
+      {!noFile && (
+        <button
+          type="button"
+          onClick={handleDownloadClick}
+          aria-label={
+            unlocked ? buttonLabel : `${buttonLabel} — fill form to download`
+          }
+          className="fixed z-[70]
+                     right-[12px] sm:right-[16px] lg:right-[1.25vw]
+                     bottom-[68px] sm:bottom-[72px] lg:bottom-[1.25vw]
+                     inline-flex items-center justify-center
+                     gap-[8px] sm:gap-[10px] lg:gap-[0.521vw]
+                     rounded-full bg-[#ef493d] hover:bg-[#d83a2f] text-white
+                     shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]
+                     h-[42px] sm:h-[48px] lg:h-[3.021vw]
+                     px-[16px] sm:px-[20px] lg:px-[1.25vw]
+                     max-w-[calc(100vw-24px)]
+                     capitalize text-[13px] sm:text-[14px] lg:text-[0.938vw]
+                     transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+        >
+          <Download
+            className="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] lg:w-[1.094vw] lg:h-[1.094vw] shrink-0"
+            strokeWidth={1.8}
+          />
+          <span className="truncate">{buttonLabel}</span>
+        </button>
+      )}
 
       {/* ===== Brochure unlock modal ===== */}
       <Dialog
@@ -332,7 +431,9 @@ export default function ProjectBrochure({
                 fontWeight: 400,
               }}
             >
-              Download {projectName} Brochure
+              {isSecondary
+                ? `Download ${projectName} ${secondaryButtonLabel}`
+                : `Download ${projectName} Brochure`}
             </Dialog.Title>
             <p
               className="font-montserrat text-[#6d6d6d] mt-[8px] lg:mt-[0.521vw]
@@ -340,7 +441,8 @@ export default function ProjectBrochure({
                          leading-[20px] sm:leading-[22px] lg:leading-[1.302vw]"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Share your details and we&apos;ll send the brochure your way right now.
+              Share your details and we&apos;ll send the{" "}
+              {isSecondary ? secondaryButtonLabel : "brochure"} your way right now.
             </p>
 
             <form
@@ -463,7 +565,8 @@ export default function ProjectBrochure({
                            leading-[1.5] mt-[2px] lg:mt-[0.156vw]"
                 style={{ fontFamily: "Montserrat, sans-serif" }}
               >
-                Submitting saves your details with our team and starts the brochure download.
+                Submitting saves your details with our team and starts the{" "}
+                {isSecondary ? secondaryButtonLabel : "brochure"} download.
               </p>
             </form>
           </Dialog.Panel>
