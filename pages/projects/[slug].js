@@ -3,6 +3,8 @@ import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import ProjectDetailBanner from "@/components/myhome/projects/ProjectDetailBanner";
 import ProjectOverview from "@/components/myhome/projects/ProjectOverview";
 import ProjectAmenities from "@/components/myhome/projects/ProjectAmenities";
+import ProjectAmenitiesIcons from "@/components/myhome/projects/ProjectAmenitiesIcons";
+import ProjectClubhouse from "@/components/myhome/projects/ProjectClubhouse";
 import ProjectFloorPlans from "@/components/myhome/projects/ProjectFloorPlans";
 import ProjectGallery from "@/components/myhome/projects/ProjectGallery";
 import ProjectSpecifications from "@/components/myhome/projects/ProjectSpecifications";
@@ -86,6 +88,27 @@ export default function ProjectDetailPage({ project }) {
     title: it.title,
     image: mediaUrl(it.image),
   }));
+
+  const ch = project.clubhouse || {};
+  const clubhouseImage = mediaUrl(ch.image) || "";
+  const hasClubhouse = Boolean(
+    hasText(ch.heading) ||
+    hasText(ch.headingAccent) ||
+    hasText(ch.description) ||
+    clubhouseImage
+  );
+
+  // Icon-grid amenities section. Each tile is a line icon + label, so entries
+  // whose icon was never uploaded are dropped (an iconless tile would render
+  // an empty cell — and crash next/image on a null src).
+  const ai = project.amenitiesIcons || {};
+  const amenityIcons = (ai.items || [])
+    .map((it) => ({
+      title: it.title,
+      icon: mediaUrl(it.icon),
+      iconAlt: it.icon?.data?.attributes?.alternativeText || it.title,
+    }))
+    .filter((it) => it.icon);
 
   // A floor plan is only meaningful with its drawing, so plans whose image was
   // left empty in the CMS are dropped (an imageless plan would otherwise render
@@ -266,6 +289,7 @@ export default function ProjectDetailPage({ project }) {
   const hasAmenities = Boolean(
     hasText(am.heading) || hasText(am.description) || amenities.length
   );
+  const hasAmenityIcons = amenityIcons.length > 0;
   const hasFloorPlans = floorPlanTabs.some((t) => t.plans.length > 0);
   const hasGallery = galleryTabs.some((t) => t.items.length > 0);
   const hasSpecifications = specs.length > 0;
@@ -294,7 +318,10 @@ export default function ProjectDetailPage({ project }) {
   const navSections = [
     { id: "overview", label: "Overview", show: hasOverview },
     { id: "location", label: "Location", show: hasConnectivity },
-    { id: "amenities", label: "Amenities", show: hasAmenities },
+    { id: "clubhouse", label: "Clubhouse", show: hasClubhouse },
+    // The image-slider amenities section is currently commented out below, so
+    // the tab follows the icon-grid section that actually owns the anchor.
+    { id: "amenities", label: "Amenities", show: hasAmenityIcons },
     { id: "plans", label: "Plans", show: hasFloorPlans },
     { id: "gallery", label: "Gallery", show: hasGallery },
     { id: "specification", label: "Specifications", show: hasSpecifications },
@@ -357,9 +384,33 @@ export default function ProjectDetailPage({ project }) {
           amenities={amenities.length ? amenities : undefined}
         />
       )} */}
-      {hasAmenities && (
+      {/* {hasAmenities && (
         <div id="amenities">
           <ProjectAmenities data={project?.amenities} />
+        </div>
+      )} */}
+      {hasClubhouse && (
+        <div id="clubhouse">
+          <ProjectClubhouse
+            sidebarLabel={txt(ch.sidebarLabel) || undefined}
+            heading={txt(ch.heading)}
+            headingAccent={txt(ch.headingAccent)}
+            description={txt(ch.description)}
+            imageSrc={clubhouseImage}
+            imageAlt={txt(ch.imageAlt) || `${project.title} clubhouse`}
+          />
+        </div>
+      )}
+
+      {/* aminities new section */}
+      {hasAmenityIcons && (
+        <div id="amenities">
+          <ProjectAmenitiesIcons
+            sidebarLabel={txt(ai.sidebarLabel) || undefined}
+            heading={txt(ai.heading)}
+            description={txt(ai.description)}
+            items={amenityIcons}
+          />
         </div>
       )}
 
