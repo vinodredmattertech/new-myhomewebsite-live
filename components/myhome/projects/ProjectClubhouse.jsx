@@ -93,11 +93,11 @@ export default function ProjectClubhouse({
       {/* Text left, image bleeding off the right edge */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_50.5vw] items-center gap-[32px] lg:gap-[3.646vw]">
         <div className="px-5 md:px-12 lg:pl-[9.375vw] lg:pr-0">
-          <span
+          {/* <span
             ref={rulesRef}
             className="block h-px w-[64px] lg:w-[4.167vw] bg-[#ef493d]/60 mb-[20px] lg:mb-[1.563vw]"
             aria-hidden="true"
-          />
+          /> */}
 
           <SectionHeading
             className="text-[#333] leading-[1.08] tracking-[0.022em]
