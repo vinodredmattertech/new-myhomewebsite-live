@@ -107,7 +107,7 @@ export default function ProjectClubhouse({
             {headingAccent ? (
               <>
                 {" "}
-                <span ref={accentRef} className="text-[#ef493d]">
+                <span ref={accentRef} className="text-[#333]">
                   {headingAccent}
                 </span>
               </>
