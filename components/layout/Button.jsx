@@ -34,7 +34,9 @@ const Button = ({
   return (
     <button
       onClick={onClick}
-      type={type && "submit"}
+      // `undefined` (not `false`) so React omits the attribute entirely —
+      // same rendered DOM as before, without the non-boolean-attribute warning.
+      type={type ? "submit" : undefined}
       className={`${baseClasses} ${variantClasses[variant]}`}
     >
       {/* Hover overlay */}

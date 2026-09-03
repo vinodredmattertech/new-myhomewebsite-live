@@ -9,6 +9,7 @@ import SectionLabel from "@/components/myhome/SectionLabel";
 import { submitLoyaltyApplication } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { pushToCRM } from "@/lib/crm";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
@@ -133,17 +134,13 @@ export default function LoyaltyForm({
 
     try {
       const [crmRes] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: application.name,
-            email: application.email,
-            phone: application.mobile,
-            project_name: application.project || "-",
-            message: crmMessage,
-            FormSource: application.formSource,
-          }),
+        pushToCRM({
+          name: application.name,
+          email: application.email,
+          phone: application.mobile,
+          project_name: application.project || "-",
+          message: crmMessage,
+          FormSource: application.formSource,
         }),
         // Persist the full submission in Strapi (every field as its own column).
         submitLoyaltyApplication(application),

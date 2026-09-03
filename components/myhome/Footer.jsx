@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { getFooterData, mediaUrl, submitLead } from "@/lib/strapi";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { pushToCRM } from "@/lib/crm";
 
 const SOCIAL_ICON_MAP = {
   instagram: Instagram,
@@ -179,16 +180,12 @@ export default function MyHomeFooter() {
     };
     try {
       const [crmRes] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            phone: payload.phone,
-            FormSource: payload.formSource,
-            project_name: "-",
-          }),
+        pushToCRM({
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          FormSource: payload.formSource,
+          project_name: "-",
         }),
         submitLead(payload),
       ]);

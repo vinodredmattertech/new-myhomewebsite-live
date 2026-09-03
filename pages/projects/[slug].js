@@ -422,6 +422,7 @@ export default function ProjectDetailPage({ project }) {
             description={txt(fp.description)}
             tabs={floorPlanTabs}
             projectName={project.title}
+            projectSlug={project.slug}
           />
         </div>
       )}
@@ -491,6 +492,7 @@ export default function ProjectDetailPage({ project }) {
           secondaryHref={secondaryFileUrl}
           secondaryButtonLabel={txt(br.secondaryButtonLabel) || "IGBC PDF"}
           projectName={project.title}
+          projectSlug={project.slug}
         />
       )}
 
@@ -519,12 +521,14 @@ export default function ProjectDetailPage({ project }) {
           reraUrl={txt(iq.reraUrl)}
           qrSrc={mediaUrl(iq?.qrImage) || ""}
           projectName={project.title}
+          projectSlug={project.slug}
         />
       )}
 
       <ProjectFloatingActions
         phone={project.phone || "+917996006262"}
         projectName={project.title}
+        projectSlug={project.slug}
       />
     </>
   );

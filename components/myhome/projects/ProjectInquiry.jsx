@@ -10,6 +10,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { pushToCRM } from "@/lib/crm";
 
 const CONFIG_OPTIONS = ["2 BHK", "2.5 BHK", "3 BHK", "Not Sure"];
 
@@ -65,6 +66,7 @@ export default function ProjectInquiry({
   qrSrc = "/assets/myhome/projects/akrida-qr.png",
   configOptions = CONFIG_OPTIONS,
   projectName,
+  projectSlug,
 }) {
   const router = useRouter();
   const rootRef = useRef(null);
@@ -157,17 +159,14 @@ export default function ProjectInquiry({
     };
     try {
       const [crmRes] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            phone: payload.phone,
-            project_name: payload.project,
-            message: payload.message,
-            FormSource: payload.formSource,
-          }),
+        pushToCRM({
+          projectSlug,
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          project_name: payload.project,
+          message: payload.message,
+          FormSource: payload.formSource,
         }),
         submitLead(payload),
       ]);

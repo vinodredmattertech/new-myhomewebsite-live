@@ -10,6 +10,7 @@ import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/Cou
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
+import { pushToCRM } from "@/lib/crm";
 
 const DEFAULT_PROJECT_OPTIONS = ["Apas", "Akrida", "Avali", "Sayuk", "Tridasa", "Vipina", "Other"];
 
@@ -123,17 +124,13 @@ export default function ContactForm({ data }) {
       // POST is still treated as the canonical success signal so the user
       // flow doesn't change if Strapi happens to be down.
       const [crmRes] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            phone: payload.phone,
-            project_name: payload.project || "-",
-            message: payload.message,
-            FormSource: payload.formSource,
-          }),
+        pushToCRM({
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          project_name: payload.project || "-",
+          message: payload.message,
+          FormSource: payload.formSource,
         }),
         submitLead(payload),
       ]);

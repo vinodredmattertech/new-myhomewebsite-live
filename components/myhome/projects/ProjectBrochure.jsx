@@ -9,6 +9,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { pushToCRM } from "@/lib/crm";
 
 const DEFAULT_HIGHLIGHTS = [
   "24.99-Acre Master Planned Community",
@@ -51,6 +52,7 @@ export default function ProjectBrochure({
   secondaryHref = "",
   secondaryButtonLabel = "IGBC PDF",
   projectName = "Project Brochure",
+  projectSlug,
 }) {
   const rootRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -131,17 +133,14 @@ export default function ProjectBrochure({
     };
     try {
       const [crmRes, leadOk] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            phone: payload.phone,
-            project_name: payload.project,
-            message: payload.message,
-            FormSource: payload.formSource,
-          }),
+        pushToCRM({
+          projectSlug,
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          project_name: payload.project,
+          message: payload.message,
+          FormSource: payload.formSource,
         }),
         submitLead(payload),
       ]);

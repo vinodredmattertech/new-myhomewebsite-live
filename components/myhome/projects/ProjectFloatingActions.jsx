@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { Phone, X } from "lucide-react";
 import { submitLead } from "@/lib/strapi";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { pushToCRM } from "@/lib/crm";
 
 const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
 
@@ -22,6 +23,7 @@ const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
 export default function ProjectFloatingActions({
   phone = "+917996006262",
   projectName = "Project",
+  projectSlug,
 }) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,17 +58,14 @@ export default function ProjectFloatingActions({
     };
     try {
       const [crmRes] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            phone: payload.phone,
-            project_name: payload.project,
-            message: payload.message,
-            FormSource: payload.formSource,
-          }),
+        pushToCRM({
+          projectSlug,
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          project_name: payload.project,
+          message: payload.message,
+          FormSource: payload.formSource,
         }),
         submitLead(payload),
       ]);

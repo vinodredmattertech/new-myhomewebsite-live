@@ -13,6 +13,7 @@ import { submitLead } from "@/lib/strapi";
 import useFancybox from "@/components/common/useFancybox";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { pushToCRM } from "@/lib/crm";
 
 const FLOOR_PLAN_IMG = "/assets/myhome/projects/floor-plan.png";
 
@@ -58,6 +59,7 @@ export default function ProjectFloorPlans({
   description = "Discover the art of spatial intelligence. From the intimate comfort of our 2 BHK residences to the expansive luxury of our 3 BHK layouts, every floor plan is engineered to maximize natural light, cross-ventilation, and functional flow.",
   tabs = DEFAULT_TABS,
   projectName = "Project Floor Plans",
+  projectSlug,
 }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -121,16 +123,13 @@ export default function ProjectFloorPlans({
       // CRM push + Strapi lead in parallel — Strapi is canonical here since
       // the CRM route is currently a no-op (still resolves OK).
       const [crmRes, leadOk] = await Promise.all([
-        fetch("/api/pushToCRM", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            phone: payload.phone,
-            project_name: payload.project,
-            FormSource: payload.formSource,
-          }),
+        pushToCRM({
+          projectSlug,
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          project_name: payload.project,
+          FormSource: payload.formSource,
         }),
         submitLead(payload),
       ]);
