@@ -5,6 +5,10 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "https",
+        hostname: "backend.myhomeconstructions.com",
+      },
+      {
         protocol: "http",
         hostname: "65.1.74.145",
       },
