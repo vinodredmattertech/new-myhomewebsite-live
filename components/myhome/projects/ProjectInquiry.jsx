@@ -12,8 +12,6 @@ import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { pushToCRM } from "@/lib/crm";
 
-const CONFIG_OPTIONS = ["2 BHK", "2.5 BHK", "3 BHK", "Not Sure"];
-
 const UnderlineField = React.forwardRef(function UnderlineField(
   { label, hasError, errorMessage, type = "text", prefix, ...inputProps },
   ref
@@ -64,10 +62,17 @@ export default function ProjectInquiry({
   buildingPermissionNo = "",
   reraUrl = "https://maharera.mahaonline.gov.in",
   qrSrc = "/assets/myhome/projects/akrida-qr.png",
-  configOptions = CONFIG_OPTIONS,
+  configOptions = [],
   projectName,
   projectSlug,
 }) {
+  // The CMS owns the dropdown list (one option per line). With nothing set
+  // there the field is not rendered at all, so it is never registered and
+  // never blocks submission.
+  const options = Array.isArray(configOptions)
+    ? configOptions.filter((opt) => typeof opt === "string" && opt.trim())
+    : [];
+
   const router = useRouter();
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -269,48 +274,50 @@ export default function ProjectInquiry({
               })}
             />
 
-            <label className="flex flex-col gap-[14px] lg:gap-[1.302vw] w-full">
-              <div className="relative flex items-center">
-                <select
-                  aria-invalid={!!errors.configuration || undefined}
-                  defaultValue=""
-                  className={`appearance-none w-full bg-transparent outline-none border-none
-                              ${errors.configuration ? "text-[#ef493d]" : "text-[#333]"}
-                              text-[15px] sm:text-[18px] lg:text-[1.094vw]
-                              leading-[26px] sm:leading-[30px] lg:leading-[1.615vw]
-                              pr-[24px] cursor-pointer`}
-                  style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-                  {...register("configuration", { required: true })}
-                >
-                  <option value="" disabled>
-                    Interested Configuration*
-                  </option>
-                  {configOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
+            {options.length > 0 && (
+              <label className="flex flex-col gap-[14px] lg:gap-[1.302vw] w-full">
+                <div className="relative flex items-center">
+                  <select
+                    aria-invalid={!!errors.configuration || undefined}
+                    defaultValue=""
+                    className={`appearance-none w-full bg-transparent outline-none border-none
+                                ${errors.configuration ? "text-[#ef493d]" : "text-[#333]"}
+                                text-[15px] sm:text-[18px] lg:text-[1.094vw]
+                                leading-[26px] sm:leading-[30px] lg:leading-[1.615vw]
+                                pr-[24px] cursor-pointer`}
+                    style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+                    {...register("configuration", { required: true })}
+                  >
+                    <option value="" disabled>
+                      Interested Configuration*
                     </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  className="pointer-events-none absolute right-0 text-[#5f5f5f]
-                             w-[16px] h-[16px] lg:w-[1.094vw] lg:h-[1.094vw]"
+                    {options.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className="pointer-events-none absolute right-0 text-[#5f5f5f]
+                               w-[16px] h-[16px] lg:w-[1.094vw] lg:h-[1.094vw]"
+                  />
+                </div>
+                <div
+                  className={`h-px w-full ${
+                    errors.configuration ? "bg-[#ef493d]" : "bg-[#33333322]"
+                  } transition-colors duration-300`}
                 />
-              </div>
-              <div
-                className={`h-px w-full ${
-                  errors.configuration ? "bg-[#ef493d]" : "bg-[#33333322]"
-                } transition-colors duration-300`}
-              />
-              {errors.configuration ? (
-                <span
-                  className="text-[#ef493d] -mt-[8px] lg:-mt-[0.521vw]
-                             text-[12px] lg:text-[0.729vw]"
-                  style={{ fontFamily: "Montserrat, sans-serif" }}
-                >
-                  Please choose a configuration
-                </span>
-              ) : null}
-            </label>
+                {errors.configuration ? (
+                  <span
+                    className="text-[#ef493d] -mt-[8px] lg:-mt-[0.521vw]
+                               text-[12px] lg:text-[0.729vw]"
+                    style={{ fontFamily: "Montserrat, sans-serif" }}
+                  >
+                    Please choose a configuration
+                  </span>
+                ) : null}
+              </label>
+            )}
 
             <UnderlineField
               label="Message"

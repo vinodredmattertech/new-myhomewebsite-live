@@ -270,6 +270,9 @@ export default function ProjectDetailPage({ project }) {
     mediaRatio(ba?.beforeImage) || mediaRatio(ba?.afterImage) || 0;
 
   const iq = project.inquiry || {};
+  // Dropdown options for "Interested Configuration", entered one per line in
+  // the CMS. Left empty, the whole field is dropped from the form.
+  const inquiryConfigOptions = lines(iq.configOptions);
 
   // Each section renders only when it actually has content. A CMS component
   // that exists but was left empty must NOT produce an empty section, so we
@@ -519,6 +522,7 @@ export default function ProjectDetailPage({ project }) {
           reraNumber={txt(iq.reraNumber)}
           buildingPermissionNo={txt(iq.buildingPermissionNo)}
           reraUrl={txt(iq.reraUrl)}
+          configOptions={inquiryConfigOptions}
           qrSrc={mediaUrl(iq?.qrImage) || ""}
           projectName={project.title}
           projectSlug={project.slug}
