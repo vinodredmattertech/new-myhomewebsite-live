@@ -131,8 +131,8 @@ export default function HeroBanner({ data }) {
 
       // Initial visual state
       gsap.set(bgRef.current, { scale: 1.18, autoAlpha: 0.7, filter: "blur(8px)" });
-      gsap.set(welcomeRef.current, { yPercent: 105, autoAlpha: 0 });
-      gsap.set(subtitleRef.current, { yPercent: 110, autoAlpha: 0 });
+      gsap.set(welcomeRef.current, { y: 0, yPercent: 105, autoAlpha: 0 });
+      gsap.set(subtitleRef.current, { y: 0, yPercent: 110, autoAlpha: 0 });
       gsap.set(
         [copyHeadingRef.current, copyBodyRef.current, btnRef.current].filter(
           Boolean
@@ -156,6 +156,8 @@ export default function HeroBanner({ data }) {
       window.dispatchEvent(new CustomEvent("mh:loader-start"));
 
       const tl = gsap.timeline({
+        // Held until the display webfont is ready — see `startTimeline` below.
+        paused: true,
         defaults: { ease: "expo.out" },
         onComplete: () => {
           // Remove scroll lock only after the final frame is revealed
@@ -270,6 +272,31 @@ export default function HeroBanner({ data }) {
         );
       }
 
+      // The loader title is set in "Tartuffo_Trial_Regular", declared without a
+      // `font-display`, so the browser blocks its text while the .otf loads.
+      // The Montserrat subtitle has no such delay — start the sequence only
+      // after the face resolves, otherwise the subtitle is the first (and for a
+      // moment the only) text on screen.
+      let fontTimeout = null;
+      const startTimeline = () => {
+        if (fontTimeout) clearTimeout(fontTimeout);
+        fontTimeout = null;
+        if (!tl.paused()) return;
+        tl.play();
+      };
+
+      if (typeof document !== "undefined" && document.fonts?.load) {
+        // Never let a slow or failed font hold the loader hostage.
+        fontTimeout = setTimeout(startTimeline, 2000);
+        document.fonts
+          .load('88px "Tartuffo_Trial_Regular"')
+          .then(() => document.fonts.ready)
+          .then(startTimeline)
+          .catch(startTimeline);
+      } else {
+        startTimeline();
+      }
+
       // Scroll parallax on the hero image — kicks in after loader is gone
       gsap.to(bgRef.current, {
         yPercent: 14,
@@ -284,6 +311,7 @@ export default function HeroBanner({ data }) {
 
       return () => {
         // Always clean up in case the component unmounts mid-animation
+        if (fontTimeout) clearTimeout(fontTimeout);
         if (typeof window !== "undefined") {
           window.removeEventListener("wheel", preventScroll);
           window.removeEventListener("touchmove", preventTouch);
@@ -449,7 +477,15 @@ export default function HeroBanner({ data }) {
           <h2
             ref={welcomeRef}
             className="Tartuffo_Trial_Regular capitalize text-white text-center leading-[1] tracking-[0.04em] text-[44px] xs:text-[56px] sm:text-[72px] md:text-[88px] lg:text-[5.286vw] font-[300] will-change-transform"
-            style={{ fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
+            style={{
+              fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+              // Hidden until the timeline reveals it — otherwise the raw markup
+              // flashes before GSAP's initial `set` runs. Deliberately no
+              // `transform` here: GSAP folds any existing translate into its
+              // own `y` and adds `yPercent` on top of it.
+              visibility: "hidden",
+              opacity: 0,
+            }}
           >
             {data.loaderTitle}
           </h2>
@@ -460,7 +496,13 @@ export default function HeroBanner({ data }) {
           <p
             ref={subtitleRef}
             className="font-montserrat font-normal uppercase text-white/90 text-center text-[10px] xs:text-[11px] sm:text-[14px] md:text-[18px] lg:text-[1.458vw] tracking-[0.22em] sm:tracking-[0.28em] md:tracking-[0.32em] leading-[1.3] will-change-transform"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
+            style={{
+              fontFamily: "Montserrat, sans-serif",
+              // Same guard as the title — Montserrat resolves instantly, so
+              // without this the subtitle paints before "Welcome Home" does.
+              visibility: "hidden",
+              opacity: 0,
+            }}
           >
             {data.loaderSubtitle}
           </p>
