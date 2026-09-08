@@ -762,3 +762,48 @@ select {
   color: #333;
   font-weight: 600;
 }
+
+/* ---------------------------------------------------------------------------
+   Social stories marquee (home page — "Everyday Stories")
+
+   Each track holds the post list twice over and slides exactly one copy's
+   length, so the loop is seamless with no JS measuring anything.
+
+   The spacing between cards is a margin on the card, never a flex `gap`: with
+   `gap`, a two-copy track is `2*copy + (2n-1)*gap` tall, so translating -50%
+   lands half a gap short and the seam visibly stutters every cycle. A trailing
+   margin on every card makes each copy exactly `copy + n*gap`, and -50% is the
+   exact loop point.
+
+   Vertical on desktop, horizontal on mobile — the two axes are separate
+   keyframes rather than one, because the transform axis has to change with the
+   layout direction, and `--rev` flips a track to run against its neighbour.
+--------------------------------------------------------------------------- */
+@keyframes mh-marquee-y {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -50%, 0); }
+}
+@keyframes mh-marquee-x {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.mh-marquee-track {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.mh-marquee-track--y { animation-name: mh-marquee-y; }
+.mh-marquee-track--x { animation-name: mh-marquee-x; }
+/* Opposite direction for the neighbouring column/row. */
+.mh-marquee-track--rev { animation-direction: reverse; }
+
+/* Let a reader stop a column to actually look at a post. */
+.mh-marquee:hover .mh-marquee-track,
+.mh-marquee:focus-within .mh-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mh-marquee-track { animation: none; }
+}

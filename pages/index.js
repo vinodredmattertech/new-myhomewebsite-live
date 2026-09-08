@@ -8,6 +8,7 @@ import WhereStoriesBegin from "@/components/myhome/WhereStoriesBegin";
 import Lifestyle from "@/components/myhome/Lifestyle";
 import CommunityLiving from "@/components/myhome/CommunityLiving";
 import Testimonials from "@/components/myhome/Testimonials";
+import SocialStories from "@/components/myhome/SocialStories";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import { getHomeData } from "@/lib/strapi";
 
@@ -24,6 +25,7 @@ export default function Home({ home }) {
       <Lifestyle data={home?.lifestyle} />
       <CommunityLiving data={home?.communityLiving} />
       <Testimonials data={home?.testimonials} />
+      <SocialStories data={home?.socialStories} />
     </>
   );
 }
