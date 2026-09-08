@@ -98,7 +98,7 @@ const FALLBACK_PROJECTS = [
     badge: null,
     price: 2200000,
     year: 2024,
-    href: "/projects/my-home-krishe",
+    href: "/my-home-krishe",
   },
   {
     title: "My Home Avatar",
@@ -114,7 +114,7 @@ const FALLBACK_PROJECTS = [
     badge: "Completed",
     price: 3200000,
     year: 2022,
-    href: "/projects/my-home-avatar",
+    href: "/my-home-avatar",
   },
   {
     title: "My Home Vihanga",
@@ -130,7 +130,7 @@ const FALLBACK_PROJECTS = [
     badge: "Completed",
     price: 2800000,
     year: 2021,
-    href: "/projects/my-home-vihanga",
+    href: "/my-home-vihanga",
   },
   {
     title: "My Home 99",
@@ -146,7 +146,7 @@ const FALLBACK_PROJECTS = [
     badge: null,
     price: 3800000,
     year: 2025,
-    href: "/projects/my-home-99",
+    href: "/my-home-99",
   },
   {
     title: "My Home Twitza",
@@ -162,7 +162,7 @@ const FALLBACK_PROJECTS = [
     badge: null,
     price: 1800000,
     year: 2024,
-    href: "/projects/my-home-twitza",
+    href: "/my-home-twitza",
   },
   {
     title: "My Home Hub",
@@ -178,7 +178,7 @@ const FALLBACK_PROJECTS = [
     badge: "Completed",
     price: 1500000,
     year: 2019,
-    href: "/projects/my-home-hub",
+    href: "/my-home-hub",
   },
   {
     title: "My Home Sayuk",
@@ -194,7 +194,7 @@ const FALLBACK_PROJECTS = [
     badge: "Upcoming",
     price: 1900000,
     year: 2026,
-    href: "/projects/my-home-sayuk",
+    href: "/my-home-sayuk",
   },
   {
     title: "My Home Mangala",
@@ -210,7 +210,7 @@ const FALLBACK_PROJECTS = [
     badge: null,
     price: 2600000,
     year: 2025,
-    href: "/projects/my-home-mangala",
+    href: "/my-home-mangala",
   },
   {
     title: "My Home Grava",
@@ -225,7 +225,7 @@ const FALLBACK_PROJECTS = [
     badge: "Upcoming",
     price: 3500000,
     year: 2027,
-    href: "/projects/my-home-grava",
+    href: "/my-home-grava",
   },
 ];
 
@@ -539,7 +539,7 @@ function normaliseCmsProject(p) {
     badge: p.badge || null,
     price: typeof p.price === "number" ? p.price : 0,
     year: typeof p.year === "number" ? p.year : 0,
-    href: p.ctaLink || (p.slug ? `/projects/${p.slug}` : "#"),
+    href: p.ctaLink || (p.slug ? `/${p.slug}` : "#"),
   };
 }
 

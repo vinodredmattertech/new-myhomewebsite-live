@@ -38,6 +38,28 @@ const nextConfig = {
       },
     ],
   },
+
+  /**
+   * Project pages moved from /projects/<slug> to /<slug>.
+   *
+   * The old paths are indexed and linked from outside the site, so they are
+   * permanently redirected rather than dropped — a 301 carries the ranking
+   * across instead of stranding it on a 404. `/projects` itself keeps working
+   * as the listing page: only the child paths move.
+   *
+   * `statusCode: 301` rather than `permanent: true`, which emits a 308. Both
+   * are permanent and Google honours either, but 301 is the one every legacy
+   * crawler, analytics tool and CDN already understands.
+   */
+  async redirects() {
+    return [
+      {
+        source: "/projects/:slug",
+        destination: "/:slug",
+        statusCode: 301,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

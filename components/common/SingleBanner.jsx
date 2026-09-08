@@ -20,7 +20,7 @@ const SingleBanner = ({ data, icon }) => {
     return segments.map(titleCase);
   }, [router?.asPath]);
 
-  const showRightIcon = router?.pathname === "/projects/[url]" || router?.pathname === "/loyalty-programme" || router?.pathname === "/channel-partner"; // more stable than route
+  const showRightIcon = router?.pathname === "/[slug]" || router?.pathname === "/loyalty-programme" || router?.pathname === "/channel-partner"; // more stable than route
 
   return (
     <div className="w-full lg:h-screen relative h-[70vh]">

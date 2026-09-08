@@ -43,7 +43,7 @@ const Footer = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const isProjectPage = router.pathname === "/projects/[url]";
+    const isProjectPage = router.pathname === "/[slug]";
     if (isProjectPage && router.query.url) {
       axios
         .get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/projects?filters[slug][$eq]=${router.query.url}&fields[0]=Title`)

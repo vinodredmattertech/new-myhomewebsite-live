@@ -540,12 +540,14 @@ export default function ProjectDetailPage({ project }) {
 
 ProjectDetailPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
 
-export async function getServerSideProps({ params, res }) {
+export async function getServerSideProps({ params }) {
   const project = await getProjectBySlug(params?.slug);
-  if (!project) {
-    if (res) res.statusCode = 404;
-    return { props: { project: null } };
-  }
+
+  // This route now sits at the site root, so it catches every path that no
+  // static page claimed — not just project URLs. A mistyped `/about-uss` has
+  // to land on the site's own 404 page, so hand the miss back to Next rather
+  // than rendering the project-shaped "not found" panel for it.
+  if (!project) return { notFound: true };
 
   return { props: { project } };
 }

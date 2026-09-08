@@ -78,7 +78,7 @@ export default function NriFeaturedProjects({ data }) {
       title: p.title || "",
       location: p.subTitle || "",
       image: mediaUrl(p.image),
-      href: p.ctaLink || (p.slug ? `/projects/${p.slug}` : "#"),
+      href: p.ctaLink || (p.slug ? `/${p.slug}` : "#"),
     }));
 
   const rootRef = useRef(null);

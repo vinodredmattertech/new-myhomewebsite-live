@@ -67,7 +67,7 @@ function normaliseProject(p) {
     bhkLabel: p?.bhkLabel || "",
     acres: p?.acres || "",
     image: mediaUrl(p?.image),
-    href: p?.ctaLink || (p?.slug ? `/projects/${p.slug}` : "/projects"),
+    href: p?.ctaLink || (p?.slug ? `/${p.slug}` : "/projects"),
   };
 }
 

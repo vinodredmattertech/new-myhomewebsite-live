@@ -44,7 +44,7 @@ export default function WhereStoriesBegin({ data }) {
     image: mediaUrl(p.image),
     sketch: mediaUrl(p.sketchImage),
     ctaText: p.ctaText || "",
-    ctaLink: p.ctaLink || (p.slug ? `/projects/${p.slug}` : ""),
+    ctaLink: p.ctaLink || (p.slug ? `/${p.slug}` : ""),
   }));
 
   const rootRef = useRef(null);
