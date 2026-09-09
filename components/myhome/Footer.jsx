@@ -34,6 +34,25 @@ const CONTACT_ICON_MAP = {
   email: Mail,
 };
 
+/* Contact rows carry their own href from the CMS, and editors regularly get it
+   wrong — a stale number that no longer matches the one on screen, or a
+   "mail to: x@y.com" that no browser recognises. Derive the href from the text
+   instead so what a visitor reads is always what they dial or mail. Anything
+   we can't parse (and every non-phone/email row) keeps the CMS href as-is. */
+function contactHref(row) {
+  if (row?.kind === "phone") {
+    // "+91 91549 81691/92" -> "+919154981691"; the "/92" alternate is display
+    // only, so the link takes the first complete number.
+    const number = (row.body || "").match(/[+\d][\d\s-]{6,}/)?.[0];
+    return number ? `tel:${number.replace(/[\s-]/g, "")}` : row.href;
+  }
+  if (row?.kind === "email") {
+    const address = (row.body || "").trim();
+    return address ? `mailto:${address}` : row.href;
+  }
+  return row?.href;
+}
+
 /**
  * Footer — Figma node 3152:3554
  *
@@ -434,6 +453,7 @@ export default function MyHomeFooter() {
               style={{ fontFamily: "Montserrat, sans-serif" }}>
             {CONTACT_ROWS.map((row, i) => {
               const Icon = CONTACT_ICON_MAP[row.kind] || MapPin;
+              const href = contactHref(row);
               return (
                 <li key={`row-${i}`} className="flex gap-3 lg:gap-[1.094vw]">
                   <Icon className="mt-1 lg:mt-[0.4vw] shrink-0 text-[#ef493d] w-[16px] h-[16px] lg:w-[0.833vw] lg:h-[0.833vw]" />
@@ -444,8 +464,8 @@ export default function MyHomeFooter() {
                         <br />
                       </>
                     ) : null}
-                    {row.href ? (
-                      <a href={row.href} className="hover:text-white transition-colors">
+                    {href ? (
+                      <a href={href} className="hover:text-white transition-colors">
                         {row.body}
                       </a>
                     ) : (
