@@ -58,13 +58,13 @@ export default function Custom404() {
 
         {/* Rotated GIF */}
         <div className="absolute left-[10%] lg:top-[40%] top-[60%] z-10 -rotate-90 mix-blend-multiply">
-          <Image
+          {/* <Image
             src="/icons/bf.gif"
             alt="decor"
             width={1000}
             height={1000}
             className="lg:h-[7.229vw] h-[80px] w-auto"
-          />
+          /> */}
         </div>
 
         <div className="text-center w-full h-full mx-auto lg:max-w-[80vw] flex flex-col items-center justify-center ">
