@@ -530,7 +530,7 @@ export default function ProjectDetailPage({ project }) {
       )}
 
       <ProjectFloatingActions
-        phone={project.phone || "+917996006262"}
+        phone={project.phone || "+919154981691"}
         projectName={project.title}
         projectSlug={project.slug}
       />

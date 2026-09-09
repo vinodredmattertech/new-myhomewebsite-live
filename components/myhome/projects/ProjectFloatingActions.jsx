@@ -21,7 +21,7 @@ const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
  * form modal that posts to the CRM (same flow as the other project forms).
  */
 export default function ProjectFloatingActions({
-  phone = "+917996006262",
+  phone = "+919154981691",
   projectName = "Project",
   projectSlug,
 }) {

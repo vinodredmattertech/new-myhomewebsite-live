@@ -149,7 +149,7 @@ const Footer = () => {
 
           {/* Call */}
           <Link
-            href="tel:+917996006262"
+            href="tel:+919154981691"
             className="flex items-center gap-2 text-gray-800 hover:text-black"
           >
             <FaPhoneAlt />
