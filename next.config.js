@@ -40,12 +40,9 @@ const nextConfig = {
   },
 
   /**
-   * Project pages moved from /projects/<slug> to /<slug>.
-   *
-   * The old paths are indexed and linked from outside the site, so they are
-   * permanently redirected rather than dropped — a 301 carries the ranking
-   * across instead of stranding it on a 404. `/projects` itself keeps working
-   * as the listing page: only the child paths move.
+   * Paths that have moved. Each is indexed or linked from outside the site, so
+   * it is permanently redirected rather than dropped — a 301 carries the
+   * ranking across instead of stranding it on a 404.
    *
    * `statusCode: 301` rather than `permanent: true`, which emits a 308. Both
    * are permanent and Google honours either, but 301 is the one every legacy
@@ -53,9 +50,21 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      // Project pages moved from /projects/<slug> to /<slug>. `/projects`
+      // itself keeps working as the listing page: only the child paths move.
       {
         source: "/projects/:slug",
         destination: "/:slug",
+        statusCode: 301,
+      },
+      // The sitemap index moved to /sitemap_index.xml. /sitemap.xml is the
+      // path robots.txt advertised for months and the one Search Console has
+      // on file, and crawlers probe it by convention even without robots.txt —
+      // so it keeps resolving rather than becoming the site's only 404 that
+      // Google checks daily.
+      {
+        source: "/sitemap.xml",
+        destination: "/sitemap_index.xml",
         statusCode: 301,
       },
     ];

@@ -22,7 +22,7 @@ const ARCHIVE_LINK_COUNT = 8;
 /**
  * SitemapDirectory — the readable index of every page on the site.
  *
- * This is the HTML counterpart to /sitemap.xml: the XML exists for crawlers,
+ * This is the HTML counterpart to /sitemap_index.xml: the XML exists for
  * this exists for people who want to see the whole site at once. Both are fed
  * by `getHtmlSitemapGroups`/`SECTIONS` in lib/sitemap.js, so a page can never
  * appear in one and be missing from the other.

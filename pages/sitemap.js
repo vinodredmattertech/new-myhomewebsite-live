@@ -7,7 +7,7 @@ import { getHtmlSitemapGroups, siteOrigin } from "@/lib/sitemap";
 /**
  * /sitemap — the HTML sitemap.
  *
- * The readable companion to /sitemap.xml: same inventory of pages, laid out
+ * The readable companion to /sitemap_index.xml: same inventory of pages, laid
  * for a visitor rather than a crawler. Both are built from lib/sitemap.js, so
  * publishing a project adds it here and to the XML in the same request.
  */

@@ -3,7 +3,7 @@
   Browser-facing stylesheet for the XML sitemaps.
 
   Crawlers ignore this entirely — they read the raw XML. It exists so that a
-  human opening /sitemap.xml sees a readable table instead of a wall of markup,
+  human opening /sitemap_index.xml sees a readable table instead of markup,
   which is how the Yoast sitemaps everyone is used to behave.
 
   One stylesheet covers both document shapes: <sitemapindex> (the index) and
