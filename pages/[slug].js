@@ -296,11 +296,10 @@ export default function ProjectDetailPage({ project }) {
   const hasFloorPlans = floorPlanTabs.some((t) => t.plans.length > 0);
   const hasGallery = galleryTabs.some((t) => t.items.length > 0);
   const hasSpecifications = specs.length > 0;
-  // TEMP: forced on so the redesigned construction-update cards are visible
-  // with the component's dummy content while Progress > Images is still empty
-  // in Strapi. Restore the commented-out gate once the CMS has real cards.
-  const hasProgress = true;
-  // const hasProgress = progressMetrics.length > 0 || progressImages.length > 0;
+  // Gated on the images actually handed to ProjectProgress. `progressMetrics`
+  // is deliberately not part of this test: the component accepts a `metrics`
+  // prop but never renders it, so metrics alone would show an empty section.
+  const hasProgress = combinedProgressImages.length > 0;
   const hasBrochure = Boolean(
     hasText(br.heading) ||
     lines(br.highlights).length ||

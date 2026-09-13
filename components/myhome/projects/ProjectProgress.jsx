@@ -11,18 +11,6 @@ import useFancybox from "@/components/common/useFancybox";
 import SectionHeading from "@/components/common/SectionHeading";
 import { mediaUrl } from "@/lib/strapi";
 
-const DEFAULT_METRICS = [
-  {
-    key: "overall",
-    label: "Overall Project Completion",
-    sublabel: "(Data as of July 2026)",
-    value: 78.94,
-  },
-  { key: "superstructure", label: "Superstructure", value: 100 },
-  { key: "building", label: "Building Work", value: 78 },
-  { key: "infrastructure", label: "Infrastructure", value: 3.58 },
-];
-
 const MONTHS_LIST = [
   { short: "Jan", full: "January", index: 0, num: "01" },
   { short: "Feb", full: "February", index: 1, num: "02" },
@@ -36,64 +24,6 @@ const MONTHS_LIST = [
   { short: "Oct", full: "October", index: 9, num: "10" },
   { short: "Nov", full: "November", index: 10, num: "11" },
   { short: "Dec", full: "December", index: 11, num: "12" },
-];
-
-// Rich dummy content across multiple months for frontend preview
-const DEFAULT_IMAGES = [
-  {
-    src: "/assets/myhome/projects/progress-1.jpg",
-    alt: "Tower 05 - Flooring Work",
-    caption: "Tower 05 - Flooring Work",
-    date: "2026-07-02",
-  },
-  {
-    src: "/assets/myhome/projects/akrida-banner.jpg",
-    alt: "Tower 08 - Terrace Waterproofing",
-    caption: "Tower 08 - Terrace Waterproofing",
-    date: "2026-07-18",
-  },
-  {
-    src: "/assets/myhome/projects/progress-1.jpg",
-    alt: "18 East - Facade work",
-    caption: "18 East - Facade work",
-    date: "2026-04-15",
-  },
-  {
-    src: "/assets/myhome/projects/akrida-banner.jpg",
-    alt: "Tower 07 - External Glass Facade",
-    caption: "Tower 07 - External Glass Facade",
-    date: "2026-04-22",
-  },
-  {
-    src: "/assets/myhome/projects/akrida-entrance.jpg",
-    alt: "Clubhouse - Roof Slab Completed",
-    caption: "Clubhouse - Structural Work",
-    date: "2026-05-08",
-  },
-  {
-    src: "/assets/myhome/projects/luxury-design.jpg",
-    alt: "Tower 02 - Interior Finishing",
-    caption: "Tower 02 - Sample Flat Finishing",
-    date: "2026-05-18",
-  },
-  {
-    src: "/assets/myhome/projects/progress-1.jpg",
-    alt: "Tower 04 - 39th Floor Slab Cast",
-    caption: "Tower 04 - 39th Floor Roof Slab",
-    date: "2026-06-02",
-  },
-  {
-    src: "/assets/myhome/projects/akrida-banner.jpg",
-    alt: "Podium Landscape & Paving",
-    caption: "Podium Landscape & Paving",
-    date: "2026-06-25",
-  },
-  {
-    src: "/assets/myhome/projects/akrida-entrance.jpg",
-    alt: "Tower 01 - Foundation Piling",
-    caption: "Tower 01 - Foundation Piling",
-    date: "2026-03-12",
-  },
 ];
 
 function parseDateInfo(dateStr) {
@@ -293,7 +223,7 @@ export default function ProjectProgress({
   sidebarLabel = "Milestones In Motion",
   heading = "Crafting Dreams Into Reality",
   description = "Designed with superior construction quality to deliver safe, durable, and comfortable homes.",
-  metrics = DEFAULT_METRICS,
+  metrics = [],
   images = [],
   entries = [],
 }) {
@@ -314,7 +244,9 @@ export default function ProjectProgress({
     fancyboxRoot(el);
   };
 
-  // Compile all slide images from entries, images props or DEFAULT_IMAGES
+  // Compile all slide images from the CMS: `entries` (repeatable
+  // progress.entries) first, then any flat `images` prop. There is no
+  // placeholder fallback — an empty result hides the section upstream.
   const allSlides = useMemo(() => {
     let combined = [];
 
@@ -351,20 +283,12 @@ export default function ProjectProgress({
       });
     }
 
-    // Fall back to DEFAULT_IMAGES if no images are present
-    if (combined.length === 0) {
-      combined = DEFAULT_IMAGES;
-    }
-
-    return combined.map((img, i) => {
-      const fallbackCaption = DEFAULT_IMAGES[i % DEFAULT_IMAGES.length].caption;
-      const dateInfo = parseDateInfo(img.date);
-      return {
-        ...img,
-        caption: img.caption || fallbackCaption,
-        ...dateInfo,
-      };
-    });
+    return combined.map((img) => ({
+      ...img,
+      // Caption is optional — the figcaption already guards on it.
+      caption: img.caption || "",
+      ...parseDateInfo(img.date),
+    }));
   }, [entries, images]);
 
   const [selectedMonthKey, setSelectedMonthKey] = useState("");
