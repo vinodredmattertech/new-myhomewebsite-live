@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -96,6 +96,47 @@ export default function CareerWorkplace({ section }) {
     const amount = el.clientWidth * 0.9 * (dir === "next" ? 1 : -1);
     el.scrollBy({ left: amount, behavior: "smooth" });
   };
+
+  // Is there anywhere to scroll to? The row is a plain overflow-x track, so
+  // this is measured (content wider than its viewport) rather than derived
+  // from a card count — the card count that fills a row differs per
+  // breakpoint (4-up on desktop, ~1 on mobile), and a filter tab that
+  // matches only a few cards leaves nothing to scroll. Re-runs on every
+  // change of `visible`, so switching tabs re-evaluates it.
+  const [canScroll, setCanScroll] = useState(false);
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return undefined;
+    // 1px of slack: sub-pixel layout rounding can leave scrollWidth a
+    // hair above clientWidth with nothing actually clipped.
+    const measure = () => setCanScroll(el.scrollWidth - el.clientWidth > 1);
+    measure();
+    const ro =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    ro?.observe(el);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [visible]);
+
+  // A tab change swaps the card set underneath a track that keeps whatever
+  // scroll offset the previous tab was left at, so the new tab would open
+  // part-way along its row — or past its end, when the new tab has fewer
+  // cards. Send it back to the first card.
+  //
+  // `scroll-smooth` on the track would animate that jump; it is suspended
+  // for the reset so the row is already at the start as the new cards
+  // appear, rather than gliding there afterwards.
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const previous = el.style.scrollBehavior;
+    el.style.scrollBehavior = "auto";
+    el.scrollLeft = 0;
+    el.style.scrollBehavior = previous;
+  }, [active]);
 
   useGSAP(
     () => {
@@ -230,28 +271,32 @@ export default function CareerWorkplace({ section }) {
       {/* Cards row */}
       {visible.length > 0 && (
         <div data-reveal className="relative mt-[36px] lg:mt-[3.125vw] px-5 md:px-10 lg:px-[7.865vw]">
-          <button
-            type="button"
-            onClick={() => scrollByCards("prev")}
-            aria-label="Previous"
-            className="hidden lg:flex absolute z-[5] left-[2.604vw] top-1/2 -translate-y-1/2
-                       items-center justify-center rounded-full border border-black/15 bg-white
-                       w-[3.646vw] h-[3.646vw] text-[#333]
-                       hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors duration-300"
-          >
-            <ChevronLeft className="w-[1.25vw] h-[1.25vw]" strokeWidth={1.5} />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollByCards("next")}
-            aria-label="Next"
-            className="hidden lg:flex absolute z-[5] right-[2.604vw] top-1/2 -translate-y-1/2
-                       items-center justify-center rounded-full border border-black/15 bg-white
-                       w-[3.646vw] h-[3.646vw] text-[#333]
-                       hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors duration-300"
-          >
-            <ChevronRight className="w-[1.25vw] h-[1.25vw]" strokeWidth={1.5} />
-          </button>
+          {canScroll && (
+            <>
+              <button
+                type="button"
+                onClick={() => scrollByCards("prev")}
+                aria-label="Previous"
+                className="hidden lg:flex absolute z-[5] left-[2.604vw] top-1/2 -translate-y-1/2
+                           items-center justify-center rounded-full border border-black/15 bg-white
+                           w-[3.646vw] h-[3.646vw] text-[#333]
+                           hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors duration-300"
+              >
+                <ChevronLeft className="w-[1.25vw] h-[1.25vw]" strokeWidth={1.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByCards("next")}
+                aria-label="Next"
+                className="hidden lg:flex absolute z-[5] right-[2.604vw] top-1/2 -translate-y-1/2
+                           items-center justify-center rounded-full border border-black/15 bg-white
+                           w-[3.646vw] h-[3.646vw] text-[#333]
+                           hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors duration-300"
+              >
+                <ChevronRight className="w-[1.25vw] h-[1.25vw]" strokeWidth={1.5} />
+              </button>
+            </>
+          )}
 
           <div
             ref={trackRef}
@@ -285,26 +330,28 @@ export default function CareerWorkplace({ section }) {
           </div>
 
           {/* mobile nav arrows */}
-          <div className="mt-[20px] flex lg:hidden items-center justify-center gap-[12px]">
-            <button
-              type="button"
-              onClick={() => scrollByCards("prev")}
-              aria-label="Previous"
-              className="inline-flex items-center justify-center rounded-full border border-black/15
-                         w-[40px] h-[40px] text-[#333] hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors"
-            >
-              <ChevronLeft className="w-[18px] h-[18px]" strokeWidth={1.5} />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByCards("next")}
-              aria-label="Next"
-              className="inline-flex items-center justify-center rounded-full border border-black/15
-                         w-[40px] h-[40px] text-[#333] hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors"
-            >
-              <ChevronRight className="w-[18px] h-[18px]" strokeWidth={1.5} />
-            </button>
-          </div>
+          {canScroll && (
+            <div className="mt-[20px] flex lg:hidden items-center justify-center gap-[12px]">
+              <button
+                type="button"
+                onClick={() => scrollByCards("prev")}
+                aria-label="Previous"
+                className="inline-flex items-center justify-center rounded-full border border-black/15
+                           w-[40px] h-[40px] text-[#333] hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors"
+              >
+                <ChevronLeft className="w-[18px] h-[18px]" strokeWidth={1.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByCards("next")}
+                aria-label="Next"
+                className="inline-flex items-center justify-center rounded-full border border-black/15
+                           w-[40px] h-[40px] text-[#333] hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white transition-colors"
+              >
+                <ChevronRight className="w-[18px] h-[18px]" strokeWidth={1.5} />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>
