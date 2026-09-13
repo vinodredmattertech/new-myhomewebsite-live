@@ -13,16 +13,6 @@ const RED = "#ef493d";
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
 
-const DEFAULT_DESC =
-  "We’re looking for a creative and analytical professional to plan, execute, and optimize marketing campaigns across multiple channels.";
-
-const DEFAULT_JOBS = [
-  { location: "Mumbai", title: "Senior Design Architect", experience: "5 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
-  { location: "Hyderabad", title: "Project Manager", experience: "8 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
-  { location: "Mumbai", title: "Civil Site Engineer", experience: "3 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
-  { location: "Bengaluru", title: "Sales & CRM Executive", experience: "4 Year", description: DEFAULT_DESC, applyLabel: "Apply Now" },
-];
-
 /**
  * CareerPositions — "Vacant Positions" (Position Overview) listing (Career
  * page, section 4).
@@ -35,18 +25,18 @@ const DEFAULT_JOBS = [
  * "Apply Now" opens the application modal with that position's title shown at
  * the top, so the resume is submitted against the role it was meant for.
  *
- * Driven by the `positions` component on the Career single type; falls back to
- * built-in defaults so the section always renders. `formCopy` is the page's
- * `applicationForm` component — the modal reuses its labels.
+ * Driven by the `positions` component on the Career single type. There is no
+ * placeholder fallback: an unauthored section renders nothing rather than
+ * advertising vacancies that do not exist — every row carries a working
+ * "Apply Now" that submits a real CV against that designation.
+ * `formCopy` is the page's `applicationForm` component — the modal reuses
+ * its labels.
  */
 export default function CareerPositions({ section, formCopy }) {
   const sideLabel = section?.sideLabel || "Position Overview";
   const heading = section?.heading || "Vacant Positions";
   const viewMoreLabel = section?.viewMoreLabel || "View More";
-  const jobs =
-    Array.isArray(section?.jobs) && section.jobs.length
-      ? section.jobs
-      : DEFAULT_JOBS;
+  const jobs = Array.isArray(section?.jobs) ? section.jobs : [];
 
   // Show the first 4 positions; reveal the rest inline on "View More".
   const [expanded, setExpanded] = useState(false);
@@ -76,6 +66,10 @@ export default function CareerPositions({ section, formCopy }) {
     },
     { scope: rootRef }
   );
+
+  // Nothing authored — hide the section entirely. Placed after the hooks
+  // above so the hook order stays identical on every render.
+  if (!jobs.length) return null;
 
   return (
     <section

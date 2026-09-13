@@ -12,29 +12,11 @@ const RED = "#ef493d";
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
 
-const DEFAULT_IMAGES = ["/assets/myhome/whoweare-color.jpg"];
-
 const ACTIONS = [
   { label: "Like", Icon: ThumbsUp },
   { label: "Comment", Icon: MessageSquare },
   { label: "Share", Icon: Share2 },
   { label: "Send", Icon: Send },
-];
-
-/* Built-in posts so the feed always renders (and is navigable) before content
-   is published in the CMS. */
-const DEFAULT_POSTS = [
-  {
-    postTitle: "Standing Together When It Mattered Most",
-    postBody:
-      "During the pandemic, My Home Group contributed ₹6 crore to state relief funds — ₹3 crore each to the Governments of Telangana and Andhra Pradesh.",
-    hashtags:
-      "#MyHome #SustainableSpaces #DesignExcellence #BuiltWithIntegrity #TrustedLiving",
-    postedLabel: "Posted:",
-    postedDate: "March 28, 2026",
-    postUrl: "",
-    images: DEFAULT_IMAGES,
-  },
 ];
 
 /** Pull a list of absolute image URLs out of the Strapi multi-media field. */
@@ -60,7 +42,7 @@ function normalisePost(raw) {
     postedLabel: raw?.postedLabel || "Posted:",
     postedDate: raw?.postedDate || "",
     postUrl: raw?.postUrl || "",
-    images: imgs.length ? imgs : DEFAULT_IMAGES,
+    images: imgs,
   };
 }
 
@@ -83,8 +65,9 @@ export default function CareerLinkedin({ section }) {
   const sideLabel = section?.sideLabel || "Latest updates";
   const heading = section?.heading || "Stay Connected on LinkedIn";
 
-  // Prefer the repeatable `posts`; fall back to the legacy single-post fields,
-  // then to built-in defaults.
+  // Prefer the repeatable `posts`, then the legacy single-post fields. With
+  // neither authored there is no post to show — the section hides itself
+  // rather than presenting invented activity as the company's own.
   const posts = useMemo(() => {
     if (Array.isArray(section?.posts) && section.posts.length) {
       return section.posts.map(normalisePost);
@@ -92,7 +75,7 @@ export default function CareerLinkedin({ section }) {
     if (section?.postTitle || section?.postBody || section?.images) {
       return [normalisePost(section)];
     }
-    return DEFAULT_POSTS;
+    return [];
   }, [section]);
 
   const [index, setIndex] = useState(0);
@@ -149,6 +132,9 @@ export default function CareerLinkedin({ section }) {
     "inline-flex items-center justify-center rounded-full border border-black/15 bg-white text-[#333] " +
     "transition-colors duration-300 hover:bg-[#ef493d] hover:border-[#ef493d] hover:text-white " +
     "disabled:opacity-40 disabled:pointer-events-none";
+
+  // Placed below the hooks so their order never changes between renders.
+  if (!posts.length) return null;
 
   return (
     <section
@@ -265,29 +251,33 @@ export default function CareerLinkedin({ section }) {
 
           {/* image stack + actions */}
           <div className="flex flex-col items-center lg:items-start">
-            <div className="relative w-full max-w-[420px] lg:max-w-[26.927vw] aspect-[517/575]">
-              {/* decorative stacked cards behind the main image */}
-              {active.images[2] && (
-                <div className="absolute right-0 top-[8%] h-[72%] w-[40%] overflow-hidden rounded-[6px] opacity-90">
-                  <Image src={active.images[2]} alt="" fill unoptimized sizes="14vw" className="object-cover object-left" />
+            {/* No uploaded images — render the copy without the stack
+                rather than a stand-in photo. */}
+            {active.images[0] && (
+              <div className="relative w-full max-w-[420px] lg:max-w-[26.927vw] aspect-[517/575]">
+                {/* decorative stacked cards behind the main image */}
+                {active.images[2] && (
+                  <div className="absolute right-0 top-[8%] h-[72%] w-[40%] overflow-hidden rounded-[6px] opacity-90">
+                    <Image src={active.images[2]} alt="" fill unoptimized sizes="14vw" className="object-cover object-left" />
+                  </div>
+                )}
+                {active.images[1] && (
+                  <div className="absolute right-[8%] top-[4%] h-[84%] w-[60%] overflow-hidden rounded-[6px]">
+                    <Image src={active.images[1]} alt="" fill unoptimized sizes="18vw" className="object-cover object-left" />
+                  </div>
+                )}
+                <div className="absolute left-0 top-0 h-full w-[88%] overflow-hidden rounded-[6px] lg:rounded-[0.313vw] shadow-lg">
+                  <Image
+                    src={active.images[0]}
+                    alt={active.postTitle}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 1024px) 88vw, 24vw"
+                    className="object-cover object-center"
+                  />
                 </div>
-              )}
-              {active.images[1] && (
-                <div className="absolute right-[8%] top-[4%] h-[84%] w-[60%] overflow-hidden rounded-[6px]">
-                  <Image src={active.images[1]} alt="" fill unoptimized sizes="18vw" className="object-cover object-left" />
-                </div>
-              )}
-              <div className="absolute left-0 top-0 h-full w-[88%] overflow-hidden rounded-[6px] lg:rounded-[0.313vw] shadow-lg">
-                <Image
-                  src={active.images[0]}
-                  alt={active.postTitle}
-                  fill
-                  unoptimized
-                  sizes="(max-width: 1024px) 88vw, 24vw"
-                  className="object-cover object-center"
-                />
               </div>
-            </div>
+            )}
 
             <div className="mt-[20px] lg:mt-[2.083vw] w-full max-w-[420px] lg:max-w-[26.927vw]">
               <div className="h-px w-full bg-[#0000001f]" />
