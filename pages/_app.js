@@ -1,3 +1,4 @@
+import LiveServChat from "@/components/common/LiveServChat";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import "@/styles/globals.css";
@@ -25,5 +26,12 @@ export default function App({ Component, pageProps }) {
     captureUtm();
   }, [router.asPath]);
 
-  return <>{getLayout(<Component {...pageProps} />, router)}</>;
+  return (
+    <>
+      {getLayout(<Component {...pageProps} />, router)}
+      {/* Outside getLayout so the widget still mounts on pages that
+          replace the default chrome with their own layout. */}
+      <LiveServChat />
+    </>
+  );
 }
