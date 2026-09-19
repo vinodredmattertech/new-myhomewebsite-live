@@ -45,7 +45,47 @@ function txt(value) {
   return hasText(value) ? value : "";
 }
 
-export default function ProjectDetailPage({ project }) {
+/**
+ * Shown while previewing an unpublished project, so a draft is never mistaken
+ * for the live page. Deliberately loud and fixed to the top: this page is on
+ * the real domain, at the real URL it will eventually have.
+ */
+function PreviewBanner({ isDraft, path }) {
+  return (
+    <div
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 9999,
+        background: isDraft ? "#A3231C" : "#0F5E5A",
+        color: "#fff",
+        padding: "10px 16px",
+        fontSize: 14,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 14,
+        flexWrap: "wrap",
+        textAlign: "center",
+      }}
+    >
+      <strong>{isDraft ? "Draft preview" : "Preview mode"}</strong>
+      <span style={{ opacity: 0.9 }}>
+        {isDraft
+          ? "This project is not published. Only people with the preview link can see this."
+          : "You are viewing this page in preview mode."}
+      </span>
+      <a
+        href={`/api/exit-preview?path=${encodeURIComponent(path || "/")}`}
+        style={{ color: "#fff", textDecoration: "underline", whiteSpace: "nowrap" }}
+      >
+        Exit preview
+      </a>
+    </div>
+  );
+}
+
+export default function ProjectDetailPage({ project, preview, isDraft, previewPath }) {
   if (!project) {
     return (
       <section className="min-h-[60vh] flex items-center justify-center px-5 text-center">
@@ -337,6 +377,7 @@ export default function ProjectDetailPage({ project }) {
 
   return (
     <>
+      {preview && <PreviewBanner isDraft={isDraft} path={previewPath} />}
       <Seo seo={project.seo} />
 
       {hasBanner && (
@@ -539,8 +580,11 @@ export default function ProjectDetailPage({ project }) {
 
 ProjectDetailPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
 
-export async function getServerSideProps({ params }) {
-  const project = await getProjectBySlug(params?.slug);
+export async function getServerSideProps({ params, preview = false }) {
+  // `preview` is set by Next's preview cookie, which /api/preview only issues
+  // against a valid secret. Without it an unpublished project is invisible
+  // here exactly as it is to the public API.
+  const project = await getProjectBySlug(params?.slug, { preview });
 
   // This route now sits at the site root, so it catches every path that no
   // static page claimed — not just project URLs. A mistyped `/about-uss` has
@@ -548,5 +592,14 @@ export async function getServerSideProps({ params }) {
   // than rendering the project-shaped "not found" panel for it.
   if (!project) return { notFound: true };
 
-  return { props: { project } };
+  const isDraft = !project.publishedAt;
+
+  return {
+    props: {
+      project,
+      preview,
+      isDraft,
+      previewPath: `/${params?.slug ?? ""}`,
+    },
+  };
 }
