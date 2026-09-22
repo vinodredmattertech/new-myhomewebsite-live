@@ -138,7 +138,7 @@ export default function MyHomeHeader() {
   useGSAP(() => {
     registerGsap();
 
-    // Wait for hero loader to finish before sliding header in.
+    // Start hidden; the reveal is driven by the hero loader when one exists.
     gsap.set(headerRef.current, { yPercent: -110, autoAlpha: 0 });
 
     const slideIn = () => {
@@ -150,13 +150,26 @@ export default function MyHomeHeader() {
       });
     };
 
-    // If no hero (other pages) or event missed, fall back to a delay.
-    const fallback = window.setTimeout(slideIn, 4200);
+    // Only the homepage hero renders a loader overlay, and only that overlay
+    // fires `mh:loader-done`. Every other page has none, so waiting on the
+    // event left the header hidden until the 4.2s safety timer expired —
+    // ~6s before it was fully on screen. Reveal immediately when there is no
+    // loader to wait for, and keep the timer purely as a safety net for the
+    // homepage in case the loader timeline never reaches its dispatch.
+    const loader = document.querySelector("[data-mh-loader]");
+
+    let fallback;
     const onDone = () => {
       window.clearTimeout(fallback);
       slideIn();
     };
-    window.addEventListener("mh:loader-done", onDone);
+
+    if (loader) {
+      fallback = window.setTimeout(slideIn, 4200);
+      window.addEventListener("mh:loader-done", onDone);
+    } else {
+      slideIn();
+    }
 
     // The header stays pinned once revealed — scrolling only swaps its
     // background treatment (transparent over the hero, solid once past it).
@@ -175,12 +188,23 @@ export default function MyHomeHeader() {
 
   return (
     <>
+      {/* At rest the header carries no solid fill — just a soft top-down scrim
+          that fades to nothing, so the banner image runs behind it with no
+          visible edge. The previous white/10 + blur + white/30 border lifted
+          the top 67px ~10% brighter and capped it with a bright hairline,
+          which read as a grey bar above the content on every page with a dark
+          banner (the homepage hid it only because its hero slide is white).
+          The scrim keeps the white logo legible on light banners, where a
+          fully transparent header would leave it low-contrast.
+          The scrolled separator is a 1px shadow rather than a border so the
+          bar stays exactly 66px tall in both states and nothing shifts when
+          `scrolled` flips. */}
       <header
         ref={headerRef}
         className={`fixed inset-x-0 top-0 z-[60] transition-all duration-500 ${
           scrolled
-            ? "bg-[#2a2828]/90 backdrop-blur-md border-b border-white/10"
-            : "bg-white/10 backdrop-blur-[6px] border-b border-white/30"
+            ? "bg-[#2a2828]/90 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.1)]"
+            : "bg-gradient-to-b from-black/25 to-transparent"
         }`}
       >
         <div className="relative h-[66px] md:h-[80px] lg:h-[5.77vw] flex items-center px-5 md:px-10 lg:px-[8.333vw]">

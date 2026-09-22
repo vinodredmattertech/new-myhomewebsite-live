@@ -453,6 +453,7 @@ export default function HeroBanner({ data }) {
       {/* ============== LOADER OVERLAY ============== */}
       <div
         ref={loaderRef}
+        data-mh-loader
         className="absolute inset-0 z-[80] bg-[#2a2828] flex flex-col items-center justify-center will-change-transform"
         aria-hidden={!loading}
       >
