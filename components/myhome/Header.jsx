@@ -63,8 +63,8 @@ export default function MyHomeHeader() {
   }, [open]);
 
   // On desktop the page scrolls behind the open menu (mobile is scroll-locked
-  // above). Close the panel on real scroll so the header/close button isn't
-  // left stranded when the header auto-hides on scroll-down. Only the native
+  // above). Close the panel on real scroll so the mega menu doesn't hang over
+  // content the visitor has scrolled to. Only the native
   // `scroll` event is used (not `wheel`): a click never changes scroll
   // position, whereas a stray wheel tick would close the panel the instant it
   // opens — which read as "needs a double click". Attach is deferred a beat so
@@ -141,13 +141,7 @@ export default function MyHomeHeader() {
     // Wait for hero loader to finish before sliding header in.
     gsap.set(headerRef.current, { yPercent: -110, autoAlpha: 0 });
 
-    let revealed = false;
-    let hidden = false;
-    let lastY = typeof window !== "undefined" ? window.scrollY : 0;
-
     const slideIn = () => {
-      revealed = true;
-      hidden = false;
       gsap.to(headerRef.current, {
         yPercent: 0,
         autoAlpha: 1,
@@ -164,48 +158,10 @@ export default function MyHomeHeader() {
     };
     window.addEventListener("mh:loader-done", onDone);
 
-    const hideHeader = () => {
-      if (hidden) return;
-      hidden = true;
-      gsap.to(headerRef.current, {
-        yPercent: -110,
-        autoAlpha: 0,
-        duration: 0.45,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    };
-
-    const showHeader = () => {
-      if (!hidden) return;
-      hidden = false;
-      gsap.to(headerRef.current, {
-        yPercent: 0,
-        autoAlpha: 1,
-        duration: 0.5,
-        ease: "expo.out",
-        overwrite: true,
-      });
-    };
-
+    // The header stays pinned once revealed — scrolling only swaps its
+    // background treatment (transparent over the hero, solid once past it).
     const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 60);
-
-      if (!revealed) {
-        lastY = y;
-        return;
-      }
-
-      const delta = y - lastY;
-      if (y <= 10) {
-        showHeader();
-      } else if (delta > 6) {
-        hideHeader();
-      } else if (delta < -6) {
-        showHeader();
-      }
-      lastY = y;
+      setScrolled(window.scrollY > 60);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
