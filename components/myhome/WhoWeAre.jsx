@@ -156,7 +156,6 @@ export default function WhoWeAre({ data }) {
             alt=""
             fill
             priority
-            unoptimized
             sizes="100vw"
             className="object-cover object-center select-none"
           />
@@ -166,7 +165,14 @@ export default function WhoWeAre({ data }) {
 
       {/* ===== Layer 2: colour photograph =====
           Desktop — absolute full-bleed, clipped and scrubbed on scroll.
-          Mobile  — stacked below the content block, in normal flow. */}
+          Mobile  — stacked below the content block, in normal flow.
+
+          Both layers must use the SAME object-fit or the scrub cross-fades
+          two differently-scaled buildings. The sources are both 16:9
+          (1920×1080 and 4096×2304) but the desktop box is 1920×1024, so
+          `fill` squashed this one 5% vertically while the sketch above was
+          drawn with `cover` and cropped instead — the two never lined up.
+          `cover` on both crops each by the same 28px and they register. */}
       <div
         ref={colorLayerRef}
         className="relative order-2 w-full h-[320px] sm:h-[420px] md:h-[480px] lg:absolute lg:inset-0 lg:order-none lg:h-auto will-change-[clip-path]"
@@ -176,9 +182,8 @@ export default function WhoWeAre({ data }) {
             src={colorImage}
             alt="My Home Group property at twilight"
             fill
-            unoptimized
             sizes="100vw"
-            className="object-cover lg:object-fill object-center lg:object-center select-none"
+            className="object-cover object-center select-none"
           />
         )}
         {/* Desktop dim gradient for white text readability after reveal */}
