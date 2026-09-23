@@ -10,6 +10,7 @@ import "swiper/css/effect-fade";
 import { mediaUrl } from "@/lib/strapi";
 import RichText from "@/components/common/RichText";
 import SectionHeading from "@/components/common/SectionHeading";
+import NavArrows from "@/components/myhome/NavArrows";
 
 /**
  * Why My Home — Figma node 2609:1613
@@ -48,6 +49,9 @@ export default function WhyMyHome({ data }) {
   // together.
   const [displayed, setDisplayed] = useState(0);
   const textTlRef = useRef(null);
+  // The pinned ScrollTrigger, when one exists (desktop only). Navigation
+  // needs its scroll range to convert a slide index into a scroll position.
+  const stRef = useRef(null);
   const firstRevealRef = useRef(true);
   // Enable Swiper touch/swipe on mobile only; desktop stays scroll-driven.
   const [isMobile, setIsMobile] = useState(false);
@@ -83,6 +87,35 @@ export default function WhyMyHome({ data }) {
       { y: 28, autoAlpha: 0 },
       { y: 0, autoAlpha: 1, duration: 0.9, ease: "expo.out", delay: 0.15 }
     );
+  };
+
+  /**
+   * Move to a slide by index.
+   *
+   * On desktop the index is a pure function of scroll position —
+   * `syncToProgress` recomputes it on every ScrollTrigger update — so calling
+   * `swiper.slideTo` alone does not hold: the slide changes, the scroll does
+   * not, and the next scroll event puts it straight back. This is why the
+   * pagination dots used to revert the moment you nudged the wheel. Moving
+   * the scroll instead lets the existing machinery land on the right slide by
+   * itself. Scrolled through Lenis so it matches the rest of the site.
+   *
+   * Mobile has no pin and no scroll-driving, so there the slider is told
+   * directly.
+   */
+  const goToIndex = (i) => {
+    const target = Math.max(0, Math.min(i, SLIDES.length - 1));
+    const st = stRef.current;
+
+    if (!st || SLIDES.length < 2) {
+      swiperRef.current?.slideTo(target, 700, false);
+      return;
+    }
+
+    const y = st.start + (target / (SLIDES.length - 1)) * (st.end - st.start);
+    const lenis = window.__lenis;
+    if (lenis?.scrollTo) lenis.scrollTo(y, { duration: 0.9 });
+    else window.scrollTo({ top: y, behavior: "smooth" });
   };
 
   /**
@@ -177,7 +210,7 @@ export default function WhyMyHome({ data }) {
       const mm = gsap.matchMedia();
 
       mm.add("(min-width: 1024px)", () => {
-        const st = ScrollTrigger.create({
+        const st = (stRef.current = ScrollTrigger.create({
           trigger: rootRef.current,
           start: "top top",
           end: `+=${SLIDES.length * 100}%`,
@@ -194,9 +227,12 @@ export default function WhyMyHome({ data }) {
             ease: "expo.inOut",
           },
           onUpdate: syncToProgress,
-        });
+        }));
 
-        return () => st.kill();
+        return () => {
+          st.kill();
+          stRef.current = null;
+        };
       });
 
       // ----- mobile/tablet: no pin and no scroll-driving. The slider is
@@ -308,7 +344,7 @@ export default function WhyMyHome({ data }) {
           Desktop keeps the Figma placement the slide version had
           (left 11.15vw, top 27.08vw, width 32.55vw); mobile stays in flow
           between the heading and the image, inside the shared gutter. */}
-      <div className="relative z-[5] lg:absolute lg:left-[11.15vw] lg:w-[32.55vw] lg:top-[27.08vw]">
+      <div className="relative z-[5] lg:absolute lg:left-[11.15vw] lg:w-[32.55vw] lg:top-[24vw]">
         <h3
           ref={subRef}
           className={`${GUTTER} lg:px-0 Tartuffo_Trial_Regular capitalize text-white tracking-[0.02em] mt-[28px] md:mt-[36px] lg:mt-0 text-[22px] leading-[32px] md:text-[28px] md:leading-[40px] lg:text-[1.823vw] lg:leading-[1.3] will-change-transform`}
@@ -327,6 +363,42 @@ export default function WhyMyHome({ data }) {
           <RichText>{COPY.body}</RichText>
         </p>
       </div>
+
+      {/* ---------- Arrow navigation (desktop) ----------
+          Absolutely positioned rather than sitting under the copy, because
+          the copy is a different height on every slide — measured at 1920 it
+          ends at 734px on three slides and 764px on the fourth, so in flow
+          the buttons would hop 30px each time the text changed. Pinned to
+          the section instead, they hold still while the copy changes behind
+          them.
+
+          The offset also has to clear the fold: the section is
+          `min-h-[1024px]` whatever the window height, so a control placed
+          near its bottom edge is simply off-screen on a laptop. At 38.5vw the
+          buttons end at ~809px on a 1920-wide screen, inside even an 860px
+          viewport, and they scale with the rest of the vw layout below that.
+          The copy moved up from 27.08vw to 24vw to make that room.
+
+          Mobile is left alone: it already has swipe, autoplay and the
+          tap-target bar under the image, and arrows here would sit above the
+          image they drive.
+
+          No wrap-around — the ends disable. The desktop track is a stretch of
+          page scroll, so looping from the last slide back to the first would
+          fling the page the length of the pinned section. */}
+      <NavArrows
+        light
+        className="hidden lg:flex absolute z-[6] left-[11.15vw] top-[38.5vw] gap-[1.042vw]"
+        // Sized in vw to match the rest of this section, which scales against
+        // the same 1920 reference (70px = 3.646vw, the 22px glyph = 1.146vw).
+        // Applied here rather than on `.mh-nav-arrow`, which other sections
+        // share at its fixed 70px.
+        buttonClassName="!w-[3.646vw] !h-[3.646vw] [&_svg]:w-[1.146vw] [&_svg]:h-auto"
+        onPrev={() => goToIndex(active - 1)}
+        onNext={() => goToIndex(active + 1)}
+        prevDisabled={active === 0}
+        nextDisabled={active === SLIDES.length - 1}
+      />
 
       {/* ---------- Right image (Swiper, EffectFade) ---------- */}
       {/* Slides are driven purely by scroll (see the ScrollTrigger above) plus
@@ -420,7 +492,7 @@ export default function WhyMyHome({ data }) {
             key={s.id}
             type="button"
             aria-label={`Go to slide ${i + 1}`}
-            onClick={() => swiperRef.current?.slideTo(i, 700, false)}
+            onClick={() => goToIndex(i)}
             className="relative w-12 h-6 -mx-2"
           />
         ))}
@@ -433,7 +505,7 @@ export default function WhyMyHome({ data }) {
             key={s.id}
             type="button"
             aria-label={`Go to slide ${i + 1}`}
-            onClick={() => swiperRef.current?.slideTo(i, 700, false)}
+            onClick={() => goToIndex(i)}
             className={`block h-[2px] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
               active === i
                 ? "w-[3.125vw] bg-white"
