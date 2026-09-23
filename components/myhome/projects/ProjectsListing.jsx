@@ -35,17 +35,27 @@ const PROJECT_TYPES = [
 // Sidebar: project status / phase (multi-select)
 const PROJECT_STATUSES = ["Ongoing", "Upcoming", "Completed"];
 
-const LOCATIONS = [
-  "Ameerpet",
-  "Somajiguda",
-  "Begumpet",
-  "Punjagutta",
-  "Abids",
-  "HITEC City",
-  "Gachibowli",
-  "Kondapur",
-  "Madhapur",
-];
+/**
+ * Spelling variants that mean the same locality, collapsed onto one label.
+ *
+ * The CMS carries HITEC City three ways — "HITEC City", "HiTech City" and
+ * "Hitech City" — so without this they would appear as three separate filter
+ * entries of one or two projects each. The right fix is to tidy the values in
+ * Strapi; this keeps the filter honest in the meantime. Keys are lowercased
+ * and whitespace-collapsed before lookup.
+ */
+const LOCATION_ALIASES = {
+  "hitec city": "HITEC City",
+  "hitech city": "HITEC City",
+  "hi tech city": "HITEC City",
+};
+
+/** The label a project's locationKey should be filed under. */
+function canonicalLocation(key) {
+  const raw = (key || "").trim();
+  if (!raw) return "";
+  return LOCATION_ALIASES[raw.toLowerCase().replace(/\s+/g, " ")] || raw;
+}
 
 const SORT_OPTIONS = [
   "Select Sort Option",
@@ -546,10 +556,40 @@ function normaliseCmsProject(p) {
 export default function ProjectsListing({ projects = [], heading }) {
   // Use the CMS list when present, otherwise fall back to the static list
   // so the page still renders during local development without the backend.
-  const PROJECTS =
-    projects.length > 0
-      ? projects.map(normaliseCmsProject).filter((p) => p.title)
-      : FALLBACK_PROJECTS;
+  const PROJECTS = useMemo(
+    () =>
+      projects.length > 0
+        ? projects.map(normaliseCmsProject).filter((p) => p.title)
+        : FALLBACK_PROJECTS,
+    [projects]
+  );
+
+  /**
+   * The location filter, taken from the projects rather than written out by
+   * hand.
+   *
+   * This list used to be a hardcoded nine, and the data had moved on without
+   * it: 18 of the 35 published projects — 51% — sat under a locality the
+   * filter had no entry for, so nothing could reach them. Tellapur alone had
+   * six. Meanwhile Punjagutta and Abids were listed but matched nothing, so
+   * picking either landed on the empty state.
+   *
+   * Deriving it means the two can no longer drift: a new locality in Strapi
+   * shows up on its own, and a locality with no projects cannot appear at
+   * all. Sorted by how many projects each holds, then alphabetically, so the
+   * busiest areas lead.
+   */
+  const LOCATIONS = useMemo(() => {
+    const counts = new Map();
+    PROJECTS.forEach((p) => {
+      const label = canonicalLocation(p.locationKey);
+      if (!label) return;
+      counts.set(label, (counts.get(label) || 0) + 1);
+    });
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([label]) => label);
+  }, [PROJECTS]);
 
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -589,7 +629,9 @@ export default function ProjectsListing({ projects = [], heading }) {
     }
 
     if (selectedLocations.length > 0) {
-      list = list.filter((p) => selectedLocations.includes(p.locationKey));
+      list = list.filter((p) =>
+        selectedLocations.includes(canonicalLocation(p.locationKey))
+      );
     }
 
     switch (sort) {
