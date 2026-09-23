@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -16,17 +16,66 @@ import SectionHeading from "@/components/common/SectionHeading";
  * right copy crossfade to the next slide via one synchronized GSAP timeline.
  */
 /**
- * 3 stacked card positions in vw, derived from Figma:
- *   front (active):  left:0 top:358 w:1044 h:626
- *   middle (off-1):  left:120.37 top:363.05 w:966.85 h:621.30 rotate:4°
- *   back   (off-2):  left:222.35 top:371.89 w:898.9 h:613.62 rotate:8°
- * Section ref width 1920, so 1px = 0.0521vw.
+ * The card stack, as transforms rather than positions.
+ *
+ * Every card renders into the SAME base box — the front slot — and its place
+ * in the stack is a transform on top of that. This is what lets a slide change
+ * be one continuous tween per card: moving a card between slots is then pure
+ * transform work, where animating left/top/width/height on five full-bleed
+ * images would thrash layout every frame and judder.
+ *
+ * The desktop slots are NOT a uniform scale. From Figma, width drops 7.4% per
+ * step back while height drops only 0.75%, so scaleX and scaleY are carried
+ * separately. Mobile's three cards do share one aspect ratio, so there a
+ * single scale is exact.
+ *
+ * Slots either side of the visible three are staged at opacity 0: -1 is where
+ * the front card exits to (and where the previous card enters from), 3 is
+ * where the next card waits. Rendering them means both directions have a real
+ * element to animate instead of popping one into existence mid-move.
+ *
+ * Derived from the original Figma boxes (section ref width 1920, 1px = 0.0521vw):
+ *   front  left:0        top:358     w:1044    h:626
+ *   middle left:120.37   top:363.05  w:966.85  h:621.30  rotate:4°
+ *   back   left:222.35   top:371.89  w:898.9   h:613.62  rotate:8°
  */
-const CARD_LAYOUT = [
-  { left: "0", top: "18.646vw", width: "54.375vw", height: "32.604vw", rotate: 0, tint: 0 },
-  { left: "6.27vw", top: "18.908vw", width: "50.357vw", height: "32.359vw", rotate: 4, tint: 0.37 },
-  { left: "11.581vw", top: "19.369vw", width: "46.823vw", height: "31.959vw", rotate: 8, tint: 0.37 },
-];
+const CARD_BASE = {
+  left: "0",
+  top: "18.646vw",
+  width: "54.375vw",
+  height: "32.604vw",
+};
+
+/** Which slots get a DOM node. -1 and 3 are the staging positions. */
+const STACK_SLOTS = [-1, 0, 1, 2, 3];
+
+const SLOT_DESKTOP = {
+  "-2": { xPercent: -170, yPercent: 0, scaleX: 1, scaleY: 1, rotate: -10, opacity: 0, tint: 0 },
+  "-1": { xPercent: -120, yPercent: 0, scaleX: 1, scaleY: 1, rotate: -6, opacity: 0, tint: 0 },
+  "0": { xPercent: 0, yPercent: 0, scaleX: 1, scaleY: 1, rotate: 0, opacity: 1, tint: 0 },
+  "1": { xPercent: 7.836, yPercent: 0.428, scaleX: 0.9261, scaleY: 0.9925, rotate: 4, opacity: 1, tint: 0.37 },
+  "2": { xPercent: 14.354, yPercent: 1.228, scaleX: 0.8611, scaleY: 0.9802, rotate: 8, opacity: 1, tint: 0.37 },
+  "3": { xPercent: 19.78, yPercent: 2.39, scaleX: 0.8016, scaleY: 0.968, rotate: 12, opacity: 0, tint: 0.37 },
+  "4": { xPercent: 24.5, yPercent: 3.5, scaleX: 0.75, scaleY: 0.955, rotate: 16, opacity: 0, tint: 0.37 },
+};
+
+const SLOT_MOBILE = {
+  "-2": { xPercent: -170, yPercent: 0, scaleX: 1, scaleY: 1, rotate: -10, opacity: 0, tint: 0 },
+  "-1": { xPercent: -120, yPercent: 0, scaleX: 1, scaleY: 1, rotate: -6, opacity: 0, tint: 0 },
+  "0": { xPercent: 0, yPercent: 0, scaleX: 1, scaleY: 1, rotate: 0, opacity: 1, tint: 0 },
+  "1": { xPercent: 6.05, yPercent: -4.55, scaleX: 0.8906, scaleY: 0.8906, rotate: 4, opacity: 1, tint: 0.37 },
+  "2": { xPercent: 11.395, yPercent: -7.605, scaleX: 0.8015, scaleY: 0.8015, rotate: 8, opacity: 1, tint: 0.37 },
+  "3": { xPercent: 16.1, yPercent: -10.2, scaleX: 0.722, scaleY: 0.722, rotate: 12, opacity: 0, tint: 0.37 },
+  "4": { xPercent: 20.5, yPercent: -12.5, scaleX: 0.65, scaleY: 0.65, rotate: 16, opacity: 0, tint: 0.37 },
+};
+
+/** Front card sits highest; the exiting card rides above everything. */
+const slotZ = (slot) => 10 - slot;
+
+const slotProps = (table, slot) => table[String(slot)] || table["4"];
+
+/** How long one shuffle takes. */
+const SHUFFLE = 0.9;
 
 export default function WorldsWeShape({ data }) {
   // Source is the `verticals` relation (collection type) — flatten the
@@ -57,7 +106,15 @@ export default function WorldsWeShape({ data }) {
   const headingRef = useRef(null);
   const introBodyRef = useRef(null);
   const labelRef = useRef(null);
-  const cardsRef = useRef([]);
+  // One node per STACK_SLOTS entry, per breakpoint. Both trees are in the DOM
+  // at all times (CSS hides one), so both are driven — animating the hidden
+  // one costs nothing and means the stack is already correct if the viewport
+  // crosses the breakpoint.
+  const deskCardsRef = useRef([]);
+  const deskTintsRef = useRef([]);
+  const mobCardsRef = useRef([]);
+  const mobTintsRef = useRef([]);
+  const shufflingRef = useRef(false);
   const numberRef = useRef(null);
   const titleRef = useRef(null);
   const descRef = useRef(null);
@@ -94,15 +151,20 @@ export default function WorldsWeShape({ data }) {
           scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
         });
       }
-      // Entrance: cards rise into stack
-      cardsRef.current.filter(Boolean).forEach((card, i) => {
-        gsap.from(card, {
-          y: 70,
-          autoAlpha: 0,
-          duration: 1.2,
-          delay: i * 0.12,
-          ease: "expo.out",
-          scrollTrigger: { trigger: rootRef.current, start: "top 60%" },
+      // Entrance: the visible cards rise into the stack. Only y and a fade —
+      // the slot transform owns everything else, so this must not touch
+      // xPercent/scale/rotate or it would fight the layout effect below.
+      [deskCardsRef, mobCardsRef].forEach((group) => {
+        STACK_SLOTS.forEach((slot, k) => {
+          const card = group.current[k];
+          if (!card || slot < 0 || slot > 2) return;
+          gsap.from(card, {
+            y: 70,
+            duration: 1.2,
+            delay: slot * 0.12,
+            ease: "expo.out",
+            scrollTrigger: { trigger: rootRef.current, start: "top 60%" },
+          });
         });
       });
       // Right column entrance
@@ -121,47 +183,136 @@ export default function WorldsWeShape({ data }) {
     { scope: rootRef }
   );
 
-  /** Smooth slide change — short veil → swap → long graceful entrance.
-   *  The user spends most of the animation watching the new slide ease
-   *  into place (0.55s with expo.out) instead of watching the old one
-   *  leave, which is what makes the change "feel" smooth instead of
-   *  choppy. One shared autoAlpha tween keeps image + text fading
-   *  together (no drift). Sine ease on exit + expo on enter creates a
-   *  single continuous-feeling curve. */
+  /** Every card node paired with the slot it currently occupies. */
+  const stackGroups = () => [
+    { cards: deskCardsRef.current, tints: deskTintsRef.current, table: SLOT_DESKTOP },
+    { cards: mobCardsRef.current, tints: mobTintsRef.current, table: SLOT_MOBILE },
+  ];
+
+  /**
+   * Drop every card onto its base slot with no animation.
+   *
+   * Deliberately does not touch `y`: the scroll entrance is a `gsap.from`
+   * on `y`, which renders its start value immediately, and writing y here
+   * would flatten the rise before it ever played. Nothing in the shuffle
+   * animates `y` on a card, so it needs no resetting.
+   */
+  const seatCards = () => {
+    stackGroups().forEach(({ cards, tints, table }) => {
+      STACK_SLOTS.forEach((slot, k) => {
+        const card = cards[k];
+        if (!card) return;
+        const t = slotProps(table, slot);
+        gsap.set(card, {
+          xPercent: t.xPercent,
+          yPercent: t.yPercent,
+          scaleX: t.scaleX,
+          scaleY: t.scaleY,
+          rotate: t.rotate,
+          autoAlpha: t.opacity,
+          zIndex: slotZ(slot),
+        });
+        if (tints[k]) gsap.set(tints[k], { opacity: t.tint });
+      });
+    });
+  };
+
+  /**
+   * Re-seat the stack the moment React has swapped the images in, before the
+   * browser paints. `useLayoutEffect` rather than `useEffect` is the whole
+   * trick: the cards finish the shuffle sitting one slot away from where they
+   * belong, and `active` changing re-renders them with the next set of
+   * images. Re-seating after paint would show one frame of the new images at
+   * the old positions.
+   */
+  useLayoutEffect(() => {
+    seatCards();
+
+    if (!shufflingRef.current) return;
+    shufflingRef.current = false;
+
+    // The copy was faded out as the shuffle began; bring it back with the
+    // card that just landed.
+    const copy = [numberRef.current, titleRef.current, descRef.current].filter(Boolean);
+    if (copy.length) {
+      gsap.fromTo(
+        copy,
+        { autoAlpha: 0, y: 16 },
+        { autoAlpha: 1, y: 0, duration: 0.55, ease: "expo.out", stagger: 0.05 }
+      );
+    }
+  }, [active]);
+
+  /**
+   * Shuffle the deck by one.
+   *
+   * Each card tweens from the slot it holds to the neighbouring one: going
+   * forward the front card leaves to the left, the middle promotes to front,
+   * the back to middle, and the card staged behind it fades up into back.
+   * Going back, the same chain runs the other way. One tween per card, no
+   * cross-fade — the previous version faded the entire stack to zero and
+   * back, so the cards never moved and the change read as a flicker.
+   */
   const navigate = (dir) => {
     if (busy) return;
     setBusy(true);
+    shufflingRef.current = true;
+
     const newActive = (active + dir + SLIDES.length) % SLIDES.length;
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setActive(newActive);
+        setBusy(false);
+      },
+    });
 
-    const cards = cardsRef.current.filter(Boolean);
-    const copy = [numberRef.current, titleRef.current, descRef.current];
-    const all = [...cards, ...copy, mobileImageRef.current].filter(Boolean);
+    stackGroups().forEach(({ cards, tints, table }) => {
+      STACK_SLOTS.forEach((slot, k) => {
+        const card = cards[k];
+        if (!card) return;
+        const target = slot - dir;
+        const t = slotProps(table, target);
 
-    const EXIT = 0.18;
-    const ENTER = 0.55;
-    const xOut = dir > 0 ? -18 : 18;
-    const xIn = -xOut;
+        // z-order has to flip up front, not at the end, or the exiting card
+        // slides out underneath the one taking its place.
+        tl.set(card, { zIndex: slotZ(target) }, 0);
+        tl.to(
+          card,
+          {
+            xPercent: t.xPercent,
+            yPercent: t.yPercent,
+            scaleX: t.scaleX,
+            scaleY: t.scaleY,
+            rotate: t.rotate,
+            autoAlpha: t.opacity,
+            duration: SHUFFLE,
+            ease: "power3.inOut",
+          },
+          0
+        );
+        if (tints[k]) {
+          tl.to(tints[k], { opacity: t.tint, duration: SHUFFLE, ease: "power3.inOut" }, 0);
+        }
+      });
+    });
 
-    const tl = gsap.timeline({ onComplete: () => setBusy(false) });
-
-    // ===== EXIT (short, soft) =====
-    tl.to(all, { autoAlpha: 0, duration: EXIT, ease: "sine.in" }, 0)
-      .to(cards, { x: xOut, duration: EXIT, ease: "sine.in" }, 0)
-
-      // ===== SWAP (invisible) =====
-      .add(() => setActive(newActive), EXIT)
-
-      // ===== ENTER (long, graceful expo.out — this is the part the user feels) =====
-      .set(cards, { x: xIn }, EXIT)
-      .to(all, { autoAlpha: 1, duration: ENTER, ease: "expo.out" }, EXIT)
-      .to(cards, { x: 0, duration: ENTER, ease: "expo.out" }, EXIT);
+    // Copy leaves early so it is gone well before the new card settles; it
+    // comes back from the layout effect once `active` has swapped.
+    const copy = [numberRef.current, titleRef.current, descRef.current].filter(Boolean);
+    if (copy.length) {
+      tl.to(copy, { autoAlpha: 0, y: -12, duration: 0.28, ease: "sine.in" }, 0);
+    }
   };
 
   // Stacked cards display slides in cycling order — front shows active,
   // middle shows next, back shows next-next. This way every card always
   // has a slide image so the visual stack is continuous.
+  //
+  // The offset can be negative: slot -1 holds the card that enters from the
+  // left when stepping backwards, so the modulo has to wrap rather than
+  // return an index JS would read as undefined.
   const cardSlide = (offset) =>
-    SLIDES[(active + offset) % SLIDES.length];
+    SLIDES[((active + offset) % SLIDES.length + SLIDES.length) % SLIDES.length];
 
   if (!data || !SLIDES.length) return null;
 
@@ -228,136 +379,84 @@ export default function WorldsWeShape({ data }) {
         <RichText>{data.body}</RichText>
       </p>
 
-      {/* ===== DESKTOP — 3 stacked rotated cards (Figma 3152:3443–3445)
-          Each card is rendered at fixed coords (front / middle / back).
-          The image inside cycles through SLIDES so a slide change
-          re-renders all three with new sources. */}
-      <div className="hidden lg:block">
-        {CARD_LAYOUT.map((pos, i) => {
-          const slide = cardSlide(i); // i=0 front, i=1 middle, i=2 back
+      {/* ===== DESKTOP stack =====
+          One base box; each card's slot is a transform on it (see SLOT_DESKTOP). */}
+      <div
+        className="hidden lg:block absolute"
+        style={{
+          left: CARD_BASE.left,
+          top: CARD_BASE.top,
+          width: CARD_BASE.width,
+          height: CARD_BASE.height,
+        }}
+      >
+        {STACK_SLOTS.map((slot, k) => {
+          const slide = cardSlide(slot);
           return (
             <div
-              key={`card-${i}`}
-              ref={(el) => (cardsRef.current[i] = el)}
-              className="absolute pointer-events-none will-change-transform"
-              style={{
-                left: pos.left,
-                top: pos.top,
-                width: pos.width,
-                height: pos.height,
-                zIndex: 3 - i, // front has highest z
-              }}
+              key={`desk-card-${k}`}
+              ref={(el) => (deskCardsRef.current[k] = el)}
+              className="absolute inset-0 pointer-events-none will-change-transform"
             >
-              <div
-                className="absolute inset-0 overflow-hidden rounded-[4px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
-                style={{
-                  transform: `rotate(${pos.rotate}deg)`,
-                  transformOrigin: "center",
-                }}
-              >
-                {slide.image && (
+              <div className="absolute inset-0 overflow-hidden rounded-[4px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]">
+                {slide?.image && (
                   <Image
                     src={slide.image}
                     alt={slide.title}
                     fill
-                    unoptimized
                     sizes="55vw"
                     className="object-cover object-center"
                   />
                 )}
-                {pos.tint > 0 && (
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: `rgba(255,255,255,${pos.tint})` }}
-                  />
-                )}
+                {/* Always rendered so the tween has something to drive; the
+                    slot decides how strong it is. */}
+                <div
+                  ref={(el) => (deskTintsRef.current[k] = el)}
+                  className="absolute inset-0 bg-white"
+                  style={{ opacity: 0 }}
+                />
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* ===== MOBILE — 3 stacked rotated cards (Figma 3152:3792–3795)
-          Container at top:266.72. The 3 cards are absolutely positioned
-          inside a centered relative wrapper so they overlap with rotation. */}
+      {/* ===== MOBILE stack =====
+          Same idea against the mobile base box (Figma 3152:3792–3795),
+          where all three cards do share one aspect ratio. */}
       <div
         ref={mobileImageRef}
         className="lg:hidden absolute z-[3] left-0 right-0 top-[267px] pointer-events-none"
       >
         <div className="relative mx-auto w-[min(440px,calc(100vw-32px))]">
-          {/* Back card (Figma 3152:3793) — w:341.97 h:205.05 rotated 8° */}
-          <div
-            className="absolute will-change-transform shadow-[0_20px_40px_-15px_rgba(0,0,0,0.6)]"
-            style={{
-              left: "21.32%", // (117.82 - 27) / 426.643
-              top: "2.32%",   // (272.68 - 266.72) / 256.556
-              width: "80.15%", // 341.97 / 426.643
-              transform: "rotate(8deg)",
-              transformOrigin: "center",
-              zIndex: 1,
-            }}
-          >
-            <div className="relative w-full aspect-[341.97/205.05] overflow-hidden rounded-[4px]">
-              {cardSlide(2).image && (
-                <Image
-                  src={cardSlide(2).image}
-                  alt={cardSlide(2).title}
-                  fill
-                  unoptimized
-                  sizes="(max-width:500px) 80vw, 340px"
-                  className="object-cover object-center"
-                />
-              )}
-              <div className="absolute inset-0 bg-white/[0.37]" />
-            </div>
-          </div>
-
-          {/* Middle card (Figma 3152:3794) — w:379.96 h:227.83 rotated 4° */}
-          <div
-            className="absolute will-change-transform shadow-[0_25px_50px_-15px_rgba(0,0,0,0.65)]"
-            style={{
-              left: "11.52%", // (76.17 - 27) / 426.643
-              top: "0.92%",   // (269.07 - 266.72) / 256.556
-              width: "89.06%", // 379.96 / 426.643
-              transform: "rotate(4deg)",
-              transformOrigin: "center",
-              zIndex: 2,
-            }}
-          >
-            <div className="relative w-full aspect-[379.96/227.83] overflow-hidden rounded-[4px]">
-              {cardSlide(1).image && (
-                <Image
-                  src={cardSlide(1).image}
-                  alt={cardSlide(1).title}
-                  fill
-                  unoptimized
-                  sizes="(max-width:500px) 89vw, 380px"
-                  className="object-cover object-center"
-                />
-              )}
-              <div className="absolute inset-0 bg-white/[0.37]" />
-            </div>
-          </div>
-
-          {/* Front card (Figma 3152:3795) — full 426×256, no rotation.
-              No cardsRef here: both breakpoints render into the DOM, so this
-              used to overwrite cardsRef.current[0] and leave the DESKTOP front
-              card out of the nav timeline (it swapped with no crossfade). The
-              parent mobileImageRef already fades this whole stack. */}
-          <div
-            className="relative w-full aspect-[426.643/256.556] rounded-[4px] overflow-hidden
-                       will-change-transform shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] z-[3]"
-          >
-            {cardSlide(0).image && (
-              <Image
-                src={cardSlide(0).image}
-                alt={cardSlide(0).title}
-                fill
-                unoptimized
-                sizes="(max-width:500px) 90vw, 426px"
-                className="object-cover object-center"
-              />
-            )}
+          <div className="relative w-full aspect-[426.643/256.556]">
+            {STACK_SLOTS.map((slot, k) => {
+              const slide = cardSlide(slot);
+              return (
+                <div
+                  key={`mob-card-${k}`}
+                  ref={(el) => (mobCardsRef.current[k] = el)}
+                  className="absolute inset-0 will-change-transform"
+                >
+                  <div className="absolute inset-0 overflow-hidden rounded-[4px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)]">
+                    {slide?.image && (
+                      <Image
+                        src={slide.image}
+                        alt={slide.title}
+                        fill
+                        sizes="(max-width:500px) 90vw, 440px"
+                        className="object-cover object-center"
+                      />
+                    )}
+                    <div
+                      ref={(el) => (mobTintsRef.current[k] = el)}
+                      className="absolute inset-0 bg-white"
+                      style={{ opacity: 0 }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -452,7 +551,10 @@ export default function WorldsWeShape({ data }) {
         </button>
 
         {/* counter — desktop only (Figma mobile has just arrows) */}
-        <span className="hidden lg:inline-block font-montserrat text-white/55 lg:text-[0.833vw] tracking-[0.12em] lg:ml-[0.8vw]">
+        {/* Was `text-white/55` on a white section — invisible. With the
+            indicator bars ruled out this counter is the only cue to where you
+            are in the seven verticals, so it also shows on mobile now. */}
+        <span className="inline-block font-montserrat text-[#333]/55 text-[12px] lg:text-[0.833vw] tracking-[0.12em] ml-[4px] lg:ml-[0.8vw]">
           {String(active + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
         </span>
       </div>
