@@ -551,12 +551,6 @@ export default function WorldsWeShape({ data }) {
         </button>
 
         {/* counter — desktop only (Figma mobile has just arrows) */}
-        {/* Was `text-white/55` on a white section — invisible. With the
-            indicator bars ruled out this counter is the only cue to where you
-            are in the seven verticals, so it also shows on mobile now. */}
-        <span className="inline-block font-montserrat text-[#333]/55 text-[12px] lg:text-[0.833vw] tracking-[0.12em] ml-[4px] lg:ml-[0.8vw]">
-          {String(active + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
-        </span>
       </div>
     </section>
   );
