@@ -42,6 +42,13 @@ export default function WhyMyHome({ data }) {
   const labelRef = useRef(null);
   const swiperRef = useRef(null);
   const [active, setActive] = useState(0);
+  // `active` is where the scroll has got to; `displayed` is what the text
+  // block is currently showing. They differ only for the ~0.25s the outgoing
+  // copy takes to leave, which is what stops the two ever being on screen
+  // together.
+  const [displayed, setDisplayed] = useState(0);
+  const textTlRef = useRef(null);
+  const firstRevealRef = useRef(true);
   // Enable Swiper touch/swipe on mobile only; desktop stays scroll-driven.
   const [isMobile, setIsMobile] = useState(false);
 
@@ -53,10 +60,17 @@ export default function WhyMyHome({ data }) {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  /** GSAP word-mask reveal fired every time the active slide index changes */
-  const animateActive = () => {
+  /**
+   * Reveal whatever copy the text block is showing right now.
+   *
+   * `splitToWords` rewrites the heading's children, so it has to run after
+   * React has committed the new text — never in the same tick as the state
+   * change that swaps it.
+   */
+  const revealCopy = () => {
     if (!subRef.current || !bodyRef.current) return;
     const words = splitToWords(subRef.current);
+    gsap.set(subRef.current, { autoAlpha: 1 });
     gsap.set(words, { yPercent: 110 });
     gsap.to(words, {
       yPercent: 0,
@@ -70,6 +84,54 @@ export default function WhyMyHome({ data }) {
       { y: 0, autoAlpha: 1, duration: 0.9, ease: "expo.out", delay: 0.15 }
     );
   };
+
+  /**
+   * Out, then in — never both at once.
+   *
+   * The images still cross-fade through Swiper, which is the right treatment
+   * for them. Text is not: two paragraphs at half opacity in the same spot
+   * are unreadable, which is exactly what a cross-fade of the copy produced.
+   * So the outgoing copy leaves first, the content swaps while nothing is on
+   * screen, and the new copy reveals. The whole handoff is ~0.85s, inside the
+   * 900ms image cross-fade, so copy and image settle together.
+   */
+  useEffect(() => {
+    if (displayed === active) return undefined;
+
+    // A fast scroll can outrun the handoff; drop the in-flight one and play
+    // the newest rather than queueing them up behind each other.
+    textTlRef.current?.kill();
+
+    const targets = [subRef.current, bodyRef.current].filter(Boolean);
+    if (!targets.length) {
+      setDisplayed(active);
+      return undefined;
+    }
+
+    const tl = gsap.timeline();
+    textTlRef.current = tl;
+    tl.to(targets, {
+      autoAlpha: 0,
+      y: -14,
+      duration: 0.25,
+      ease: "power2.in",
+    }).add(() => setDisplayed(active));
+
+    return () => {
+      tl.kill();
+    };
+  }, [active, displayed]);
+
+  // Runs after React has committed the swapped copy, so `splitToWords` is
+  // rewriting the new heading rather than the one on its way out.
+  useEffect(() => {
+    if (firstRevealRef.current) {
+      firstRevealRef.current = false;
+      return;
+    }
+    gsap.set([subRef.current, bodyRef.current].filter(Boolean), { y: 0 });
+    revealCopy();
+  }, [displayed]);
 
   useGSAP(
     () => {
@@ -94,7 +156,7 @@ export default function WhyMyHome({ data }) {
       });
 
       // initial in-slide reveal
-      requestAnimationFrame(() => animateActive());
+      requestAnimationFrame(() => revealCopy());
 
       // Maps a 0→1 ScrollTrigger progress onto a slide index and drives Swiper.
       const syncToProgress = (self) => {
@@ -145,6 +207,10 @@ export default function WhyMyHome({ data }) {
   );
 
   if (!data || !SLIDES.length) return null;
+
+  // What the copy block is showing. Clamped because `displayed` trails
+  // `active` by one beat and the CMS can shorten the slide list underneath it.
+  const COPY = SLIDES[Math.min(displayed, SLIDES.length - 1)] || SLIDES[0];
 
   // Decorative bottom-left bloom — managed in /public, not in the CMS.
   // const floralImage = "/assets/myhome/whymyhome-floral.png";
@@ -232,7 +298,37 @@ export default function WhyMyHome({ data }) {
         />
       </div>
 
-      {/* ---------- Right image + left text (Swiper, EffectFade) ---------- */}
+      {/* ---------- The copy: one block, outside the slider ----------
+          Rendered once from `displayed` rather than once per slide. While it
+          lived inside the slider every slide carried its own copy, and the
+          cross-fade held two of them on screen at partial opacity for 900ms
+          — the overlap this section was reported for. With a single node
+          there is nothing to overlap with.
+
+          Desktop keeps the Figma placement the slide version had
+          (left 11.15vw, top 27.08vw, width 32.55vw); mobile stays in flow
+          between the heading and the image, inside the shared gutter. */}
+      <div className="relative z-[5] lg:absolute lg:left-[11.15vw] lg:w-[32.55vw] lg:top-[27.08vw]">
+        <h3
+          ref={subRef}
+          className={`${GUTTER} lg:px-0 Tartuffo_Trial_Regular capitalize text-white tracking-[0.02em] mt-[28px] md:mt-[36px] lg:mt-0 text-[22px] leading-[32px] md:text-[28px] md:leading-[40px] lg:text-[1.823vw] lg:leading-[1.3] will-change-transform`}
+          style={{
+            fontFamily:
+              '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+          }}
+        >
+          {COPY.sub}
+        </h3>
+        <p
+          ref={bodyRef}
+          className={`${GUTTER} lg:px-0 font-montserrat font-normal text-white/85 text-left mt-[12px] md:mt-[16px] lg:mt-[0.781vw] text-[14px] leading-[24px] md:text-[16px] md:leading-[28px] lg:text-[0.833vw] lg:leading-[1.563vw] lg:max-w-[30.83vw]`}
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          <RichText>{COPY.body}</RichText>
+        </p>
+      </div>
+
+      {/* ---------- Right image (Swiper, EffectFade) ---------- */}
       {/* Slides are driven purely by scroll (see the ScrollTrigger above) plus
           the pagination buttons — no autoplay, and no loop so `activeIndex`
           maps 1:1 onto the scroll progress index. */}
@@ -250,38 +346,19 @@ export default function WhyMyHome({ data }) {
         }
         rewind={isMobile}
         onSwiper={(s) => (swiperRef.current = s)}
-        onSlideChange={(s) => {
-          setActive(s.activeIndex);
-          animateActive();
-        }}
+        // Only records where we are. The copy handoff is driven by the
+        // `active` effect above, which runs after React has re-rendered —
+        // animating here would have played the reveal on the outgoing text,
+        // because the refs still point at it until the next commit.
+        onSlideChange={(s) => setActive(s.activeIndex)}
         // Mobile keeps the slider in flow so its content defines the section
         // height; desktop pins it across the whole (scroll-pinned) viewport.
         className="w-full !h-auto lg:!absolute lg:!inset-0 lg:!z-[4] lg:!h-full"
       >
         {SLIDES.map((slide, i) => (
           <SwiperSlide key={slide.id} className="relative !h-auto lg:!h-full">
-            {/* ===== MOBILE LAYOUT (<lg) — sub-heading, body, then image, all
-                stacked in flow inside the shared gutter so their left/right
-                edges align with the heading above. Heights are intrinsic, so
-                a long body can no longer run into the image. ===== */}
-            <h3
-              ref={i === active ? subRef : null}
-              className={`lg:hidden ${GUTTER} mt-[28px] md:mt-[36px] capitalize text-white tracking-[0.02em] text-[22px] leading-[32px] md:text-[28px] md:leading-[40px] will-change-transform`}
-              style={{
-                fontFamily:
-                  '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-              }}
-            >
-              {slide.sub}
-            </h3>
-
-            <p
-              ref={i === active ? bodyRef : null}
-              className={`lg:hidden ${GUTTER} mt-[12px] md:mt-[16px] font-montserrat font-normal text-white/85 text-[14px] leading-[24px] md:text-[16px] md:leading-[28px] text-left`}
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              <RichText>{slide.body}</RichText>
-            </p>
+            {/* Copy lives outside this slider — see the single text block
+                below. Only the imagery cross-fades here. */}
 
             {/* Figma image box: w:460 h:395 (aspect 460/395), centred. */}
             {slide.image && (
@@ -318,26 +395,6 @@ export default function WhyMyHome({ data }) {
               </div>
             </div>
 
-            {/* Desktop text block (sub + body) */}
-            <div className="hidden lg:block absolute z-[5] left-[11.15vw] w-[32.55vw] top-[27.08vw]">
-              <h3
-                ref={i === active ? subRef : null}
-                className="Tartuffo_Trial_Regular capitalize text-white leading-[1.3] tracking-[0.02em] text-[1.823vw] will-change-transform"
-                style={{
-                  fontFamily:
-                    '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-                }}
-              >
-                {slide.sub}
-              </h3>
-              <p
-                ref={i === active ? bodyRef : null}
-                className="font-montserrat font-normal mt-[0.781vw] text-white/85 text-[0.833vw] leading-[1.563vw] max-w-[30.83vw]"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                <RichText>{slide.body}</RichText>
-              </p>
-            </div>
           </SwiperSlide>
         ))}
       </Swiper>
