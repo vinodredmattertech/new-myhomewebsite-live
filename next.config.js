@@ -2,6 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["swiper", "ssr-window", "dom7"],
+
+  // lib/strapi.js imports the Redis cache and is also bundled for the browser
+  // (components use its media helpers). ioredis needs Node's net/tls, so stub
+  // it out of client bundles; lib/cache.js never calls it there anyway.
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      config.resolve.alias = { ...config.resolve.alias, ioredis: false };
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {
