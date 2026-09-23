@@ -465,8 +465,16 @@ export default function WorldsWeShape({ data }) {
           Desktop (Figma 3152:3446): left:1279 top:358 w:502
           Mobile (Figma 3152:3788): left:55 top:559 w:365 gap:20 */}
       <div
+        // Mobile top is derived, not hardcoded. The card stack starts at 267px
+        // and is `min(440px, 100vw-32px)` wide at aspect 426.643/256.556, so
+        // its height — and therefore where this column should start — moves
+        // with the viewport. The old flat 559px left a gap that ranged from
+        // 27px on a 472px-wide screen to 95px on a 360px one, and on the
+        // narrow end that wasted space pushed the arrows into the section
+        // edge. This keeps a constant 28px under the cards at every width.
         className="absolute z-[5]
-                   left-[max(40px,calc(50%-180px))] top-[559px] w-[min(365px,calc(100vw-80px))]
+                   left-[max(40px,calc(50%-180px))] w-[min(365px,calc(100vw-80px))]
+                   top-[calc(267px_+_min(440px,100vw_-_32px)/1.663_+_28px)]
                    flex flex-col gap-[20px]
                    lg:left-[66.614vw] lg:top-[18.646vw] lg:w-[26.146vw] lg:gap-[1.823vw] lg:max-w-none"
       >
@@ -506,52 +514,55 @@ export default function WorldsWeShape({ data }) {
         >
           <RichText>{SLIDES[active].body}</RichText>
         </p>
+
+          {/* ===== Arrows (Figma 3152:3796 mobile / 3152:3451 desktop) */}
+        <div
+          // Mobile: a flex child of the copy column, so it always sits a fixed
+          // 28px under the description however long that runs, instead of at a
+          // flat 872px that the longest vertical nearly reached.
+          // Desktop: unchanged — absolutely placed, but now relative to the
+          // column rather than the section, so left:0 and top:28.284vw restate
+          // the original 66.614vw / 46.93vw.
+          className="z-[5] mt-[8px] flex items-center justify-center gap-[13px]
+                     lg:absolute lg:left-0 lg:top-[28.284vw] lg:mt-0 lg:justify-start lg:gap-[1.042vw]"
+        >
+          <button
+            type="button"
+            aria-label="Previous slide"
+            onClick={() => navigate(-1)}
+            className="group inline-flex items-center justify-center rounded-full border border-[#333]/35 text-[#333]
+                       w-[46px] h-[46px] lg:w-[3.646vw] lg:h-[3.646vw]
+                       transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+                       hover:bg-[#ef493d] hover:border-[#ef493d]"
+          >
+            <svg viewBox="0 0 22 14" fill="none" className="w-[16px] lg:w-[1.146vw] h-auto">
+              <path
+                d="M0.293 6.293L6.586 0 8 1.414 4.414 5 22 5v2H4.414L8 10.586 6.586 12 .293 5.707a1 1 0 010-1.414z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            aria-label="Next slide"
+            onClick={() => navigate(1)}
+            className="group inline-flex items-center justify-center rounded-full border border-[#333]/35 text-[#333]
+                       w-[46px] h-[46px] lg:w-[3.646vw] lg:h-[3.646vw]
+                       transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+                       hover:bg-[#ef493d] hover:border-[#ef493d]"
+          >
+            <svg viewBox="0 0 22 14" fill="none" className="w-[16px] lg:w-[1.146vw] h-auto">
+              <path
+                d="M21.707 7.707L15.414 14 14 12.586 17.586 9H0V7h17.586L14 3.414 15.414 2l6.293 6.293a1 1 0 010 1.414z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+
+          {/* counter — desktop only (Figma mobile has just arrows) */}
+        </div>
       </div>
 
-      {/* ===== Arrows
-          Mobile (Figma 3152:3796): centered at top:872, 46×46, gap:13
-          Desktop (Figma 3152:3451): left:1279 top:901, 70×70, gap:20 */}
-      <div
-        className="absolute z-[5]
-                   left-1/2 -translate-x-1/2 top-[872px]
-                   flex items-center gap-[13px]
-                   lg:left-[66.614vw] lg:translate-x-0 lg:top-[46.93vw] lg:gap-[1.042vw] max-sm:mt-[25px]"
-      >
-        <button
-          type="button"
-          aria-label="Previous slide"
-          onClick={() => navigate(-1)}
-          className="group inline-flex items-center justify-center rounded-full border border-[#333]/35 text-[#333]
-                     w-[46px] h-[46px] lg:w-[3.646vw] lg:h-[3.646vw]
-                     transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-                     hover:bg-[#ef493d] hover:border-[#ef493d]"
-        >
-          <svg viewBox="0 0 22 14" fill="none" className="w-[16px] lg:w-[1.146vw] h-auto">
-            <path
-              d="M0.293 6.293L6.586 0 8 1.414 4.414 5 22 5v2H4.414L8 10.586 6.586 12 .293 5.707a1 1 0 010-1.414z"
-              fill="currentColor"
-            />
-          </svg>
-        </button>
-        <button
-          type="button"
-          aria-label="Next slide"
-          onClick={() => navigate(1)}
-          className="group inline-flex items-center justify-center rounded-full border border-[#333]/35 text-[#333]
-                     w-[46px] h-[46px] lg:w-[3.646vw] lg:h-[3.646vw]
-                     transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-                     hover:bg-[#ef493d] hover:border-[#ef493d]"
-        >
-          <svg viewBox="0 0 22 14" fill="none" className="w-[16px] lg:w-[1.146vw] h-auto">
-            <path
-              d="M21.707 7.707L15.414 14 14 12.586 17.586 9H0V7h17.586L14 3.414 15.414 2l6.293 6.293a1 1 0 010 1.414z"
-              fill="currentColor"
-            />
-          </svg>
-        </button>
-
-        {/* counter — desktop only (Figma mobile has just arrows) */}
-      </div>
     </section>
   );
 }
