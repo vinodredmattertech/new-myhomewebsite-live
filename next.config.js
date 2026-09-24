@@ -13,6 +13,12 @@ const nextConfig = {
     return config;
   },
   images: {
+    // Strapi serves uploads with `Cache-Control: max-age=0`, so without this
+    // every resized image expired after Next's 60s default and was fetched and
+    // re-encoded again — the whole site's images, every minute. Upload URLs
+    // carry a `?v=<updatedAt>` stamp (lib/strapi.js), so a replaced file gets
+    // a new URL and a day's cache never shows a stale image.
+    minimumCacheTTL: 86400,
     remotePatterns: [
       {
         protocol: "https",

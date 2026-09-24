@@ -12,7 +12,12 @@ module.exports = {
       node_args: '--max-old-space-size=1024',
       max_memory_restart: '1200M',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
+        // Nearly all of this process's memory is native, not JS heap: sharp's
+        // threads each get their own glibc malloc arena and never hand the
+        // memory back. Two arenas cut peak RSS from ~700MB to ~300MB under
+        // the same image load. https://sharp.pixelplumbing.com/install#linux-memory-allocator
+        MALLOC_ARENA_MAX: '2',
       },
     },
   ],
