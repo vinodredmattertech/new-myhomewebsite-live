@@ -4,6 +4,7 @@ import { Paperclip, X } from "lucide-react";
 import CountryCodeSelect, {
   DEFAULT_COUNTRY_CODE,
 } from "@/components/common/CountryCodeSelect";
+import { dialCodeFor, validatePhone } from "@/lib/phone";
 import { submitJobApplication } from "@/lib/strapi";
 
 const RED = "#ef493d";
@@ -77,6 +78,8 @@ export default function JobApplicationForm({
 
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     setValue,
@@ -111,8 +114,8 @@ export default function JobApplicationForm({
       {
         name: values.name,
         email: values.email,
-        phone: `${values.countryCode || DEFAULT_COUNTRY_CODE} ${values.phone}`.trim(),
-        countryCode: values.countryCode || DEFAULT_COUNTRY_CODE,
+        phone: `${dialCodeFor(values.countryCode)} ${values.phone}`.trim(),
+        countryCode: dialCodeFor(values.countryCode),
         designation,
         message: values.message || "",
         formSource,
@@ -176,7 +179,9 @@ export default function JobApplicationForm({
         compact={compact}
       >
         <CountryCodeSelect
-          {...register("countryCode")}
+          {...register("countryCode", {
+            onChange: () => getValues("phone") && trigger("phone"),
+          })}
           className={`text-[#333] pb-[8px] lg:pb-[0.417vw] ${
             compact
               ? "text-[14px] sm:text-[15px] lg:text-[0.938vw]"
@@ -192,10 +197,7 @@ export default function JobApplicationForm({
           style={{ fontFamily: MONTSERRAT }}
           {...register("phone", {
             required: "Please enter your phone number",
-            pattern: {
-              value: /^[0-9+\-\s()]{7,15}$/,
-              message: "Enter a valid phone number",
-            },
+            validate: (v) => validatePhone(v, getValues("countryCode")),
           })}
         />
       </FieldRow>

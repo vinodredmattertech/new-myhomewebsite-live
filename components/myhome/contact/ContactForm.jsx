@@ -7,6 +7,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronDown } from "lucide-react";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { dialCodeFor, validatePhone } from "@/lib/phone";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
@@ -76,6 +77,8 @@ export default function ContactForm({ data }) {
 
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
@@ -114,7 +117,7 @@ export default function ContactForm({ data }) {
     const payload = {
       name: formValues.name,
       email: formValues.email,
-      phone: `${formValues.countryCode || DEFAULT_COUNTRY_CODE} ${formValues.phone}`.trim(),
+      phone: `${dialCodeFor(formValues.countryCode)} ${formValues.phone}`.trim(),
       project: formValues.project || "",
       message: formValues.message || "",
       formSource: "Contact Us Page",
@@ -224,17 +227,16 @@ export default function ContactForm({ data }) {
               errorMessage={errors.phone?.message}
               prefix={
                 <CountryCodeSelect
-                  {...register("countryCode")}
+                  {...register("countryCode", {
+                    onChange: () => getValues("phone") && trigger("phone"),
+                  })}
                   className="font-montserrat text-[#333] pb-[8px] lg:pb-[0.521vw]
                              text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.094vw]"
                 />
               }
               {...register("phone", {
                 required: "Please enter your phone number",
-                pattern: {
-                  value: /^[0-9+\-\s()]{7,15}$/,
-                  message: "Enter a valid phone number",
-                },
+                validate: (v) => validatePhone(v, getValues("countryCode")),
               })}
             />
 

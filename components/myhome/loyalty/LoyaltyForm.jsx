@@ -9,6 +9,7 @@ import SectionLabel from "@/components/myhome/SectionLabel";
 import { submitLoyaltyApplication } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { dialCodeFor, validatePhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const TARTUFFO =
@@ -71,6 +72,8 @@ export default function LoyaltyForm({
 
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
@@ -112,7 +115,7 @@ export default function LoyaltyForm({
     const application = {
       name: v.name,
       email: v.email,
-      mobile: `${v.countryCode || DEFAULT_COUNTRY_CODE} ${v.phone}`.trim(),
+      mobile: `${dialCodeFor(v.countryCode)} ${v.phone}`.trim(),
       city: v.city || "",
       project: v.project || "",
       apartmentUnit: v.apartment || "",
@@ -213,17 +216,16 @@ export default function LoyaltyForm({
             errorMessage={errors.phone?.message}
             prefix={
               <CountryCodeSelect
-                {...register("countryCode")}
+                {...register("countryCode", {
+                  onChange: () => getValues("phone") && trigger("phone"),
+                })}
                 className="font-montserrat text-[#333] pb-[8px] lg:pb-[0.521vw]
                            text-[16px] sm:text-[18px] lg:text-[1.094vw]"
               />
             }
             {...register("phone", {
               required: "Please enter your mobile number",
-              pattern: {
-                value: /^[0-9+\-\s()]{7,15}$/,
-                message: "Enter a valid mobile number",
-              },
+              validate: (v) => validatePhone(v, getValues("countryCode")),
             })}
           />
           <Field

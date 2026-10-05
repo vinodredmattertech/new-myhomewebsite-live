@@ -10,6 +10,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { dialCodeFor, validatePhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const UnderlineField = React.forwardRef(function UnderlineField(
@@ -86,6 +87,8 @@ export default function ProjectInquiry({
 
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
@@ -149,7 +152,7 @@ export default function ProjectInquiry({
     const payload = {
       name: formValues.name,
       email: formValues.email,
-      phone: `${formValues.countryCode || DEFAULT_COUNTRY_CODE} ${formValues.phone}`.trim(),
+      phone: `${dialCodeFor(formValues.countryCode)} ${formValues.phone}`.trim(),
       // Tag the lead with the actual CMS project title when the parent
       // page passes it; falls back to the section heading otherwise so
       // local-dev rendering still gets a useful project label.
@@ -249,17 +252,19 @@ export default function ProjectInquiry({
               label="Phone Number*"
               type="tel"
               hasError={!!errors.phone}
-              errorMessage="Please enter a valid phone number"
+              errorMessage={errors.phone?.message || "Please enter a valid phone number"}
               prefix={
                 <CountryCodeSelect
-                  {...register("countryCode")}
+                  {...register("countryCode", {
+                    onChange: () => getValues("phone") && trigger("phone"),
+                  })}
                   className="text-[#333] text-[15px] sm:text-[18px] lg:text-[1.094vw]"
                   style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
                 />
               }
               {...register("phone", {
                 required: true,
-                pattern: /^[+0-9 ()-]{7,}$/,
+                validate: (v) => validatePhone(v, getValues("countryCode")),
               })}
             />
             <UnderlineField

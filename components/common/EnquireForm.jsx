@@ -6,6 +6,8 @@ import Button from "../layout/Button";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useLeadStore } from "@/store/useLeadStore";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "./CountryCodeSelect";
+import { validatePhone } from "@/lib/phone";
 
 const EnquireModal = ({
   isOpen,
@@ -24,10 +26,12 @@ const EnquireModal = ({
 
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({ defaultValues: { countryCode: DEFAULT_COUNTRY_CODE } });
   const sendEmaill = async (data) => {
     try {
       const response = await fetch("/api/sendEmail", {
@@ -92,28 +96,6 @@ const EnquireModal = ({
       alert("Error submitting form");
     }
   };
-  const countryCodes = [
-    { code: "+91", label: "🇮🇳 India" },
-    { code: "+1", label: "🇺🇸 USA" },
-    { code: "+44", label: "🇬🇧 UK" },
-    { code: "+971", label: "🇦🇪 UAE" },
-    { code: "+61", label: "🇦🇺 Australia" },
-    { code: "+81", label: "🇯🇵 Japan" },
-    { code: "+49", label: "🇩🇪 Germany" },
-    { code: "+33", label: "🇫🇷 France" },
-    { code: "+86", label: "🇨🇳 China" },
-    { code: "+92", label: "🇵🇰 Pakistan" },
-    { code: "+880", label: "🇧🇩 Bangladesh" },
-    { code: "+94", label: "🇱🇰 Sri Lanka" },
-    { code: "+977", label: "🇳🇵 Nepal" },
-    { code: "+65", label: "🇸🇬 Singapore" },
-    { code: "+60", label: "🇲🇾 Malaysia" },
-    { code: "+7", label: "🇷🇺 Russia" },
-    { code: "+39", label: "🇮🇹 Italy" },
-    { code: "+34", label: "🇪🇸 Spain" },
-    { code: "+27", label: "🇿🇦 South Africa" },
-    { code: "+55", label: "🇧🇷 Brazil" },
-  ];
   return (
     <Dialog
       open={isOpen}
@@ -198,30 +180,19 @@ const EnquireModal = ({
 
               <div className="flex items-center border-b border-[#ffffffa9]">
                 {/* Country Code Dropdown */}
-                <select
-                  {...register("countryCode", { required: true })}
-                  className="bg-transparent text-[#ffffffa9] outline-none px-2 w-36"
-                >
-                  {countryCodes.map((country, index) => (
-                    <option
-                      key={index}
-                      value={country.code}
-                      className="text-black"
-                    >
-                      {country.label} {country.code}
-                    </option>
-                  ))}
-                </select>
+                <CountryCodeSelect
+                  {...register("countryCode", {
+                    onChange: () => getValues("phone") && trigger("phone"),
+                  })}
+                  className="text-[#ffffffa9] px-2"
+                />
 
                 {/* Phone Input */}
                 <input
                   placeholder="Phone Number"
                   {...register("phone", {
                     required: "Phone number is required",
-                    pattern: {
-                      value: /^[0-9]{6,14}$/,
-                      message: "Invalid phone number",
-                    },
+                    validate: (v) => validatePhone(v, getValues("countryCode")),
                   })}
                   className="w-full bg-transparent p-2 outline-none text-[#ffffffa9]"
                 />

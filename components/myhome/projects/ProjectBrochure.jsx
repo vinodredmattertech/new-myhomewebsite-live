@@ -8,7 +8,8 @@ import { Download, X } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
-import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import CountryCodeSelect from "@/components/common/CountryCodeSelect";
+import { dialCodeFor, validatePhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const DEFAULT_HIGHLIGHTS = [
@@ -74,6 +75,8 @@ export default function ProjectBrochure({
   const [submitError, setSubmitError] = useState(null);
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
@@ -122,7 +125,7 @@ export default function ProjectBrochure({
     const payload = {
       name: data.name,
       email: data.email,
-      phone: `${data.countryCode || DEFAULT_COUNTRY_CODE} ${data.phone}`.trim(),
+      phone: `${dialCodeFor(data.countryCode)} ${data.phone}`.trim(),
       project: projectName,
       message: isSecondary
         ? `Requested project ${secondaryButtonLabel} download`
@@ -500,7 +503,9 @@ export default function ProjectBrochure({
                               ${errors.phone ? "border-[#ef493d]" : "border-[#33333322]"}`}
                 >
                   <CountryCodeSelect
-                    {...register("countryCode")}
+                    {...register("countryCode", {
+                      onChange: () => getValues("phone") && trigger("phone"),
+                    })}
                     className="text-[#333] text-[14px] sm:text-[16px] lg:text-[0.938vw] py-[8px] lg:py-[0.417vw]"
                     style={{ fontFamily: "Montserrat, sans-serif" }}
                   />
@@ -515,10 +520,7 @@ export default function ProjectBrochure({
                     style={{ fontFamily: "Montserrat, sans-serif" }}
                     {...register("phone", {
                       required: "Please enter your phone",
-                      pattern: {
-                        value: /^[0-9+\-\s()]{7,15}$/,
-                        message: "Enter a valid phone",
-                      },
+                      validate: (v) => validatePhone(v, getValues("countryCode")),
                     })}
                   />
                 </div>

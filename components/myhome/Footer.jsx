@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { getFooterData, mediaUrl, submitLead } from "@/lib/strapi";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
+import { dialCodeFor, validatePhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const SOCIAL_ICON_MAP = {
@@ -161,6 +162,8 @@ export default function MyHomeFooter() {
 
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
@@ -194,7 +197,7 @@ export default function MyHomeFooter() {
     const payload = {
       name: formValues.name,
       email: formValues.email,
-      phone: `${formValues.countryCode || DEFAULT_COUNTRY_CODE} ${formValues.phone}`.trim(),
+      phone: `${dialCodeFor(formValues.countryCode)} ${formValues.phone}`.trim(),
       formSource: FORM_SOURCE,
     };
     try {
@@ -326,7 +329,9 @@ export default function MyHomeFooter() {
                               ${errors.phone ? "border-[#ef493d]" : "border-white/85 focus-within:border-white"}`}
                 >
                   <CountryCodeSelect
-                    {...register("countryCode")}
+                    {...register("countryCode", {
+                      onChange: () => getValues("phone") && trigger("phone"),
+                    })}
                     className="text-white text-[11px] md:text-[14px] lg:text-[0.938vw] pl-[7px] lg:pl-[0.625vw]"
                     style={{ fontFamily: "Montserrat, sans-serif" }}
                   />
@@ -341,10 +346,7 @@ export default function MyHomeFooter() {
                     style={{ fontFamily: "Montserrat, sans-serif" }}
                     {...register("phone", {
                       required: "Please enter your phone number",
-                      pattern: {
-                        value: /^[0-9+\-\s()]{7,15}$/,
-                        message: "Enter a valid phone number",
-                      },
+                      validate: (v) => validatePhone(v, getValues("countryCode")),
                     })}
                   />
                 </div>
