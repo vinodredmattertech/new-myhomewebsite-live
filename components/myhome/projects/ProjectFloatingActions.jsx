@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Dialog } from "@headlessui/react";
@@ -30,6 +30,13 @@ export default function ProjectFloatingActions({
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+
+  // Lets globals.css lift the third-party chat widget above the mobile
+  // bottom bar while this component is mounted.
+  useEffect(() => {
+    document.body.classList.add("has-mobile-action-bar");
+    return () => document.body.classList.remove("has-mobile-action-bar");
+  }, []);
 
   const {
     register,

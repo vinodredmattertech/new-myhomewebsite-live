@@ -14,22 +14,26 @@
   font-weight: 300;
   letter-spacing: 0.02em;
 }
+
 .font-tartuffo-reg {
   font-family: "Tartuffo Trial", "Cormorant Garamond", "Playfair Display", serif !important;
   font-weight: 400;
   letter-spacing: 0.03em;
 }
+
 .font-tartuffo-italic {
   font-family: "Tartuffo Trial", "Cormorant Garamond", "Playfair Display", serif !important;
   font-style: italic;
   font-weight: 300;
   letter-spacing: 0.02em;
 }
+
 .font-beautique {
   font-family: "Beautique Display", "Big Shoulders Display", "Oswald", sans-serif !important;
   font-weight: 400;
   letter-spacing: 0.03em;
 }
+
 .font-montserrat {
   font-family: "Montserrat", sans-serif !important;
 }
@@ -97,6 +101,7 @@
   transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   background: transparent;
 }
+
 .mh-btn-outline::before {
   content: "";
   position: absolute;
@@ -106,9 +111,19 @@
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 0;
 }
-.mh-btn-outline:hover { color: #fff; }
-.mh-btn-outline:hover::before { transform: translateY(0); }
-.mh-btn-outline > * { position: relative; z-index: 1; }
+
+.mh-btn-outline:hover {
+  color: #fff;
+}
+
+.mh-btn-outline:hover::before {
+  transform: translateY(0);
+}
+
+.mh-btn-outline>* {
+  position: relative;
+  z-index: 1;
+}
 
 .mh-btn-solid {
   position: relative;
@@ -127,6 +142,7 @@
   overflow: hidden;
   transition: color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .mh-btn-solid::before {
   content: "";
   position: absolute;
@@ -135,43 +151,53 @@
   transform: translateY(101%);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.mh-btn-solid:hover { color: #ef493d; }
-.mh-btn-solid:hover::before { transform: translateY(0); }
-.mh-btn-solid > * {
+
+.mh-btn-solid:hover {
+  color: #ef493d;
+}
+
+.mh-btn-solid:hover::before {
+  transform: translateY(0);
+}
+
+.mh-btn-solid>* {
   position: relative;
   z-index: 1;
   border: 1px solid transparent;
 }
-.mh-btn-solid:hover > * { }
+
+.mh-btn-solid:hover>* {}
 
 .mh-nav-arrow {
   width: 70px;
   height: 70px;
   border-radius: 9999px;
-  border: 1px solid rgba(51,51,51,0.25);
+  border: 1px solid rgba(51, 51, 51, 0.25);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #333;
   transition: background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   background: transparent;
 }
+
 .mh-nav-arrow:hover {
   background: #ef493d;
   border-color: #ef493d;
   color: #fff;
 }
+
 .mh-nav-arrow--light {
-  border-color: rgba(255,255,255,0.4);
+  border-color: rgba(255, 255, 255, 0.4);
   color: #fff;
 }
 
 .mh-input {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
   color: #fff;
   font-family: "Montserrat", sans-serif;
   font-size: 18px;
@@ -180,8 +206,14 @@
   outline: none;
   transition: border-color 0.3s ease;
 }
-.mh-input::placeholder { color: rgba(255,255,255,0.85); }
-.mh-input:focus { border-color: #ef493d; }
+
+.mh-input::placeholder {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mh-input:focus {
+  border-color: #ef493d;
+}
 
 .mh-noise {
   position: absolute;
@@ -197,7 +229,8 @@
   display: inline-block;
   overflow: hidden;
 }
-.mh-reveal > span {
+
+.mh-reveal>span {
   display: inline-block;
   will-change: transform;
 }
@@ -207,10 +240,22 @@ html.lenis,
 html.lenis body {
   height: auto;
 }
-.lenis.lenis-smooth { scroll-behavior: auto; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-.lenis.lenis-scrolling iframe { pointer-events: none; }
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
 
 /* card stack mask */
 .mh-card-tilt {
@@ -221,15 +266,26 @@ html.lenis body {
 /* gradient line below testimonials */
 .mh-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(51,51,51,0.4) 20%, rgba(51,51,51,0.4) 80%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(51, 51, 51, 0.4) 20%, rgba(51, 51, 51, 0.4) 80%, transparent);
 }
 
 /* small caps & utility */
-.tracking-mh { letter-spacing: 0.05em; }
-.tracking-mh-wide { letter-spacing: 0.1em; }
+.tracking-mh {
+  letter-spacing: 0.05em;
+}
+
+.tracking-mh-wide {
+  letter-spacing: 0.1em;
+}
 
 @media (max-width: 1023px) {
-  .mh-btn-outline, .mh-btn-solid { height: 50px; min-width: 190px; font-size: 16px; }
+
+  .mh-btn-outline,
+  .mh-btn-solid {
+    height: 50px;
+    min-width: 190px;
+    font-size: 16px;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -271,11 +327,13 @@ input[type="number"] {
   font-family: "Tartuffo_Trial_Regular";
   src: url("/fonts/Tartuffo_Trial-Regular-BF643371db1355b.otf");
 }
+
 @font-face {
   font-family: "Tartuffo_Trial_Light";
   src: url("/fonts/Tartuffo_Trial-Light.otf");
   font-weight: 300;
 }
+
 @font-face {
   font-family: "Avenir";
   src: url("/fonts/AvenirNextLTPro-Regular.otf");
@@ -298,12 +356,12 @@ body {
   font-family: "Avenir";
 }
 
-.LifeatPSwiper .swiper-wrapper{
+.LifeatPSwiper .swiper-wrapper {
   display: flex !important;
   flex-direction: row !important;
 }
 
-.LifeatPSwiper .swiper-slide{
+.LifeatPSwiper .swiper-slide {
   height: auto !important;
 }
 
@@ -394,8 +452,9 @@ select {
 }
 
 .heading-sub {
-  @apply text-[24px] md:text-[40px] lg:text-[4.375vw]  font-[400];
+  @apply text-[24px] md:text-[40px] lg:text-[4.375vw] font-[400];
 }
+
 .heading-md {
   @apply text-[1.5rem] md:text-[2rem] lg:text-[1.667vw];
 }
@@ -441,6 +500,7 @@ select {
     opacity: 0;
     transform: translateX(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -491,11 +551,12 @@ select {
 .pin {
   width: 24px;
   height: 24px;
-  background: #e63946; /* red */
+  background: #e63946;
+  /* red */
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
   position: relative;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* inner white circle */
@@ -526,6 +587,7 @@ select {
 
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
+
 /* label */
 .pin-label {
   margin-top: 10px;
@@ -535,7 +597,7 @@ select {
   font-size: 13px;
   border-radius: 6px;
   white-space: nowrap;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .content-rl ul {
@@ -553,6 +615,7 @@ select {
 .phone-input-wrapper {
   width: 100%;
 }
+
 /* Input field */
 .phone-input-field {
   width: 100% !important;
@@ -560,13 +623,15 @@ select {
   border: none !important;
   border-bottom: 1px solid #5F5F5F5C !important;
   border-radius: 0 !important;
-  padding-left: 58px !important; /* space for country code */
+  padding-left: 58px !important;
+  /* space for country code */
   padding-bottom: 8px !important;
   padding-top: 8px !important;
   font-family: OutfitRegular;
   color: #5F5F5F5C !important;
   outline: none !important;
 }
+
 /* Flag button */
 .phone-input-button {
   background: transparent !important;
@@ -574,15 +639,18 @@ select {
   border-radius: 0 !important;
   border-bottom: 1px solid #d3b46d !important;
 }
+
 /* Remove focus box shadow */
 .phone-input-field:focus {
   box-shadow: none !important;
   border-bottom: 1px solid #d3b46d !important;
 }
+
 /* Fix country code spacing */
 .react-tel-input .selected-flag {
   padding-left: 0.5rem !important;
 }
+
 .react-tel-input .flag-dropdown {
   background: transparent !important;
 }
@@ -590,16 +658,19 @@ select {
 
 .react-tel-input .form-control {
 
-    font-size: 18px !important;
-    color: #5F5F5F !important;
+  font-size: 18px !important;
+  color: #5F5F5F !important;
 }
+
 /* === Blog detail rich-text body === */
-.blog-content > *:first-child {
+.blog-content>*:first-child {
   margin-top: 0;
 }
+
 .blog-content p {
   margin: 0 0 1.15em;
 }
+
 .blog-content h2 {
   font-family: "Tartuffo_Trial_Regular", "Tartuffo Trial", "Cormorant Garamond",
     "Playfair Display", serif;
@@ -609,6 +680,7 @@ select {
   line-height: 1.25;
   margin: 1.6em 0 0.6em;
 }
+
 .blog-content h3 {
   font-family: "Tartuffo_Trial_Regular", "Tartuffo Trial", "Cormorant Garamond",
     "Playfair Display", serif;
@@ -618,24 +690,30 @@ select {
   line-height: 1.3;
   margin: 1.4em 0 0.5em;
 }
+
 .blog-content ul,
 .blog-content ol {
   margin: 0 0 1.15em;
   padding-left: 1.4em;
 }
+
 .blog-content ul {
   list-style: disc;
 }
+
 .blog-content ol {
   list-style: decimal;
 }
+
 .blog-content li {
   margin: 0.4em 0;
 }
+
 .blog-content a {
   color: #ef493d;
   text-decoration: underline;
 }
+
 .blog-content blockquote {
   margin: 1.4em 0;
   padding: 0.4em 0 0.4em 1.1em;
@@ -643,12 +721,14 @@ select {
   color: #333;
   font-style: italic;
 }
+
 .blog-content img {
   max-width: 100%;
   height: auto;
   border-radius: 10px;
   margin: 1.4em 0;
 }
+
 .blog-content strong {
   color: #333;
   font-weight: 600;
@@ -661,12 +741,14 @@ select {
    dangerouslySetInnerHTML, so Tailwind classes can't reach the nodes —
    the editor's headings, lists, tables and links are styled here.
    ------------------------------------------------------------------ */
-.legal-content > *:first-child {
+.legal-content>*:first-child {
   margin-top: 0;
 }
+
 .legal-content p {
   margin: 0 0 1.15em;
 }
+
 .legal-content h1,
 .legal-content h2,
 .legal-content h3,
@@ -677,51 +759,63 @@ select {
   color: #333;
   line-height: 1.28;
 }
+
 .legal-content h1 {
   font-size: 1.75em;
   margin: 1.6em 0 0.6em;
 }
+
 .legal-content h2 {
   font-size: 1.5em;
   margin: 1.6em 0 0.55em;
 }
+
 .legal-content h3 {
   font-size: 1.25em;
   margin: 1.4em 0 0.5em;
 }
+
 .legal-content h4 {
   font-family: Montserrat, sans-serif;
   font-weight: 600;
   font-size: 1.05em;
   margin: 1.2em 0 0.45em;
 }
+
 .legal-content ul,
 .legal-content ol {
   margin: 0 0 1.15em;
   padding-left: 1.4em;
 }
+
 .legal-content ul {
   list-style: disc;
 }
+
 .legal-content ol {
   list-style: decimal;
 }
+
 .legal-content li {
   margin: 0.45em 0;
 }
-.legal-content li > ul,
-.legal-content li > ol {
+
+.legal-content li>ul,
+.legal-content li>ol {
   margin: 0.45em 0 0.2em;
 }
+
 .legal-content a {
   color: #ef493d;
   text-decoration: underline;
   overflow-wrap: anywhere;
 }
+
 .legal-content strong {
   color: #333;
   font-weight: 600;
 }
+
 .legal-content blockquote {
   margin: 1.4em 0;
   padding: 0.4em 0 0.4em 1.1em;
@@ -729,17 +823,20 @@ select {
   color: #333;
   font-style: italic;
 }
+
 .legal-content hr {
   border: 0;
   border-top: 1px solid #e7e7e7;
   margin: 2em 0;
 }
+
 .legal-content img {
   max-width: 100%;
   height: auto;
   border-radius: 10px;
   margin: 1.4em 0;
 }
+
 /* Tables are the one block that can overflow a phone — let them scroll
    inside their own wrapper instead of pushing the page sideways. */
 .legal-content table {
@@ -750,6 +847,7 @@ select {
   margin: 1.4em 0;
   white-space: nowrap;
 }
+
 .legal-content th,
 .legal-content td {
   border: 1px solid #e7e7e7;
@@ -757,6 +855,7 @@ select {
   text-align: left;
   vertical-align: top;
 }
+
 .legal-content th {
   background: #faf8f5;
   color: #333;
@@ -780,12 +879,23 @@ select {
    layout direction, and `--rev` flips a track to run against its neighbour.
 --------------------------------------------------------------------------- */
 @keyframes mh-marquee-y {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(0, -50%, 0); }
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
 }
+
 @keyframes mh-marquee-x {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-50%, 0, 0); }
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 .mh-marquee-track {
@@ -793,10 +903,19 @@ select {
   animation-iteration-count: infinite;
   will-change: transform;
 }
-.mh-marquee-track--y { animation-name: mh-marquee-y; }
-.mh-marquee-track--x { animation-name: mh-marquee-x; }
+
+.mh-marquee-track--y {
+  animation-name: mh-marquee-y;
+}
+
+.mh-marquee-track--x {
+  animation-name: mh-marquee-x;
+}
+
 /* Opposite direction for the neighbouring column/row. */
-.mh-marquee-track--rev { animation-direction: reverse; }
+.mh-marquee-track--rev {
+  animation-direction: reverse;
+}
 
 /* Let a reader stop a column to actually look at a post. */
 .mh-marquee:hover .mh-marquee-track,
@@ -805,5 +924,34 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mh-marquee-track { animation: none; }
+  .mh-marquee-track {
+    animation: none;
+  }
+}
+
+/* ------------------- Third-party chat widget ------------------- */
+/* LivHousing bot (loaded by LiveServChat.js) mounts a cross-origin iframe in
+   #liv-prop-chat-root: fixed bottom-right, ~150x139px while collapsed, with
+   inline bottom/right styles. Only the outer box can be moved from here.
+   On pages with the mobile bottom action bar (ProjectFloatingActions, 56px),
+   lift it just above the bar (56px + 8px gap). ProjectBrochure's sticky CTA
+   shares that row on the left; the launcher is scaled down on phones (below)
+   so the two stay apart. On lg+ the brochure CTA is bottom-left and the chat
+   keeps its default bottom-right spot. */
+@media (max-width: 1023.98px) {
+  body.has-mobile-action-bar #liv-prop-chat-root {
+    bottom: 64px !important;
+    max-height: calc(100vh - 174px) !important;
+  }
+}
+
+/* Shrink the collapsed launcher ("We are Online!" bubble + icon) on phones.
+   `data-lp-collapsed` is set by LiveServChat.js only while the chat is closed,
+   so the open chat window keeps its full, readable size. A transform scales
+   the iframe's hit area with it, so clicks still land where they look. */
+@media (max-width: 767.98px) {
+  #liv-prop-chat-root[data-lp-collapsed] {
+    transform: scale(0.7);
+    transform-origin: bottom right;
+  }
 }

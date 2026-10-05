@@ -364,12 +364,14 @@ export default function ProjectBrochure({
       </div>
 
       {/* ===== Sticky "Download Brochure" CTA =====
-          Pinned bottom-right for the whole project detail page. Opens the same
-          unlock form as the section button (handleDownloadClick), so there is
-          one modal and one lead flow.
-          On mobile it sits above ProjectFloatingActions' 56px bottom bar; on
-          lg+ that bar is hidden and the right-edge pills are vertically
-          centred, so the bottom-right corner is clear. */}
+          Shown for the whole project detail page. Opens the same unlock form
+          as the section button (handleDownloadClick), so there is one modal
+          and one lead flow.
+          Pinned bottom-left so it never meets the live-chat widget
+          (#liv-prop-chat-root), which owns the bottom-right corner. Below lg it
+          sits just above the "Call Now" half of ProjectFloatingActions' 56px
+          bottom bar, and globals.css lifts the chat above this row so its
+          collapsed iframe box can't cover the button on narrow phones. */}
       {!noFile && (
         <button
           type="button"
@@ -378,7 +380,7 @@ export default function ProjectBrochure({
             unlocked ? buttonLabel : `${buttonLabel} — fill form to download`
           }
           className="fixed z-[70]
-                     right-[12px] sm:right-[16px] lg:right-[1.25vw]
+                     left-[12px] sm:left-[16px] lg:left-[1.25vw]
                      bottom-[68px] sm:bottom-[72px] lg:bottom-[1.25vw]
                      inline-flex items-center justify-center
                      gap-[8px] sm:gap-[10px] lg:gap-[0.521vw]
