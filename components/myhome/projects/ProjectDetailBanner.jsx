@@ -85,20 +85,16 @@ export default function ProjectDetailBanner({
   return (
     <section
       ref={rootRef}
-      className="relative w-full bg-[#2a2828] h-[100svh] min-h-[560px] lg:h-[56.25vw] lg:min-h-0"
+      className="relative w-full bg-[#2a2828] lg:h-[56.25vw] lg:min-h-0"
       data-section="project-detail-banner"
     >
-      <div ref={imgRef} className="absolute inset-0 overflow-hidden will-change-transform">
-        {/* Mobile crop (below lg) — falls back to the desktop image when unset. */}
-        <Image
+      <div ref={imgRef} className="relative w-full lg:absolute lg:inset-0 overflow-hidden will-change-transform">
+        {/* Mobile: full artwork at its own ratio, fitted to the screen width. */}
+        <img
           src={mobileImageSrc || imageSrc}
           alt={imageAlt}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center select-none lg:hidden"
+          className="block w-full h-auto max-h-[100svh] object-contain object-center select-none lg:hidden"
         />
-        {/* Desktop crop (lg and up). */}
         <Image
           src={imageSrc}
           alt={imageAlt}

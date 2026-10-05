@@ -16,7 +16,8 @@ const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
  *
  * Desktop (lg+): pinned to the right edge, vertically centred. Each button
  * shows only its icon by default and expands smoothly on hover to reveal the
- * label. Mobile: a sticky two-button bar fixed to the bottom of the viewport.
+ * label. Mobile: a sticky bar fixed to the bottom of the viewport. Call Now
+ * is hidden for now; only Request Site Visit is shown.
  *
  * "Call Now" dials the configured number; "Request Site Visit" opens a lead
  * form modal that posts to the CRM (same flow as the other project forms).
@@ -150,7 +151,7 @@ export default function ProjectFloatingActions({
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-[70] flex shadow-[0_-6px_20px_-8px_rgba(0,0,0,0.35)]">
         <a
           href={telHref}
-          className="flex-1 flex items-center justify-center gap-[8px]
+          className="hidden flex-1 items-center justify-center gap-[8px]
                      bg-[#fff] text-[#ef493d] h-[56px]
                      font-montserrat font-medium capitalize text-[15px]"
           style={{ fontFamily: "Montserrat, sans-serif" }}

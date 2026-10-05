@@ -341,22 +341,18 @@ export default function HeroBanner({ data }) {
   return (
     <section
       ref={rootRef}
-      className="relative w-full overflow-hidden bg-[#2a2828] h-[100svh] min-h-[640px]"
+      className="relative w-full overflow-hidden bg-[#2a2828] lg:h-[100svh] lg:min-h-[640px]"
       data-section="hero"
     >
       {/* ---------- Hero image (revealed under the loader) ----------
-          Render two <Image>s — mobile-only crop swaps to desktop crop at lg. */}
-      <div ref={bgRef} className="absolute inset-0 will-change-transform">
+          Mobile shows the full uploaded banner at its own ratio. Desktop
+          fills the viewport. */}
+      <div ref={bgRef} className="relative w-full lg:absolute lg:inset-0 will-change-transform">
         {mobileImage && (
-          <Image
+          <img
             src={mobileImage}
             alt="My Home Group flagship tower at twilight"
-            fill
-            priority
-            quality={92}
-            sizes="100vw"
-            unoptimized
-            className="lg:hidden object-cover object-bottom"
+            className="lg:hidden block w-full h-auto"
           />
         )}
         {desktopImage && (
@@ -378,7 +374,7 @@ export default function HeroBanner({ data }) {
         {showVideo && (
           <video
             key={activeVideo}
-            className="absolute inset-0 h-full w-full object-cover object-bottom"
+            className="absolute inset-0 h-full w-full object-contain lg:object-cover object-bottom"
             src={activeVideo}
             poster={activePoster || undefined}
             autoPlay
