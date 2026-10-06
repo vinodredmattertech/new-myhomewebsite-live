@@ -6,7 +6,8 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionHeading from "@/components/common/SectionHeading";
 
 export default function ProjectClubhouse({
-  sidebarLabel = "Clubhouse",
+  // Rail label; the rail is not rendered at all when this is empty.
+  sidebarLabel = "",
   heading = "",
   // Rendered after `heading` in the accent colour, so the CMS can pick which
   // words carry the highlight (reference: "…Turn into *Memories*").
@@ -14,6 +15,10 @@ export default function ProjectClubhouse({
   description = "",
   imageSrc = "",
   imageAlt = "",
+  // Mirror the desktop layout: image bleeds off the left edge, text and the
+  // sidebar rail sit on the right. Used for every other clubhouse so
+  // consecutive sections alternate sides.
+  reverse = false,
 }) {
   const rootRef = useRef(null);
   const headingRef = useRef(null);
@@ -47,7 +52,8 @@ export default function ProjectClubhouse({
         scrollTrigger: trigger,
       });
 
-      gsap.from([sidebarRef.current, rulesRef.current, descRef.current], {
+      // filter: the rail, rule and description are each optional.
+      gsap.from([sidebarRef.current, rulesRef.current, descRef.current].filter(Boolean), {
         autoAlpha: 0,
         y: 24,
         duration: 0.9,
@@ -59,7 +65,7 @@ export default function ProjectClubhouse({
 
       gsap.from(imageRef.current, {
         autoAlpha: 0,
-        x: 60,
+        x: reverse ? -60 : 60,
         duration: 1.1,
         ease: "expo.out",
         delay: 0.2,
@@ -75,24 +81,37 @@ export default function ProjectClubhouse({
       className="relative w-full bg-white overflow-hidden pt-[20px] pb-[40px] lg:pt-[4.688vw] lg:pb-[4.688vw]"
       data-section="project-clubhouse"
     >
-      {/* Vertical sidebar — same rail every other section uses */}
-      <div
-        ref={sidebarRef}
-        className="flex lg:absolute left-[12px] top-[30px] lg:left-[4.167vw] lg:top-[4.688vw] flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]"
-        aria-hidden="true"
-      >
-        <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-[#ef493d] max-lg:!w-[28px] max-lg:!h-px" />
-        <span
-          className="font-montserrat font-medium capitalize whitespace-nowrap text-[#ef493d] text-[12px] md:text-[14px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
-          style={{ fontFamily: "Montserrat, sans-serif" }}
+      {/* Vertical sidebar — same rail every other section uses. Hidden when
+          the CMS label is empty. */}
+      {sidebarLabel ? (
+        <div
+          ref={sidebarRef}
+          className={`flex lg:absolute top-[30px] lg:top-[4.688vw] ${
+            reverse ? "lg:right-[4.167vw]" : "left-[12px] lg:left-[4.167vw]"
+          } flex-col items-center gap-[8px] md:gap-[12px] lg:gap-[1.094vw] w-auto lg:w-[2.813vw] z-[5] max-lg:static max-lg:!w-full max-lg:flex-row max-lg:!justify-center max-lg:items-center max-lg:!gap-[8px] max-lg:mt-[15px] max-lg:mb-[18px]`}
+          aria-hidden="true"
         >
-          {sidebarLabel}
-        </span>
-      </div>
+          <span className="block w-px h-[28px] md:h-[36px] lg:h-[3.125vw] bg-[#ef493d] max-lg:!w-[28px] max-lg:!h-px" />
+          <span
+            className="font-montserrat font-medium capitalize whitespace-nowrap text-[#ef493d] text-[12px] md:text-[14px] lg:text-[1.25vw] max-lg:[writing-mode:horizontal-tb] lg:[writing-mode:vertical-rl] lg:rotate-180"
+            style={{ fontFamily: "Montserrat, sans-serif" }}
+          >
+            {sidebarLabel}
+          </span>
+        </div>
+      ) : null}
 
       {/* Text left, image bleeding off the right edge */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_50.5vw] items-center gap-[32px] lg:gap-[3.646vw]">
-        <div className="px-5 md:px-12 lg:pl-[9.375vw] lg:pr-0">
+      <div
+        className={`grid grid-cols-1 items-center gap-[32px] lg:gap-[3.646vw] ${
+          reverse ? "lg:grid-cols-[50.5vw_1fr]" : "lg:grid-cols-[1fr_50.5vw]"
+        }`}
+      >
+        <div
+          className={`px-5 md:px-12 ${
+            reverse ? "lg:order-2 lg:pr-[9.375vw] lg:pl-0" : "lg:pl-[9.375vw] lg:pr-0"
+          }`}
+        >
           {/* <span
             ref={rulesRef}
             className="block h-px w-[64px] lg:w-[4.167vw] bg-[#ef493d]/60 mb-[20px] lg:mb-[1.563vw]"
@@ -142,13 +161,18 @@ export default function ProjectClubhouse({
 
         {imageSrc ? (
           // Gutter matches the text block on small screens; on lg the photo
-          // runs to the right edge of the viewport as in the reference.
-          <div className="px-5 md:px-12 lg:px-0">
+          // runs to the right edge of the viewport as in the reference (the
+          // left edge when `reverse`).
+          <div className={`px-5 md:px-12 lg:px-0 ${reverse ? "lg:order-1" : ""}`}>
             <div
               ref={imageRef}
-              className="relative w-full overflow-hidden
+              className={`relative w-full overflow-hidden
                          aspect-[821/658] lg:aspect-auto lg:h-[36.458vw]
-                         rounded-[12px] lg:rounded-r-none lg:rounded-l-[12px]"
+                         rounded-[12px] ${
+                           reverse
+                             ? "lg:rounded-l-none lg:rounded-r-[12px]"
+                             : "lg:rounded-r-none lg:rounded-l-[12px]"
+                         }`}
             >
               <Image
                 src={imageSrc}

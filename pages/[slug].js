@@ -129,14 +129,24 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
     image: mediaUrl(it.image),
   }));
 
-  const ch = project.clubhouse || {};
-  const clubhouseImage = mediaUrl(ch.image) || "";
-  const hasClubhouse = Boolean(
-    hasText(ch.heading) ||
-    hasText(ch.headingAccent) ||
-    hasText(ch.description) ||
-    clubhouseImage
-  );
+  // `clubhouse` is a repeatable component (one entry per clubhouse). Tolerate the
+  // old single-object shape too, so a backend still on the previous schema
+  // keeps rendering. Entries with nothing filled in are dropped.
+  const clubhouses = (Array.isArray(project.clubhouse)
+    ? project.clubhouse
+    : project.clubhouse
+      ? [project.clubhouse]
+      : []
+  )
+    .map((ch) => ({ ...ch, imageSrc: mediaUrl(ch.image) || "" }))
+    .filter(
+      (ch) =>
+        hasText(ch.heading) ||
+        hasText(ch.headingAccent) ||
+        hasText(ch.description) ||
+        ch.imageSrc
+    );
+  const hasClubhouse = clubhouses.length > 0;
 
   // Icon-grid amenities section. Each tile is a line icon + label, so entries
   // whose icon was never uploaded are dropped (an iconless tile would render
@@ -432,18 +442,22 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
           <ProjectAmenities data={project?.amenities} />
         </div>
       )} */}
-      {hasClubhouse && (
-        <div id="clubhouse">
+      {/* One section per clubhouse; the nav tab targets the first. Every
+          other one mirrors the layout (image left) so consecutive sections
+          alternate sides. */}
+      {clubhouses.map((ch, i) => (
+        <div key={ch.id ?? i} id={i === 0 ? "clubhouse" : `clubhouse-${i + 1}`}>
           <ProjectClubhouse
-            sidebarLabel={txt(ch.sidebarLabel) || undefined}
+            sidebarLabel={txt(ch.sidebarLabel)}
             heading={txt(ch.heading)}
             headingAccent={txt(ch.headingAccent)}
             description={txt(ch.description)}
-            imageSrc={clubhouseImage}
+            imageSrc={ch.imageSrc}
             imageAlt={txt(ch.imageAlt) || `${project.title} clubhouse`}
+            reverse={i % 2 === 1}
           />
         </div>
-      )}
+      ))}
 
       {/* aminities new section */}
       {hasAmenityIcons && (
