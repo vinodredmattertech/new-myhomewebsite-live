@@ -1,5 +1,6 @@
 import LiveServChat from "@/components/common/LiveServChat";
 import ScrollToTop from "@/components/common/ScrollToTop";
+import ProjectFloatingActions from "@/components/myhome/projects/ProjectFloatingActions";
 import MyHomeLayout from "@/components/myhome/MyHomeLayout";
 import "@/styles/globals.css";
 import { useRouter } from "next/router";
@@ -29,8 +30,11 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       {getLayout(<Component {...pageProps} />, router)}
-      {/* Outside getLayout so the widget still mounts on pages that
-          replace the default chrome with their own layout. */}
+      {/* Outside getLayout so these still mount on pages that replace the
+          default chrome with their own layout. Pages that render their own
+          project-specific actions (project detail) opt out of the generic
+          sticky Call Now / Request Site Visit. */}
+      {!Component.ownFloatingActions && <ProjectFloatingActions />}
       <LiveServChat />
     </>
   );

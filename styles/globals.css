@@ -939,6 +939,10 @@ select {
    so the two stay apart. On lg+ the brochure CTA is bottom-left and the chat
    keeps its default bottom-right spot. */
 @media (max-width: 1023.98px) {
+  /* Keep the end of every page (footer) clear of the 56px fixed bar. */
+  body.has-mobile-action-bar {
+    padding-bottom: 56px;
+  }
   body.has-mobile-action-bar #liv-prop-chat-root {
     bottom: 64px !important;
     max-height: calc(100vh - 174px) !important;

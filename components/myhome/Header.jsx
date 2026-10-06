@@ -86,10 +86,10 @@ export default function MyHomeHeader() {
   const NAV_ITEMS =
     Array.isArray(cms?.navItems) && cms.navItems.length > 0
       ? cms.navItems.map((n) => ({
-          label: n.label,
-          href: n.href,
-          openInNewTab: !!n.openInNewTab,
-        }))
+        label: n.label,
+        href: n.href,
+        openInNewTab: !!n.openInNewTab,
+      }))
       : FALLBACK_NAV_ITEMS;
   const LOGO = mediaUrl(cms?.logo) || FALLBACK_LOGO;
   const MENU_LABEL = cms?.menuLabel || "Menu";
@@ -201,11 +201,10 @@ export default function MyHomeHeader() {
           `scrolled` flips. */}
       <header
         ref={headerRef}
-        className={`fixed inset-x-0 top-0 z-[60] transition-all duration-500 ${
-          scrolled
-            ? "bg-[#2a2828]/90 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.1)]"
-            : "bg-gradient-to-b from-black/25 to-transparent"
-        }`}
+        className={`fixed inset-x-0 top-0 z-[70] transition-all duration-500 ${scrolled
+          ? "bg-[#2a2828]/90 backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.1)]"
+          : "bg-gradient-to-b from-black/25 to-transparent"
+          }`}
       >
         <div className="relative h-[66px] md:h-[80px] lg:h-[5.77vw] flex items-center px-5 md:px-10 lg:px-[8.333vw]">
           {/* ===== Mobile (<md): logo LEFT, Menu RIGHT (matches Figma 3189:5437) ===== */}
@@ -303,15 +302,13 @@ export default function MyHomeHeader() {
 
       {/* Slide-down mega menu (full-width, drops from the top) */}
       <div
-        className={`fixed inset-0 z-[55] pointer-events-none ${
-          open ? "pointer-events-auto" : ""
-        }`}
+        className={`fixed inset-0 z-[55] pointer-events-none ${open ? "pointer-events-auto" : ""
+          }`}
       >
         <div
           onClick={() => setOpen(false)}
-          className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-            open ? "opacity-60 backdrop-blur-[2px] md:backdrop-blur-none" : "opacity-0"
-          }`}
+          className={`absolute inset-0 bg-black transition-opacity duration-500 ${open ? "opacity-60 backdrop-blur-[2px] md:backdrop-blur-none" : "opacity-0"
+            }`}
         />
         {/*
           `data-lenis-prevent`: Lenis calls preventDefault() on every touchmove
@@ -326,9 +323,8 @@ export default function MyHomeHeader() {
           className={`absolute inset-x-0 top-0 overflow-hidden flex flex-col
                       h-screen md:h-auto
                       bg-[#2a2828] text-white shadow-[0_30px_60px_rgba(0,0,0,0.45)]
-                      transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            open ? "translate-y-0" : "-translate-y-full"
-          }`}
+                      transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-y-0" : "-translate-y-full"
+            }`}
         >
           {/* Spacer so content clears the fixed header bar above */}
           <div className="h-[66px] md:h-[80px] lg:h-[5.77vw]" />

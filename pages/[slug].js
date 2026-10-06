@@ -593,6 +593,9 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
 }
 
 ProjectDetailPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+// Renders ProjectFloatingActions itself with this project's phone and CRM
+// slug, so _app.js skips its generic site-wide instance here.
+ProjectDetailPage.ownFloatingActions = true;
 
 export async function getServerSideProps({ params, preview = false }) {
   // `preview` is set by Next's preview cookie, which /api/preview only issues

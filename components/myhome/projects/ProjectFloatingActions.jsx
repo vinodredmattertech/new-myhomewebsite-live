@@ -3,16 +3,33 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
-import { Phone, X } from "lucide-react";
-import { submitLead } from "@/lib/strapi";
+import { ChevronDown, Phone, X } from "lucide-react";
+import { STRAPI_URL, submitLead } from "@/lib/strapi";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, validatePhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
 
+// Published projects that can receive Sell.Do leads, alphabetical. The CRM
+// route looks the Sell.Do ids up itself, so they are not requested here.
+const SELLDO_PROJECTS_URL =
+  `${STRAPI_URL}/api/projects?fields[0]=title&fields[1]=slug&fields[2]=badge` +
+  `&filters[selldoProjectId][$notNull]=true&filters[selldoProjectId][$ne]=` +
+  `&sort=title:asc&pagination[pageSize]=100`;
+
 /**
- * Floating "Call Now" + "Request Site Visit" actions for project detail pages.
+ * Floating "Call Now" + "Request Site Visit" actions, shown on every page.
+ *
+ * _app.js renders a generic instance site-wide (default number, no project).
+ * Project detail pages render their own with the project's phone, name and
+ * slug instead, so the CRM push can file the lead against that project; they
+ * opt out of the global one with `ProjectDetailPage.ownFloatingActions`.
+ * Sell.Do files every lead against a project, so without a `projectSlug` the
+ * modal asks for a "Preferred Project", listing only ongoing projects that
+ * have a Sell.Do project id in Strapi, and sends that project's slug to the CRM
+ * route. If that list can't be loaded the field is left out and the lead is
+ * kept in Strapi only (the CRM route skips leads with no project).
  *
  * Desktop (lg+): pinned to the right edge, vertically centred. Each button
  * shows only its icon by default and expands smoothly on hover to reveal the
@@ -24,13 +41,41 @@ const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
  */
 export default function ProjectFloatingActions({
   phone = "+919154981691",
-  projectName = "Project",
+  // Empty outside project pages; the modal copy and payload adapt.
+  projectName = "",
   projectSlug,
 }) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  // Project choices for the site-wide instance (no projectSlug); null = not
+  // loaded yet, [] = unavailable, in which case the field is not shown.
+  const [projectOptions, setProjectOptions] = useState(null);
+  const askProject = !projectSlug && projectOptions?.length > 0;
+
+  useEffect(() => {
+    if (!modalOpen || projectSlug || projectOptions !== null) return;
+    let cancelled = false;
+    fetch(SELLDO_PROJECTS_URL)
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((json) => {
+        const options = (json?.data || [])
+          // Ongoing only: `badge` is "Ongoing" or empty for ongoing projects,
+          // "Completed" / "Upcoming" otherwise.
+          .filter((p) => {
+            const badge = (p.attributes?.badge || "").trim().toLowerCase();
+            return !badge || badge === "ongoing";
+          })
+          .map((p) => ({ title: p.attributes?.title, slug: p.attributes?.slug }))
+          .filter((p) => p.title && p.slug);
+        if (!cancelled) setProjectOptions(options);
+      })
+      .catch(() => !cancelled && setProjectOptions([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [modalOpen, projectSlug, projectOptions]);
 
   // Lets globals.css lift the third-party chat widget above the mobile
   // bottom bar while this component is mounted.
@@ -53,11 +98,16 @@ export default function ProjectFloatingActions({
   const onSubmit = async (data) => {
     setSubmitting(true);
     setSubmitError(null);
+    // On a project page the props win; elsewhere use the visitor's choice.
+    const chosen = projectSlug
+      ? null
+      : (projectOptions || []).find((p) => p.slug === data.project);
+    const leadSlug = projectSlug || chosen?.slug;
     const payload = {
       name: data.name,
       email: data.email,
       phone: `${dialCodeFor(data.countryCode)} ${data.phone}`.trim(),
-      project: projectName,
+      project: projectName || chosen?.title || "",
       message: [
         "Requested a site visit",
         data.preferredDate && `Preferred date: ${data.preferredDate}`,
@@ -70,11 +120,11 @@ export default function ProjectFloatingActions({
     try {
       const [crmRes] = await Promise.all([
         pushToCRM({
-          projectSlug,
+          projectSlug: leadSlug,
           name: payload.name,
           email: payload.email,
           phone: payload.phone,
-          project_name: payload.project,
+          project_name: payload.project || "-",
           message: payload.message,
           FormSource: payload.formSource,
         }),
@@ -221,8 +271,8 @@ export default function ProjectFloatingActions({
                          leading-[20px] sm:leading-[22px] lg:leading-[1.302vw]"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
-              Share your details for {projectName} and our team will arrange a
-              visit at your convenience.
+              Share your details{projectName ? ` for ${projectName}` : ""} and
+              our team will arrange a visit at your convenience.
             </p>
 
             <form
@@ -306,6 +356,42 @@ export default function ProjectFloatingActions({
                   <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.email.message}</p>
                 )}
               </div>
+
+              {askProject && (
+                <div>
+                  <div
+                    className={`relative w-full border-b
+                                ${errors.project ? "border-[#ef493d]" : "border-[#33333322]"}`}
+                  >
+                    <select
+                      aria-label="Preferred project"
+                      aria-invalid={!!errors.project || undefined}
+                      defaultValue=""
+                      className="w-full appearance-none bg-transparent outline-none border-none cursor-pointer
+                                 text-[#333] text-[14px] sm:text-[16px] lg:text-[0.938vw]
+                                 py-[8px] lg:py-[0.417vw] pr-[20px]"
+                      style={{ fontFamily: "Montserrat, sans-serif" }}
+                      {...register("project", { required: "Please select a project" })}
+                    >
+                      <option value="" disabled>
+                        Preferred Project*
+                      </option>
+                      {projectOptions.map((p) => (
+                        <option key={p.slug} value={p.slug}>
+                          {p.title}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 w-[14px] h-[14px] text-[#999]"
+                      strokeWidth={2}
+                    />
+                  </div>
+                  {errors.project && (
+                    <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.project.message}</p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <input
