@@ -349,7 +349,11 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
   // Gated on the images actually handed to ProjectProgress. `progressMetrics`
   // is deliberately not part of this test: the component accepts a `metrics`
   // prop but never renders it, so metrics alone would show an empty section.
-  const hasProgress = combinedProgressImages.length > 0;
+  // Completed projects have no construction left to report, so the section
+  // (and its nav tab) is hidden for them. Same phase rule as ProjectsListing.
+  const isCompleted =
+    project.status === "Completed" || project.badge === "Completed";
+  const hasProgress = !isCompleted && combinedProgressImages.length > 0;
   const hasBrochure = Boolean(
     hasText(br.heading) ||
     lines(br.highlights).length ||
