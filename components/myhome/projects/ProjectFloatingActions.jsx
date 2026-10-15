@@ -19,7 +19,8 @@ const SELLDO_PROJECTS_URL =
   `&sort=title:asc&pagination[pageSize]=100`;
 
 /**
- * Floating "Call Now" + "Request Site Visit" actions, shown on every page.
+ * Floating "Call Now" (mobile only) + "Request Site Visit" actions, shown on
+ * every page.
  *
  * _app.js renders a generic instance site-wide (default number, no project).
  * Project detail pages render their own with the project's phone, name and
@@ -31,10 +32,10 @@ const SELLDO_PROJECTS_URL =
  * route. If that list can't be loaded the field is left out and the lead is
  * kept in Strapi only (the CRM route skips leads with no project).
  *
- * Desktop (lg+): pinned to the right edge, vertically centred. Each button
- * shows only its icon by default and expands smoothly on hover to reveal the
- * label. Mobile: a sticky bar fixed to the bottom of the viewport. Call Now
- * is hidden for now; only Request Site Visit is shown.
+ * Desktop (lg+): only Request Site Visit, pinned to the right edge and
+ * vertically centred; it shows its icon by default and expands smoothly on
+ * hover to reveal the label. Mobile: a sticky bar fixed to the bottom of the
+ * viewport with Call Now and Request Site Visit side by side.
  *
  * "Call Now" dials the configured number; "Request Site Visit" opens a lead
  * form modal that posts to the CRM (same flow as the other project forms).
@@ -146,28 +147,8 @@ export default function ProjectFloatingActions({
 
   return (
     <>
-      {/* ===== Desktop: right-edge expanding pills ===== */}
+      {/* ===== Desktop: right-edge expanding pill (site visit only) ===== */}
       <div className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-[70] flex-col items-end gap-[0.833vw]">
-        <a
-          href={telHref}
-          aria-label="Call Now"
-          className="group flex items-center overflow-hidden rounded-l-full
-                     bg-[#fff] hover:bg-[#fff] text-[#d83a2f] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]
-                     h-[3.333vw] pl-[1.042vw] pr-[1.042vw]
-                     transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-        >
-          <Phone className="w-[1.25vw] h-[1.25vw] shrink-0" strokeWidth={1.8} />
-          <span
-            className="max-w-0 group-hover:max-w-[10vw] group-hover:ml-[0.625vw]
-                       overflow-hidden whitespace-nowrap
-                       font-montserrat font-medium capitalize text-[0.938vw]
-                       transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
-            Call Now
-          </span>
-        </a>
-
         <button
           type="button"
           onClick={() => setModalOpen(true)}
@@ -201,7 +182,7 @@ export default function ProjectFloatingActions({
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-[70] flex shadow-[0_-6px_20px_-8px_rgba(0,0,0,0.35)]">
         <a
           href={telHref}
-          className="hidden flex-1 items-center justify-center gap-[8px]
+          className="flex-1 flex items-center justify-center gap-[8px]
                      bg-[#fff] text-[#ef493d] h-[56px]
                      font-montserrat font-medium capitalize text-[15px]"
           style={{ fontFamily: "Montserrat, sans-serif" }}

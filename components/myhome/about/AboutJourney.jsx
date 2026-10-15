@@ -17,7 +17,7 @@ import SectionHeading from "@/components/common/SectionHeading";
    The rail is a fixed-height window over the full year list. It starts pinned
    to the first milestone and only scrolls once the active year would leave the
    window — so the list can hold any number of milestones without spilling out
-   of the section, and the earliest year still reads from the top. */
+   of the section, and the latest year still reads from the top. */
 const RAIL_VW = 33.75; // rail height — same as the image column
 const ROW_VW = 3.125; // one year row (tall enough for the active pill)
 
@@ -32,7 +32,8 @@ export default function AboutJourney({ data }) {
   const JOURNEY = Array.isArray(data?.items)
     ? data.items
         .slice()
-        .sort((a, b) => (a.year ?? 0) - (b.year ?? 0))
+        // Newest first: the timeline opens on the latest year and runs back.
+        .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
         .map((m) => ({
           year: m.year,
           title: m.title || "",

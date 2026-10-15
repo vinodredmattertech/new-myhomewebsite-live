@@ -33,7 +33,9 @@ const PROJECT_TYPES = [
 ];
 
 // Sidebar: project status / phase (multi-select)
-const PROJECT_STATUSES = ["Ongoing", "Upcoming", "Completed"];
+const PROJECT_STATUSES = ["Ongoing", "New Launch", "Upcoming", "Completed"];
+// Statuses shown only when at least one project falls under them.
+const OPTIONAL_STATUSES = ["New Launch", "Upcoming"];
 
 /**
  * Spelling variants that mean the same locality, collapsed onto one label.
@@ -81,12 +83,14 @@ function projectType(p) {
 
 function projectStatus(p) {
   if (p.status === "Completed" || p.badge === "Completed") return "Completed";
-  if ((p.badge || "").toLowerCase() === "upcoming") return "Upcoming";
+  const badge = (p.badge || "").toLowerCase().replace(/[\s-]+/g, "");
+  if (badge === "newlaunch") return "New Launch";
+  if (badge === "upcoming") return "Upcoming";
   return "Ongoing";
 }
 
-// Phase ordering for the listing: ongoing first, then upcoming, then completed.
-const PHASE_ORDER = { Ongoing: 0, Upcoming: 1, Completed: 2 };
+// Phase ordering for the listing: ongoing, new launch, upcoming, completed.
+const PHASE_ORDER = { Ongoing: 0, "New Launch": 1, Upcoming: 2, Completed: 3 };
 function phaseRank(p) {
   return PHASE_ORDER[projectStatus(p)] ?? 0;
 }
@@ -591,6 +595,15 @@ export default function ProjectsListing({ projects = [], heading }) {
       .map(([label]) => label);
   }, [PROJECTS]);
 
+  // Hide optional statuses (New Launch, Upcoming) when no project carries them, so the
+  // filter never offers an option that leads to an empty grid.
+  const STATUSES = useMemo(() => {
+    const present = new Set(PROJECTS.map(projectStatus));
+    return PROJECT_STATUSES.filter(
+      (st) => !OPTIONAL_STATUSES.includes(st) || present.has(st)
+    );
+  }, [PROJECTS]);
+
   const rootRef = useRef(null);
   const headingRef = useRef(null);
   const gridRef = useRef(null);
@@ -651,7 +664,7 @@ export default function ProjectsListing({ projects = [], heading }) {
         break;
     }
 
-    // Always group by phase (ongoing → upcoming → completed); the chosen
+    // Always group by phase (ongoing → new launch → upcoming → completed); the chosen
     // sort above acts as the tiebreaker within each group.
     list = [...list].sort((a, b) => phaseRank(a) - phaseRank(b));
 
@@ -801,7 +814,7 @@ export default function ProjectsListing({ projects = [], heading }) {
             count={selectedStatuses.length}
             active={selectedStatuses.length > 0}
           >
-            {PROJECT_STATUSES.map((st) => (
+            {STATUSES.map((st) => (
               <DropdownOption
                 key={st}
                 label={st}
@@ -888,7 +901,7 @@ export default function ProjectsListing({ projects = [], heading }) {
 
             <FilterPanel title="PROJECT STATUS:" collapsible>
               <div className="flex flex-col">
-                {PROJECT_STATUSES.map((st) => (
+                {STATUSES.map((st) => (
                   <CheckRow
                     key={st}
                     label={st}

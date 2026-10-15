@@ -955,19 +955,19 @@ select {
    scales the iframe's hit area with it, so clicks still land where they look. */
 #liv-prop-chat-root[data-lp-collapsed] {
   right: 8px !important;
-  transform: scale(0.85);
+  transform: scale(0.7);
   transform-origin: bottom right;
 }
 /* Narrower desktop viewports, e.g. a 1920px screen zoomed up to 150% (1280px):
    browser zoom enlarges the launcher, so scale it down further here. */
 @media (min-width: 768px) and (max-width: 1280px) {
   #liv-prop-chat-root[data-lp-collapsed] {
-    transform: scale(0.7);
+    transform: scale(0.6);
   }
 }
 @media (max-width: 767.98px) {
   #liv-prop-chat-root[data-lp-collapsed] {
     right: 6px !important;
-    transform: scale(0.7);
+    transform: scale(0.6);
   }
 }
