@@ -9,6 +9,7 @@ import { ChevronDown } from "lucide-react";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
@@ -230,8 +231,9 @@ export default function ProjectInquiry({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-          dangerouslySetInnerHTML={{ __html: description || "" }}
-        />
+        >
+          <RichText>{description || ""}</RichText>
+        </p>
 
         {/* Form + info row */}
         <div className="mt-[40px] lg:mt-[3.125vw] grid grid-cols-1 lg:grid-cols-[31.771vw_1fr] gap-[40px] lg:gap-[8.281vw] items-start lg:divide-x lg:divide-[#33333322]">

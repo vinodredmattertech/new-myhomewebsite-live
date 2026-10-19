@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/grid";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 
 // Columns per view, per breakpoint. Kept in JS as well as in the Swiper
 // `breakpoints` map so the arrows can be hidden when everything fits on one
@@ -145,8 +146,9 @@ export default function ProjectAmenitiesIcons({
                        sm:text-[16px] sm:leading-[28px]
                        lg:text-[0.938vw] lg:leading-[1.563vw]"
             style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-            dangerouslySetInnerHTML={{ __html: description }}
-          />
+          >
+            <RichText>{description}</RichText>
+          </p>
         ) : null}
       </div>
 

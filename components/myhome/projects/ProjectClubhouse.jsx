@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 
 export default function ProjectClubhouse({
   // Rail label; the rail is not rendered at all when this is empty.
@@ -141,8 +142,9 @@ export default function ProjectClubhouse({
                          sm:text-[16px] sm:leading-[28px]
                          lg:text-[0.938vw] lg:leading-[1.667vw]"
               style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
+            >
+              <RichText>{description}</RichText>
+            </p>
           ) : null}
 
           {/* Dot grid, echoing the reference's quiet corner detail */}

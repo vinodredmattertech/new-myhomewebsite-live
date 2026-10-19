@@ -9,7 +9,8 @@ import { mediaUrl } from "@/lib/strapi";
  * Hero banner — opens with a cinematic "Welcome HOME" loader on a #2a2828
  * panel. The loader text fades + mask-reveals, the text slides down out of
  * its clip mask, then the entire dark panel slides up off-screen to reveal
- * the property image with bottom-left copy + the white Enquire-Now button.
+ * the property image with bottom-left copy. The whole image links to the
+ * banner destination.
  *
  * Animation states (replicated from Figma 2609:2746 → 2609:2774 → 2609:2808).
  */
@@ -22,12 +23,12 @@ export default function HeroBanner({ data }) {
   const shimmerRef = useRef(null);
   const copyHeadingRef = useRef(null);
   const copyBodyRef = useRef(null);
-  const btnRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
 
-  // Strapi can leave `ctaText` blank — treat blank/whitespace as "no button".
-  const hasCta = Boolean(data?.ctaText && String(data.ctaText).trim());
+  // The banner image is the link. A blank CMS destination means it stays static.
+  const ctaHref = String(data?.ctaLink || "").trim();
+  const ctaLabel = String(data?.ctaText || "").trim();
 
   // Which breakpoint we're on — `null` until hydration so the server and the
   // first client render agree. Only the matching video is ever mounted, so we
@@ -134,9 +135,7 @@ export default function HeroBanner({ data }) {
       gsap.set(welcomeRef.current, { y: 0, yPercent: 105, autoAlpha: 0 });
       gsap.set(subtitleRef.current, { y: 0, yPercent: 110, autoAlpha: 0 });
       gsap.set(
-        [copyHeadingRef.current, copyBodyRef.current, btnRef.current].filter(
-          Boolean
-        ),
+        [copyHeadingRef.current, copyBodyRef.current].filter(Boolean),
         {
           y: 50,
           autoAlpha: 0,
@@ -250,7 +249,7 @@ export default function HeroBanner({ data }) {
           window.dispatchEvent(new CustomEvent("mh:loader-done"));
           setLoading(false);
         }, "hold+=0.6")
-        // Phase 6 — bottom-left copy & button fade in
+        // Phase 6 — bottom-left copy fades in
         .to(
           copyHeadingRef.current,
           { y: 0, autoAlpha: 1, duration: 0.8, ease: "expo.out" },
@@ -261,16 +260,6 @@ export default function HeroBanner({ data }) {
           { y: 0, autoAlpha: 1, duration: 0.7, ease: "expo.out" },
           "hold+=0.85"
         );
-
-      // The CTA is optional — when Strapi sends an empty `ctaText` the button
-      // isn't rendered at all, so there's nothing to fade in.
-      if (btnRef.current) {
-        tl.to(
-          btnRef.current,
-          { y: 0, autoAlpha: 1, duration: 0.65, ease: "expo.out" },
-          "hold+=0.95"
-        );
-      }
 
       // The loader title is set in "Tartuffo_Trial_Regular", declared without a
       // `font-display`, so the browser blocks its text while the .otf loads.
@@ -387,8 +376,17 @@ export default function HeroBanner({ data }) {
         )}
       </div>
 
-      {/* ---------- Bottom hero block: copy + Enquire button ---------- */}
-      <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[8.333vw] pb-[40px] sm:pb-12 md:pb-14 lg:pb-[7.291vw]">
+      {/* The whole banner is the link. Copy sits above it but lets clicks through. */}
+      {ctaHref && (
+        <a
+          href={ctaHref}
+          aria-label={ctaLabel || data.headingLine1 || "Banner"}
+          className="absolute inset-0 z-[4] cursor-pointer"
+        />
+      )}
+
+      {/* ---------- Bottom hero block: copy ---------- */}
+      <div className="absolute inset-x-0 bottom-0 z-[5] pointer-events-none px-5 md:px-12 lg:px-[8.333vw] pb-[40px] sm:pb-12 md:pb-14 lg:pb-[7.291vw]">
         <div className="flex flex-col gap-[14px] sm:gap-6 md:gap-7 lg:flex-row lg:items-end lg:justify-between lg:gap-10 xl:gap-[4vw]">
           {/* Copy */}
           <div
@@ -415,34 +413,6 @@ export default function HeroBanner({ data }) {
               {data.description}
             </p>
           </div>
-
-          {/* Enquire button — only when the CMS actually supplies a label */}
-          {hasCta && (
-          <a
-            ref={btnRef}
-            href={data.ctaLink || "#"}
-            className="group self-start lg:self-end shrink-0 inline-flex items-center justify-center lg:justify-between gap-0 lg:gap-[1.041vw] w-[152px] sm:w-[180px] lg:w-[15.354vw] xl:w-[15.354vw] h-[42px] sm:h-[50px] lg:h-[3.125vw] px-4 sm:px-5 lg:px-[1.5vw] bg-white text-[#2a2828] hover:bg-mh-red hover:text-white transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden whitespace-nowrap"
-          >
-            <span
-              className="font-montserrat font-medium capitalize text-[12px] sm:text-[13px] lg:text-[0.833vw] tracking-[0.08em] whitespace-nowrap"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              {data.ctaText}
-            </span>
-            <svg
-              viewBox="0 0 36 14"
-              fill="none"
-              className="hidden lg:block shrink-0 w-[28px] sm:w-[32px] lg:w-[2.03vw] h-auto transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5"
-            >
-              <path
-                d="M0 7h33M27 1l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="square"
-              />
-            </svg>
-          </a>
-          )}
         </div>
       </div>
 

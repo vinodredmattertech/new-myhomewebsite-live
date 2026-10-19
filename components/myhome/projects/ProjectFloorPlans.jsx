@@ -12,6 +12,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import useFancybox from "@/components/common/useFancybox";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
@@ -311,8 +312,9 @@ export default function ProjectFloorPlans({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-          dangerouslySetInnerHTML={{ __html: description }}
-        />
+        >
+          <RichText>{description}</RichText>
+        </p>
 
         {/* Tabs */}
         <div

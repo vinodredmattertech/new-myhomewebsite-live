@@ -10,6 +10,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
 import { cleanImage } from "@/components/ImageHandle";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 
 // const DEFAULT_AMENITIES = [
 //   {
@@ -164,8 +165,9 @@ export default function ProjectAmenities({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-          dangerouslySetInnerHTML={{ __html: data?.description }}
-        />
+        >
+          <RichText>{data?.description}</RichText>
+        </p>
       </div>
       <div ref={sliderRef} className="mt-[40px] lg:mt-[3.802vw] w-full">
         <Swiper

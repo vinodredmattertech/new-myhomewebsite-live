@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 
 const DEFAULT_STATS = [
   { value: "24.99", label: "Acres" },
@@ -143,8 +144,9 @@ export default function ProjectOverview({
                          lg:text-[0.938vw] lg:leading-[1.563vw]
                          lg:max-w-[36vw]"
               style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
+            >
+              <RichText>{description}</RichText>
+            </p>
 
             <div
               ref={statsRef}

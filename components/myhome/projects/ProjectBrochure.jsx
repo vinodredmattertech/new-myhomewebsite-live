@@ -369,8 +369,8 @@ export default function ProjectBrochure({
           and one lead flow.
           Pinned bottom-left so it never meets the live-chat widget
           (#liv-prop-chat-root), which owns the bottom-right corner. Below lg it
-          sits just above the "Call Now" half of ProjectFloatingActions' 56px
-          bottom bar, and globals.css lifts the chat above this row so its
+          sits just above ProjectFloatingActions' 56px bottom bar, and
+          globals.css lifts the chat above this row so its
           collapsed iframe box can't cover the button on narrow phones. */}
       {!noFile && (
         <button

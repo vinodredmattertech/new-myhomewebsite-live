@@ -123,7 +123,7 @@ export default function MyHomeHeader() {
     {
       heading: "Quick Links",
       items: [
-        resolveNav("Home", "/"),
+   
         resolveNav("Blogs", "/blogs"),
         resolveNav("News & Media", "/news"),
         resolveNav("Testimonials", "/testimonials"),

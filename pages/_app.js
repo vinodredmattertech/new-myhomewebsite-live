@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }) {
       {/* Outside getLayout so these still mount on pages that replace the
           default chrome with their own layout. Pages that render their own
           project-specific actions (project detail) opt out of the generic
-          sticky Call Now / Request Site Visit. */}
+          sticky Request Site Visit. */}
       {!Component.ownFloatingActions && <ProjectFloatingActions />}
       <LiveServChat />
     </>

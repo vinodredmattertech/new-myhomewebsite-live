@@ -9,6 +9,7 @@ import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 import { mediaUrl } from "@/lib/strapi";
 
 const MONTHS_LIST = [
@@ -412,8 +413,9 @@ export default function ProjectProgress({
                        sm:text-[16px] sm:leading-[28px]
                        lg:text-[0.938vw] lg:leading-[1.563vw]"
             style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-            dangerouslySetInnerHTML={{ __html: description }}
-          />
+          >
+            <RichText>{description}</RichText>
+          </p>
         ) : null}
 
         {/* Full Calendar Month & Year Date Picker Popover matching screenshot */}

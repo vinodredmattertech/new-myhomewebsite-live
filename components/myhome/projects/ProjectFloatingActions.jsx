@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
-import { ChevronDown, Phone, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { STRAPI_URL, submitLead } from "@/lib/strapi";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
@@ -19,29 +19,25 @@ const SELLDO_PROJECTS_URL =
   `&sort=title:asc&pagination[pageSize]=100`;
 
 /**
- * Floating "Call Now" (mobile only) + "Request Site Visit" actions, shown on
- * every page.
+ * Floating "Request Site Visit" action, shown on every page.
  *
- * _app.js renders a generic instance site-wide (default number, no project).
- * Project detail pages render their own with the project's phone, name and
- * slug instead, so the CRM push can file the lead against that project; they
- * opt out of the global one with `ProjectDetailPage.ownFloatingActions`.
- * Sell.Do files every lead against a project, so without a `projectSlug` the
- * modal asks for a "Preferred Project", listing only ongoing projects that
- * have a Sell.Do project id in Strapi, and sends that project's slug to the CRM
- * route. If that list can't be loaded the field is left out and the lead is
- * kept in Strapi only (the CRM route skips leads with no project).
+ * _app.js renders a generic instance site-wide (no project). Project detail
+ * pages render their own with the project's name and slug instead, so the CRM
+ * push can file the lead against that project; they opt out of the global one
+ * with `ProjectDetailPage.ownFloatingActions`. Sell.Do files every lead
+ * against a project, so without a `projectSlug` the modal asks for a
+ * "Preferred Project", listing only ongoing projects that have a Sell.Do
+ * project id in Strapi, and sends that project's slug to the CRM route. If
+ * that list can't be loaded the field is left out and the lead is kept in
+ * Strapi only (the CRM route skips leads with no project).
  *
- * Desktop (lg+): only Request Site Visit, pinned to the right edge and
- * vertically centred; it shows its icon by default and expands smoothly on
- * hover to reveal the label. Mobile: a sticky bar fixed to the bottom of the
- * viewport with Call Now and Request Site Visit side by side.
- *
- * "Call Now" dials the configured number; "Request Site Visit" opens a lead
- * form modal that posts to the CRM (same flow as the other project forms).
+ * Desktop (lg+): pinned to the right edge and vertically centred; it shows
+ * its icon by default and expands smoothly on hover to reveal the label.
+ * Mobile: a sticky bar fixed to the bottom of the viewport. "Request Site
+ * Visit" opens a lead form modal that posts to the CRM (same flow as the
+ * other project forms).
  */
 export default function ProjectFloatingActions({
-  phone = "+919154981691",
   // Empty outside project pages; the modal copy and payload adapt.
   projectName = "",
   projectSlug,
@@ -93,8 +89,6 @@ export default function ProjectFloatingActions({
     reset,
     formState: { errors },
   } = useForm({ mode: "onBlur" });
-
-  const telHref = `tel:${(phone || "").replace(/\s+/g, "")}`;
 
   const onSubmit = async (data) => {
     setSubmitting(true);
@@ -180,16 +174,6 @@ export default function ProjectFloatingActions({
 
       {/* ===== Mobile: sticky bottom bar ===== */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-[70] flex shadow-[0_-6px_20px_-8px_rgba(0,0,0,0.35)]">
-        <a
-          href={telHref}
-          className="flex-1 flex items-center justify-center gap-[8px]
-                     bg-[#fff] text-[#ef493d] h-[56px]
-                     font-montserrat font-medium capitalize text-[15px]"
-          style={{ fontFamily: "Montserrat, sans-serif" }}
-        >
-          <Phone className="w-[18px] h-[18px] shrink-0" strokeWidth={1.8} />
-          Call Now
-        </a>
         <button
           type="button"
           onClick={() => setModalOpen(true)}

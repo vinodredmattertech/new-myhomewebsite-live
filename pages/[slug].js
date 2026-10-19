@@ -588,7 +588,6 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
       )}
 
       <ProjectFloatingActions
-        phone={project.phone || "+919154981691"}
         projectName={project.title}
         projectSlug={project.slug}
       />
@@ -597,7 +596,7 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
 }
 
 ProjectDetailPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
-// Renders ProjectFloatingActions itself with this project's phone and CRM
+// Renders ProjectFloatingActions itself with this project's CRM
 // slug, so _app.js skips its generic site-wide instance here.
 ProjectDetailPage.ownFloatingActions = true;
 

@@ -9,6 +9,7 @@ import "swiper/css";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import useFancybox from "@/components/common/useFancybox";
 import SectionHeading from "@/components/common/SectionHeading";
+import RichText from "@/components/common/RichText";
 
 /**
  * Default content shown when no CMS data is wired (e.g. local dev).
@@ -200,8 +201,9 @@ export default function ProjectGallery({
                      sm:text-[16px] sm:leading-[28px]
                      lg:text-[0.938vw] lg:leading-[1.563vw]"
           style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-          dangerouslySetInnerHTML={{ __html: description }}
-        />
+        >
+          <RichText>{description}</RichText>
+        </p>
 
         {/* Tabs */}
         <div
