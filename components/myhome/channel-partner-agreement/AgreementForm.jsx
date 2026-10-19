@@ -9,6 +9,7 @@ import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { submitChannelPartnerApplication } from "@/lib/strapi";
+import AgreementTermsModal from "@/components/myhome/channel-partner-agreement/AgreementTermsModal";
 import {
   PLEASE_READ,
   NATURE_OF_BUSINESS,
@@ -128,6 +129,7 @@ export default function AgreementForm() {
   // Bumped per document to remount its file input, so removing a file also
   // clears the filename the browser holds on the DOM node.
   const [fileKeys, setFileKeys] = useState({});
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const {
     register,
@@ -353,11 +355,11 @@ export default function AgreementForm() {
       ref={rootRef}
       id="register"
       className="relative w-full bg-white overflow-hidden scroll-mt-[80px]
-                 pt-[40px] md:pt-[60px] lg:pt-[3.125vw]
+                 pt-[120px] md:pt-[150px] lg:pt-[10.417vw]
                  pb-[60px] md:pb-[90px] lg:pb-[7.5vw]"
       style={{ fontFamily: MONTSERRAT }}
     >
-      <div className="lg:absolute left-[4.167vw] top-[3.125vw] max-lg:flex max-lg:justify-center max-lg:mb-[18px]">
+      <div className="lg:absolute left-[4.167vw] top-[10.417vw] max-lg:flex max-lg:justify-center max-lg:mb-[18px]">
         <SectionLabel>Become A Partner</SectionLabel>
       </div>
 
@@ -382,7 +384,7 @@ export default function AgreementForm() {
             <p className={`text-[#555] ${textCls}`}>
               Our team will review your details and documents. Once approved, we will send you the
               Channel Partner Agreement to be franked or e-stamped, signed on each page with your
-              company stamp and witnessed, as described above.
+              company stamp and witnessed.
             </p>
           </div>
         ) : (
@@ -674,7 +676,24 @@ export default function AgreementForm() {
                   <span className="text-[#ef493d] text-[12px] lg:text-[0.729vw]">{errors.declarationAccepted.message}</span>
                 )}
                 <Choice
-                  label="I have read and agree to the Channel Partner Agreement, including the Annexure A payment matrix, set out above."
+                  label={
+                    <>
+                      I have read and agree to the{" "}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          // Inside the checkbox's label: open the terms without
+                          // toggling the box.
+                          e.preventDefault();
+                          setTermsOpen(true);
+                        }}
+                        className="text-[#ef493d] underline underline-offset-2 hover:no-underline"
+                      >
+                        Channel Partner Agreement
+                      </button>
+                      , including the Annexure A payment matrix.
+                    </>
+                  }
                   {...register("agreementAccepted", { required: "Please accept the agreement" })}
                 />
                 {errors.agreementAccepted && (
@@ -716,6 +735,15 @@ export default function AgreementForm() {
           </form>
         )}
       </div>
+
+      <AgreementTermsModal
+        open={termsOpen}
+        onClose={() => setTermsOpen(false)}
+        onAccept={() => {
+          setValue("agreementAccepted", true, { shouldValidate: true });
+          setTermsOpen(false);
+        }}
+      />
     </section>
   );
 }
