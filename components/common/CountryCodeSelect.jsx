@@ -7,8 +7,9 @@ import { COUNTRY_CODES, DEFAULT_COUNTRY } from "@/lib/phone";
  * form. The full country list (name + dial code + flag) is sourced from the
  * `country-codes-list` package so every country is selectable without hand-
  * maintaining a subset. Spread a react-hook-form `register("countryCode")`
- * onto it and default the field to DEFAULT_COUNTRY_CODE. Validate the phone
- * input with `validatePhone()` from "@/lib/phone".
+ * onto it and default the field to DEFAULT_COUNTRY_CODE. Register the phone
+ * input with `registerPhone()` from "@/lib/phone" (digits-only, country-wise
+ * length and mobile validation).
  *
  * The trigger is a fixed-width, clipped control (shows "flag + code", the
  * country name truncates) so it never overflows into the phone input beside

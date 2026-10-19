@@ -10,7 +10,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const UnderlineField = React.forwardRef(function UnderlineField(
@@ -262,9 +262,8 @@ export default function ProjectInquiry({
                   style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
                 />
               }
-              {...register("phone", {
-                required: true,
-                validate: (v) => validatePhone(v, getValues("countryCode")),
+              {...registerPhone(register, "phone", () => getValues("countryCode"), {
+                required: "Please enter your phone number",
               })}
             />
             <UnderlineField

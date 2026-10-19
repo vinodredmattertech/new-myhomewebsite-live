@@ -9,7 +9,7 @@ import SectionLabel from "@/components/myhome/SectionLabel";
 import { submitLoyaltyApplication } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const TARTUFFO =
@@ -223,9 +223,8 @@ export default function LoyaltyForm({
                            text-[16px] sm:text-[18px] lg:text-[1.094vw]"
               />
             }
-            {...register("phone", {
+            {...registerPhone(register, "phone", () => getValues("countryCode"), {
               required: "Please enter your mobile number",
-              validate: (v) => validatePhone(v, getValues("countryCode")),
             })}
           />
           <Field

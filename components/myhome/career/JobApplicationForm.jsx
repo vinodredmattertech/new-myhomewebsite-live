@@ -4,7 +4,7 @@ import { Paperclip, X } from "lucide-react";
 import CountryCodeSelect, {
   DEFAULT_COUNTRY_CODE,
 } from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { submitJobApplication } from "@/lib/strapi";
 
 const RED = "#ef493d";
@@ -195,9 +195,8 @@ export default function JobApplicationForm({
           aria-invalid={!!errors.phone || undefined}
           className={inputCls}
           style={{ fontFamily: MONTSERRAT }}
-          {...register("phone", {
+          {...registerPhone(register, "phone", () => getValues("countryCode"), {
             required: "Please enter your phone number",
-            validate: (v) => validatePhone(v, getValues("countryCode")),
           })}
         />
       </FieldRow>

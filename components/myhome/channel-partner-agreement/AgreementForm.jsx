@@ -7,7 +7,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { submitChannelPartnerApplication } from "@/lib/strapi";
 import {
   PLEASE_READ,
@@ -145,6 +145,7 @@ export default function AgreementForm() {
       contactTitle: "Mr.",
       contactName: "",
       countryCode: DEFAULT_COUNTRY_CODE,
+      altCountryCode: DEFAULT_COUNTRY_CODE,
       primaryContact: "",
       alternativeContact: "",
       email: "",
@@ -302,7 +303,9 @@ export default function AgreementForm() {
       contactTitle: v.contactTitle,
       contactName: v.contactName.trim(),
       primaryContact: `${dialCodeFor(v.countryCode)} ${v.primaryContact}`.trim(),
-      alternativeContact: v.alternativeContact.trim(),
+      alternativeContact: v.alternativeContact
+        ? `${dialCodeFor(v.altCountryCode)} ${v.alternativeContact}`
+        : "",
       email: v.email.trim(),
       dateOfIncorporation: (!soleProp && v.dateOfIncorporation) || null,
       directorsPartners: soleProp ? "" : v.directorsPartners.trim(),
@@ -452,21 +455,26 @@ export default function AgreementForm() {
                     placeholder="Primary Contact No.*"
                     aria-invalid={!!errors.primaryContact || undefined}
                     className={inputCls}
-                    {...register("primaryContact", {
+                    {...registerPhone(register, "primaryContact", () => getValues("countryCode"), {
                       required: "Please enter your contact number",
-                      validate: (val) => validatePhone(val, getValues("countryCode")),
                     })}
                   />
                 </FieldRow>
 
-                {text(
-                  "alternativeContact",
-                  "Alternative Contact No.",
-                  {
-                    pattern: { value: /^\+?[0-9\s-]{7,16}$/, message: "Enter a valid phone number" },
-                  },
-                  { type: "tel" }
-                )}
+                <FieldRow hasError={!!errors.alternativeContact} errorMessage={errors.alternativeContact?.message}>
+                  <CountryCodeSelect
+                    {...register("altCountryCode", {
+                      onChange: () => getValues("alternativeContact") && trigger("alternativeContact"),
+                    })}
+                    className={`text-[#333] pb-[8px] lg:pb-[0.417vw] text-[14px] sm:text-[16px] lg:text-[1.042vw]`}
+                  />
+                  <input
+                    placeholder="Alternative Contact No."
+                    aria-invalid={!!errors.alternativeContact || undefined}
+                    className={inputCls}
+                    {...registerPhone(register, "alternativeContact", () => getValues("altCountryCode"))}
+                  />
+                </FieldRow>
 
                 {!isSoleProp && (
                   <FieldRow hasError={!!errors.dateOfIncorporation} errorMessage={errors.dateOfIncorporation?.message}>

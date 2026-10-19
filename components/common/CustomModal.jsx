@@ -9,6 +9,8 @@ import { useLeadStore } from "@/store/useLeadStore";
 
 import Link from "next/link";
 import { useProjectStore } from "@/store/useProjectListing";
+import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "./CountryCodeSelect";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 
 const EnquireModal = ({
   projectApiKey,
@@ -30,10 +32,12 @@ const EnquireModal = ({
   ];
   const {
     register,
+    getValues,
+    trigger,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({ defaultValues: { countryCode: DEFAULT_COUNTRY_CODE } });
   const { postWebsiteLead, loading, error, success, resetStatus } =
     useLeadStore();
   const { Projectdata, fetchProjectData } = useProjectStore();
@@ -61,6 +65,8 @@ const EnquireModal = ({
   const onSubmit = async (formData) => {
     const payload = {
       ...formData,
+      phone: `${dialCodeFor(formData.countryCode)} ${formData.phone}`.trim(),
+      countryCode: dialCodeFor(formData.countryCode),
       project_name: projectName,
       FormSource: formSource,
       ApiKey: projectApiKey || formData.projects,
@@ -197,17 +203,21 @@ const EnquireModal = ({
                 </div>
               )}
 
-              <input
-                placeholder="Phone Number"
-                {...register("phone", {
-                  required: "Phone number is required",
-                  pattern: {
-                    value: /^[0-9]{10}$/,
-                    message: "Invalid phone number",
-                  },
-                })}
-                className="border-b text-[0.875rem]   font-[400]  lg:text-[0.729vw]  tracking-[2px]   OutfitRegular border-[#162847] bg-transparent placeholder-[#162847] p-2 outline-none text-[#7B766C]"
-              />
+              <div className="flex items-center border-b border-[#162847]">
+                <CountryCodeSelect
+                  {...register("countryCode", {
+                    onChange: () => getValues("phone") && trigger("phone"),
+                  })}
+                  className="text-[0.875rem] lg:text-[0.729vw] OutfitRegular text-[#7B766C] px-2"
+                />
+                <input
+                  placeholder="Phone Number"
+                  {...registerPhone(register, "phone", () => getValues("countryCode"), {
+                    required: "Phone number is required",
+                  })}
+                  className="w-full text-[0.875rem]   font-[400]  lg:text-[0.729vw]  tracking-[2px]   OutfitRegular bg-transparent placeholder-[#162847] p-2 outline-none text-[#7B766C]"
+                />
+              </div>
               {errors.phone && (
                 <p className="text-red-500 text-sm lg:-mt-[1.8vw] md:-mt-5 -mt-5">
                   {errors.phone.message}

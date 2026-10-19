@@ -9,7 +9,7 @@ import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const DEFAULT_HIGHLIGHTS = [
@@ -520,9 +520,8 @@ export default function ProjectBrochure({
                                text-[14px] sm:text-[16px] lg:text-[0.938vw]
                                py-[8px] lg:py-[0.417vw]"
                     style={{ fontFamily: "Montserrat, sans-serif" }}
-                    {...register("phone", {
+                    {...registerPhone(register, "phone", () => getValues("countryCode"), {
                       required: "Please enter your phone",
-                      validate: (v) => validatePhone(v, getValues("countryCode")),
                     })}
                   />
                 </div>

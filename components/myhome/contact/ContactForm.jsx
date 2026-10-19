@@ -7,7 +7,7 @@ import { gsap } from "gsap";
 import { registerGsap, splitToWords } from "@/lib/gsapSetup";
 import { ChevronDown } from "lucide-react";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
@@ -234,9 +234,8 @@ export default function ContactForm({ data }) {
                              text-[14px] sm:text-[16px] md:text-[18px] lg:text-[1.094vw]"
                 />
               }
-              {...register("phone", {
+              {...registerPhone(register, "phone", () => getValues("countryCode"), {
                 required: "Please enter your phone number",
-                validate: (v) => validatePhone(v, getValues("countryCode")),
               })}
             />
 

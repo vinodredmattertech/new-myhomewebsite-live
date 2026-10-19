@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { getFooterData, mediaUrl, submitLead } from "@/lib/strapi";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
-import { dialCodeFor, validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
 
 const SOCIAL_ICON_MAP = {
@@ -344,9 +344,8 @@ export default function MyHomeFooter() {
                                text-[11px] md:text-[14px] lg:text-[0.938vw]
                                pr-[8px] pt-[8px] pb-[8px] lg:pt-[12px] lg:pb-[12px]"
                     style={{ fontFamily: "Montserrat, sans-serif" }}
-                    {...register("phone", {
+                    {...registerPhone(register, "phone", () => getValues("countryCode"), {
                       required: "Please enter your phone number",
-                      validate: (v) => validatePhone(v, getValues("countryCode")),
                     })}
                   />
                 </div>

@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useLeadStore } from "@/store/useLeadStore";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "./CountryCodeSelect";
-import { validatePhone } from "@/lib/phone";
+import { dialCodeFor, registerPhone } from "@/lib/phone";
 
 const EnquireModal = ({
   isOpen,
@@ -52,7 +52,7 @@ const EnquireModal = ({
   const onSubmit = async (formData) => {
     const payload = {
       name: formData.name,
-      phone: formData.phone,
+      phone: `${dialCodeFor(formData.countryCode)} ${formData.phone}`.trim(),
       email: formData.email,
       message: formData.message || "",
       FormSource: formSource,
@@ -190,9 +190,8 @@ const EnquireModal = ({
                 {/* Phone Input */}
                 <input
                   placeholder="Phone Number"
-                  {...register("phone", {
+                  {...registerPhone(register, "phone", () => getValues("countryCode"), {
                     required: "Phone number is required",
-                    validate: (v) => validatePhone(v, getValues("countryCode")),
                   })}
                   className="w-full bg-transparent p-2 outline-none text-[#ffffffa9]"
                 />
