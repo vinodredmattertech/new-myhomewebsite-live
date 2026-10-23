@@ -35,42 +35,52 @@ export default function WhoWeAre({ data }) {
     () => {
       registerGsap();
 
-      // ---------------- Common entrance (every viewport) ----------------
       const headingWords = splitToWords(headingRef.current);
-      gsap.set(headingWords, { yPercent: 110 });
-      gsap.to(headingWords, {
-        yPercent: 0,
-        duration: 1.2,
-        stagger: 0.09,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 80%" },
-      });
-      gsap.from(paraRef.current, {
-        y: 40,
-        autoAlpha: 0,
-        duration: 1.0,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
-      });
-      gsap.from(btnRef.current, {
-        y: 30,
-        autoAlpha: 0,
-        duration: 0.9,
-        delay: 0.15,
-        ease: "expo.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
-      });
-      gsap.from([labelRef.current, mobileLabelRef.current], {
-        autoAlpha: 0,
-        y: -20,
-        duration: 0.9,
-        ease: "power3.out",
-        scrollTrigger: { trigger: rootRef.current, start: "top 85%" },
+      const mm = gsap.matchMedia();
+
+      // ---------------- Mobile / tablet entrance ----------------
+      mm.add("(max-width: 1023px)", () => {
+        gsap.set(headingWords, { yPercent: 110 });
+        gsap.to(headingWords, {
+          yPercent: 0,
+          duration: 1.2,
+          stagger: 0.09,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 80%" },
+        });
+        gsap.from(paraRef.current, {
+          y: 40,
+          autoAlpha: 0,
+          duration: 1.0,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
+        });
+        gsap.from(btnRef.current, {
+          y: 30,
+          autoAlpha: 0,
+          duration: 0.9,
+          delay: 0.15,
+          ease: "expo.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 70%" },
+        });
+        gsap.from(mobileLabelRef.current, {
+          autoAlpha: 0,
+          y: -20,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: { trigger: rootRef.current, start: "top 85%" },
+        });
       });
 
       // ---------------- Desktop-only pinned clip-path scrub ----------------
-      const mm = gsap.matchMedia();
+      // The copy is white, set for the colour photograph, and unreadable over
+      // the sketch — so it stays hidden until the photograph has mostly wiped
+      // in, and is revealed in the tail of the same scrub.
       mm.add("(min-width: 1024px)", () => {
+        gsap.set(headingWords, { yPercent: 110 });
+        gsap.set([paraRef.current, btnRef.current], { y: 40, autoAlpha: 0 });
+        gsap.set(labelRef.current, { y: -20, autoAlpha: 0 });
+
         // Initial: colour layer clipped from the TOP (hidden).
         gsap.set(colorLayerRef.current, {
           clipPath: "inset(100% 0% 0% 0%)",
@@ -128,6 +138,26 @@ export default function WhoWeAre({ data }) {
             btnTextRef.current,
             { color: "#ffffff", ease: "none", duration: 1 },
             0
+          )
+          .to(
+            labelRef.current,
+            { y: 0, autoAlpha: 1, ease: "power2.out", duration: 0.3 },
+            0.7
+          )
+          .to(
+            headingWords,
+            { yPercent: 0, ease: "power2.out", duration: 0.3, stagger: 0.03 },
+            0.7
+          )
+          .to(
+            paraRef.current,
+            { y: 0, autoAlpha: 1, ease: "power2.out", duration: 0.3 },
+            0.75
+          )
+          .to(
+            btnRef.current,
+            { y: 0, autoAlpha: 1, ease: "power2.out", duration: 0.3 },
+            0.8
           );
       });
     },
