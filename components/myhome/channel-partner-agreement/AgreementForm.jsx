@@ -24,6 +24,7 @@ import {
   ORGANISATION_TYPES,
   CONTACT_TITLES,
   DECLARATION,
+  AGREEMENT_BLANKS,
 } from "@/lib/channelPartnerAgreement";
 
 /* Document constraints — mirrored in the validation messages below. */
@@ -116,6 +117,11 @@ export default function AgreementForm() {
       witnessAddress: "",
       declarationAccepted: false,
       agreementAccepted: false,
+      ...Object.fromEntries(
+        Object.values(AGREEMENT_BLANKS)
+          .filter(({ name }) => name !== "reraState")
+          .map(({ name }) => [name, ""])
+      ),
     },
     mode: "onBlur",
   });
@@ -267,6 +273,15 @@ export default function AgreementForm() {
       witnessAddress: v.witnessAddress.trim(),
       declarationAccepted: v.declarationAccepted,
       agreementAccepted: v.agreementAccepted,
+      // The blanks filled in on the agreement itself (reraState is above).
+      ...Object.fromEntries(
+        Object.values(AGREEMENT_BLANKS)
+          .filter(({ name }) => name !== "reraState")
+          .map(({ name, type, upper }) => {
+            const value = String(v[name] || "").trim();
+            return [name, type === "date" ? value || null : upper ? value.toUpperCase() : value];
+          })
+      ),
     };
 
     const files = Object.fromEntries(DOCUMENTS.map(({ field }) => [field, v[field]?.[0] || null]));
@@ -291,6 +306,7 @@ export default function AgreementForm() {
         <AgreementTermsModal
           open={termsOpen}
           onClose={() => setTermsOpen(false)}
+          form={{ watch, setValue }}
           onAccept={() => {
             setValue("agreementAccepted", true, { shouldValidate: true });
             setTermsOpen(false);

@@ -6,6 +6,7 @@ import {
   AGREEMENT_PREAMBLE,
   AGREEMENT_CLAUSES,
   ANNEXURE_A,
+  AGREEMENT_BLANKS,
 } from "@/lib/channelPartnerAgreement";
 
 const MONTSERRAT = "Montserrat, sans-serif";
@@ -19,21 +20,42 @@ const subheadCls =
 const clauseTitleCls = "font-montserrat text-[#333] font-semibold text-[14px] sm:text-[15px] lg:text-[0.938vw]";
 
 /**
- * Renders agreement copy, turning each `{{Label}}` blank into a marked
- * placeholder — the printed form's dotted line, labelled with what goes there.
+ * Renders agreement copy, turning each `{{Label}}` blank into an inline input
+ * on the printed form's dotted line, bound to the registration form field
+ * AGREEMENT_BLANKS names — so what is typed here is submitted with the
+ * application. Controlled through `form` ({ watch, setValue }) rather than
+ * registered, so a blank can share a field with an input on the form itself
+ * (State ↔ reraState) and keeps its value while the modal is closed. A blank
+ * with no mapping stays a labelled placeholder.
  */
-function AgreementText({ text }) {
+function AgreementText({ text, form }) {
   const parts = String(text).split(/(\{\{[^}]+\}\})/g);
   return parts.map((part, i) => {
     const blank = part.match(/^\{\{([^}]+)\}\}$/);
     if (!blank) return <React.Fragment key={i}>{part}</React.Fragment>;
+    const field = AGREEMENT_BLANKS[blank[1]];
+    if (!field || !form) {
+      return (
+        <span key={i} className="inline-block border-b border-dashed border-[#999] px-[4px] text-[#999] italic text-[0.9em]">
+          {blank[1]}
+        </span>
+      );
+    }
     return (
-      <span
+      <input
         key={i}
-        className="inline-block border-b border-dashed border-[#999] px-[4px] text-[#999] italic text-[0.9em]"
-      >
-        {blank[1]}
-      </span>
+        type={field.type || "text"}
+        aria-label={blank[1]}
+        placeholder={blank[1]}
+        inputMode={field.inputMode}
+        maxLength={field.maxLength}
+        style={{ width: `${field.width}ch`, maxWidth: "100%" }}
+        className={`inline-block mx-[2px] px-[4px] py-0 align-baseline bg-[#fcfbf8] border-0 border-b border-dashed border-[#999]
+                    text-[#1f1d1b] text-[0.95em] not-italic placeholder:italic placeholder:text-[#a59d92]
+                    outline-none focus:border-solid focus:border-[#ef493d] focus:bg-[#fef7f6] ${field.upper ? "uppercase" : ""}`}
+        value={form.watch(field.name) || ""}
+        onChange={(e) => form.setValue(field.name, e.target.value, { shouldDirty: true })}
+      />
     );
   });
 }
@@ -45,8 +67,9 @@ function AgreementText({ text }) {
  * transcribed from the printed agreement (lib/channelPartnerAgreement.js).
  *
  * The body scrolls inside the panel; "Accept" ticks the checkbox via `onAccept`.
+ * `form` ({ watch, setValue } from react-hook-form) binds the agreement's blanks.
  */
-export default function AgreementTermsModal({ open, onClose, onAccept }) {
+export default function AgreementTermsModal({ open, onClose, onAccept, form }) {
   // Lenis owns page scrolling; pause it so the page behind stays put while
   // the terms are open.
   useEffect(() => {
@@ -121,7 +144,7 @@ export default function AgreementTermsModal({ open, onClose, onAccept }) {
                   </p>
                 ) : (
                   <p key={i} className={`${bodyCls} text-justify`}>
-                    <AgreementText text={p} />
+                    <AgreementText text={p} form={form} />
                   </p>
                 )
               )}
@@ -144,7 +167,7 @@ export default function AgreementTermsModal({ open, onClose, onAccept }) {
                   </h4>
                   {clause.body?.map((p, j) => (
                     <p key={j} className={`${bodyCls} text-justify`}>
-                      <AgreementText text={p} />
+                      <AgreementText text={p} form={form} />
                     </p>
                   ))}
                   {clause.items?.map((item) => (
