@@ -19,4 +19,5 @@ export default function CustomerMarketSurveyBengaluruPage() {
   );
 }
 
-CustomerMarketSurveyBengaluruPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+CustomerMarketSurveyBengaluruPage.getLayout = (page) => <MyHomeLayout minimal>{page}</MyHomeLayout>;
+CustomerMarketSurveyBengaluruPage.formPage = true;

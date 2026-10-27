@@ -971,3 +971,52 @@ select {
     transform: scale(0.6);
   }
 }
+
+/* Form pages (Component.formPage) keep the bot out of the way. The vendor
+   script outlives client-side navigation, so the root is hidden rather than
+   relying on LiveServChat not mounting. */
+html[data-hide-chat] #liv-prop-chat-root {
+  display: none !important;
+}
+
+/* Radio / checkbox drawn for the document forms (DynamicForm's Choice). */
+.mh-check {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  display: inline-grid;
+  place-content: center;
+  width: 17px;
+  height: 17px;
+  margin-top: 3px;
+  border: 1.5px solid #b9b0a4;
+  background: #fff;
+  cursor: inherit;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.mh-check[type="radio"] { border-radius: 50%; }
+.mh-check[type="checkbox"] { border-radius: 3px; }
+.mh-check:checked { border-color: #ef493d; }
+.mh-check[type="checkbox"]:checked { background: #ef493d; }
+.mh-check::before {
+  content: "";
+  transform: scale(0);
+  transition: transform 0.18s ease-out;
+}
+.mh-check[type="radio"]::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef493d;
+}
+.mh-check[type="checkbox"]::before {
+  width: 9px;
+  height: 5px;
+  margin-top: -2px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) scale(0);
+}
+.mh-check[type="radio"]:checked::before { transform: scale(1); }
+.mh-check[type="checkbox"]:checked::before { transform: rotate(-45deg) scale(1); }
+.mh-check:focus-visible { outline: 2px solid rgba(195, 154, 62, 0.55); outline-offset: 2px; }

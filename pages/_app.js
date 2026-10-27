@@ -27,6 +27,15 @@ export default function App({ Component, pageProps }) {
     captureUtm();
   }, [router.asPath]);
 
+  // Form pages (Component.formPage) drop the chat bot and the sticky Request
+  // Site Visit. Once loaded the chat widget stays in <body> across client-side
+  // navigation, so it is hidden via CSS as well as never loaded when a form
+  // page is the landing page.
+  const formPage = !!Component.formPage;
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-hide-chat", formPage);
+  }, [formPage]);
+
   return (
     <>
       {getLayout(<Component {...pageProps} />, router)}
@@ -34,8 +43,8 @@ export default function App({ Component, pageProps }) {
           default chrome with their own layout. Pages that render their own
           project-specific actions (project detail) opt out of the generic
           sticky Request Site Visit. */}
-      {!Component.ownFloatingActions && <ProjectFloatingActions />}
-      <LiveServChat />
+      {!Component.ownFloatingActions && !formPage && <ProjectFloatingActions />}
+      {!formPage && <LiveServChat />}
     </>
   );
 }

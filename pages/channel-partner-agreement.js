@@ -22,4 +22,5 @@ export default function ChannelPartnerAgreementPage() {
   );
 }
 
-ChannelPartnerAgreementPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+ChannelPartnerAgreementPage.getLayout = (page) => <MyHomeLayout minimal>{page}</MyHomeLayout>;
+ChannelPartnerAgreementPage.formPage = true;

@@ -19,4 +19,5 @@ export default function VanaBookingApplicationPage() {
   );
 }
 
-VanaBookingApplicationPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+VanaBookingApplicationPage.getLayout = (page) => <MyHomeLayout minimal>{page}</MyHomeLayout>;
+VanaBookingApplicationPage.formPage = true;

@@ -19,4 +19,5 @@ export default function CustomerMarketSurveyChennaiPage() {
   );
 }
 
-CustomerMarketSurveyChennaiPage.getLayout = (page) => <MyHomeLayout>{page}</MyHomeLayout>;
+CustomerMarketSurveyChennaiPage.getLayout = (page) => <MyHomeLayout minimal>{page}</MyHomeLayout>;
+CustomerMarketSurveyChennaiPage.formPage = true;
