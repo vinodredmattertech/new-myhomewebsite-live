@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { X } from "lucide-react";
+import { Controller } from "react-hook-form";
+import { Upload, X } from "lucide-react";
 import {
   REGISTRATION_TERMS,
   AGREEMENT_PREAMBLE,
@@ -8,6 +9,7 @@ import {
   ANNEXURE_A,
   AGREEMENT_BLANKS,
 } from "@/lib/channelPartnerAgreement";
+import SignatureField, { SIGNATURE_EXT, SIGNATURE_MAX_MB, signatureRules } from "@/components/myhome/forms/SignatureField";
 
 const MONTSERRAT = "Montserrat, sans-serif";
 const TARTUFFO =
@@ -41,6 +43,9 @@ function AgreementText({ text, form }) {
         </span>
       );
     }
+    if (field.type === "signature") {
+      return <InlineSignatureUpload key={i} label={blank[1]} name={field.name} form={form} />;
+    }
     return (
       <input
         key={i}
@@ -61,13 +66,133 @@ function AgreementText({ text, form }) {
 }
 
 /**
+ * A blank that takes an image of a signature: an "Upload signature" chip on
+ * the dotted line, which becomes a thumbnail of the signature once chosen.
+ */
+function InlineSignatureUpload({ label, name, form }) {
+  const file = form.watch(name);
+  const [preview, setPreview] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!file) return setPreview(null);
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const choose = (e) => {
+    const picked = e.target.files?.[0];
+    e.target.value = "";
+    if (!picked) return;
+    const problem = signatureRules(label, false).validate;
+    const message = [problem.type(picked), problem.size(picked)].find((r) => r !== true);
+    setError(message || null);
+    if (!message) form.setValue(name, picked, { shouldDirty: true });
+  };
+
+  return (
+    <span className="inline-flex flex-col align-bottom mx-[2px]">
+      {preview ? (
+        <span className="inline-flex items-end gap-[6px] border-b border-dashed border-[#999] px-[4px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview} alt={`${label} signature`} className="h-[40px] max-w-[160px] object-contain" />
+          <button
+            type="button"
+            onClick={() => form.setValue(name, null, { shouldDirty: true })}
+            aria-label={`Remove ${label} signature`}
+            className="mb-[4px] text-[#a59d92] hover:text-[#ef493d] transition-colors"
+          >
+            <X className="w-[14px] h-[14px]" strokeWidth={1.8} />
+          </button>
+        </span>
+      ) : (
+        <label
+          className="inline-flex items-center gap-[6px] cursor-pointer border-b border-dashed border-[#999] bg-[#fcfbf8] px-[6px]
+                     text-[0.9em] italic text-[#a59d92] hover:text-[#ef493d] hover:border-[#ef493d] transition-colors"
+        >
+          <Upload className="w-[13px] h-[13px] not-italic" strokeWidth={1.8} />
+          Upload {label} signature
+          <input
+            type="file"
+            accept={SIGNATURE_EXT.join(",")}
+            className="sr-only"
+            aria-label={`${label} signature (PNG or JPG, up to ${SIGNATURE_MAX_MB}MB)`}
+            onChange={choose}
+          />
+        </label>
+      )}
+      {error && <span className="not-italic text-[#d93d31] text-[11px] leading-[16px]">{error}</span>}
+    </span>
+  );
+}
+
+/** Anchor of the signing block, scrolled to when "I Agree" is pressed unsigned. */
+export const SIGN_BLOCK_ID = "cp-agreement-signing";
+
+/** A signature pad in the signing block, bound to a media field of the form. */
+function SignaturePad({ form, name, label, fileName, required }) {
+  return (
+    <Controller
+      name={name}
+      control={form.control}
+      rules={signatureRules(label, required)}
+      render={({ field, fieldState }) => (
+        <SignatureField
+          label={required ? `${label}*` : label}
+          fileName={fileName}
+          value={field.value}
+          onChange={field.onChange}
+          onBlur={field.onBlur}
+          error={fieldState.error}
+        />
+      )}
+    />
+  );
+}
+
+/**
+ * The printed agreement's signing block, after clause 16: the Channel Partner
+ * signs here (required) with a witness (optional). My Home Group's half is
+ * signed by the Company later, so it stays a printed line.
+ */
+function SigningBlock({ form }) {
+  return (
+    <div id={SIGN_BLOCK_ID} className="mt-[18px] lg:mt-[1.25vw] flex flex-col gap-[18px] lg:gap-[1.25vw] border-t border-[#0000001a] pt-[20px] lg:pt-[1.25vw]">
+      <div className="flex flex-col gap-[10px] lg:gap-[0.625vw]">
+        <p className={bodyCls}>
+          <AgreementText text="Signed, Sealed & Delivered by {{Channel Partner Name}}" form={form} />
+        </p>
+        <p className={bodyCls}>
+          <AgreementText text="Represented by {{Signatory}}" form={form} />
+        </p>
+        <SignaturePad form={form} name="signatureFile" label="Signature of Authorised Signatory" fileName="signatory-signature" required />
+      </div>
+
+      <div className="flex flex-col gap-[6px] lg:gap-[0.417vw]">
+        <p className={bodyCls}>Signed, Sealed &amp; Delivered by My Home Group</p>
+        <p className={bodyCls}>
+          Represented by <span className="italic text-[#999]">(signed by My Home Group on countersignature)</span>
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-[10px] lg:gap-[0.625vw]">
+        <p className={`${bodyCls} font-semibold text-[#333]`}>WITNESSES</p>
+        <SignaturePad form={form} name="witnessSignatureFile" label="Signature of Witness" fileName="witness-signature" />
+      </div>
+    </div>
+  );
+}
+
+/**
  * AgreementTermsModal — the full terms behind the "I have read and agree"
  * checkbox on the registration form: the registration terms, every clause of
  * the Domestic Channel Partner Agreement and the Annexure A payment matrix,
  * transcribed from the printed agreement (lib/channelPartnerAgreement.js).
  *
  * The body scrolls inside the panel; "Accept" ticks the checkbox via `onAccept`.
- * `form` ({ watch, setValue } from react-hook-form) binds the agreement's blanks.
+ * `form` ({ watch, setValue, control } from react-hook-form) binds the agreement's
+ * blanks and the signatures in its signing block.
  */
 export default function AgreementTermsModal({ open, onClose, onAccept, form }) {
   // Lenis owns page scrolling; pause it so the page behind stays put while
@@ -178,6 +303,8 @@ export default function AgreementTermsModal({ open, onClose, onAccept, form }) {
                   ))}
                 </div>
               ))}
+
+              {form && <SigningBlock form={form} />}
             </section>
 
             {/* Annexure A */}

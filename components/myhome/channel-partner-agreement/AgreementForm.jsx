@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Paperclip, X } from "lucide-react";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { submitChannelPartnerApplication } from "@/lib/strapi";
-import AgreementTermsModal from "@/components/myhome/channel-partner-agreement/AgreementTermsModal";
+import AgreementTermsModal, { SIGN_BLOCK_ID } from "@/components/myhome/channel-partner-agreement/AgreementTermsModal";
 import {
   GOLD,
   inputCls,
@@ -76,6 +76,8 @@ export default function AgreementForm() {
 
   const {
     register,
+    control,
+    setError,
     getValues,
     trigger,
     handleSubmit,
@@ -115,12 +117,14 @@ export default function AgreementForm() {
       signatoryDesignation: "",
       witnessName: "",
       witnessAddress: "",
+      signatureFile: null,
+      witnessSignatureFile: null,
       declarationAccepted: false,
       agreementAccepted: false,
       ...Object.fromEntries(
         Object.values(AGREEMENT_BLANKS)
           .filter(({ name }) => name !== "reraState")
-          .map(({ name }) => [name, ""])
+          .map(({ name, type }) => [name, type === "signature" ? null : ""])
       ),
     },
     mode: "onBlur",
@@ -276,7 +280,7 @@ export default function AgreementForm() {
       // The blanks filled in on the agreement itself (reraState is above).
       ...Object.fromEntries(
         Object.values(AGREEMENT_BLANKS)
-          .filter(({ name }) => name !== "reraState")
+          .filter(({ name, type }) => name !== "reraState" && type !== "signature")
           .map(({ name, type, upper }) => {
             const value = String(v[name] || "").trim();
             return [name, type === "date" ? value || null : upper ? value.toUpperCase() : value];
@@ -284,7 +288,12 @@ export default function AgreementForm() {
       ),
     };
 
-    const files = Object.fromEntries(DOCUMENTS.map(({ field }) => [field, v[field]?.[0] || null]));
+    const files = {
+      ...Object.fromEntries(DOCUMENTS.map(({ field }) => [field, v[field]?.[0] || null])),
+      signatureFile: v.signatureFile,
+      companySignatureFile: v.companySignatureFile,
+      witnessSignatureFile: v.witnessSignatureFile,
+    };
 
     const ok = await submitChannelPartnerApplication(data, files);
     setSubmitting(false);
@@ -301,13 +310,20 @@ export default function AgreementForm() {
       ref={rootRef}
       id="register"
       eyebrow="Channel Partner"
-      heading="Customer Survey Form"
+      heading="Channel Partner Form"
       after={
         <AgreementTermsModal
           open={termsOpen}
           onClose={() => setTermsOpen(false)}
-          form={{ watch, setValue }}
+          form={{ watch, setValue, control }}
           onAccept={() => {
+            // Accepting means signing: the agreement's signing block must
+            // carry the signatory's signature first.
+            if (!getValues("signatureFile")) {
+              setError("signatureFile", { message: "Please sign the agreement before accepting" });
+              document.getElementById(SIGN_BLOCK_ID)?.scrollIntoView({ behavior: "smooth", block: "center" });
+              return;
+            }
             setValue("agreementAccepted", true, { shouldValidate: true });
             setTermsOpen(false);
           }}
@@ -622,7 +638,13 @@ export default function AgreementForm() {
                     , including the Annexure A payment matrix.
                   </>
                 }
-                {...register("agreementAccepted", { required: "Please accept the agreement" })}
+                {...register("agreementAccepted", {
+                  validate: (accepted) =>
+                    (accepted && !!getValues("signatureFile")) ||
+                    (accepted
+                      ? "Please open the Channel Partner Agreement and sign it at the end"
+                      : "Please accept the agreement"),
+                })}
               />
               {errors.agreementAccepted && (
                 <span className={errorCls}>{errors.agreementAccepted.message}</span>
