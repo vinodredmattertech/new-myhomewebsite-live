@@ -11,6 +11,7 @@ import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const DEFAULT_HIGHLIGHTS = [
   "24.99-Acre Master Planned Community",
@@ -379,15 +380,14 @@ export default function ProjectBrochure({
           aria-label={
             unlocked ? buttonLabel : `${buttonLabel} — fill form to download`
           }
-          className="fixed z-[70]
+          className="group fixed z-[70]
                      left-[12px] sm:left-[16px] lg:left-[1.25vw]
                      bottom-[68px] sm:bottom-[72px] lg:bottom-[1.25vw]
-                     inline-flex items-center justify-center
-                     gap-[8px] sm:gap-[10px] lg:gap-[0.521vw]
+                     inline-flex items-center
                      rounded-full bg-[#ef493d] hover:bg-[#d83a2f] text-white
                      shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]
                      h-[42px] sm:h-[48px] lg:h-[3.021vw]
-                     px-[16px] sm:px-[20px] lg:px-[1.25vw]
+                     px-[13px] sm:px-[15px] lg:px-[0.964vw]
                      max-w-[calc(100vw-24px)]
                      capitalize text-[13px] sm:text-[14px] lg:text-[0.938vw]
                      transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -397,7 +397,20 @@ export default function ProjectBrochure({
             className="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] lg:w-[1.094vw] lg:h-[1.094vw] shrink-0"
             strokeWidth={1.8}
           />
-          <span className="truncate">{buttonLabel}</span>
+          {/* Icon-only circle at rest; the label slides out on hover/focus,
+              widening the pill. */}
+          <span
+            className="overflow-hidden whitespace-nowrap max-w-0 opacity-0
+                       group-hover:max-w-[240px] group-hover:opacity-100
+                       group-hover:ml-[8px] sm:group-hover:ml-[10px] lg:group-hover:ml-[0.521vw]
+                       group-hover:pr-[3px] sm:group-hover:pr-[5px] lg:group-hover:pr-[0.286vw]
+                       group-focus-visible:max-w-[240px] group-focus-visible:opacity-100
+                       group-focus-visible:ml-[8px] sm:group-focus-visible:ml-[10px] lg:group-focus-visible:ml-[0.521vw]
+                       group-focus-visible:pr-[3px] sm:group-focus-visible:pr-[5px] lg:group-focus-visible:pr-[0.286vw]
+                       transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          >
+            {buttonLabel}
+          </span>
         </button>
       )}
 
@@ -529,6 +542,8 @@ export default function ProjectBrochure({
                   <p className="text-[#ef493d] text-[12px] mt-[4px]">{errors.phone.message}</p>
                 )}
               </div>
+
+              <ConsentNote />
 
               {submitError && (
                 <p className="text-[#ef493d] text-[13px]" role="alert">

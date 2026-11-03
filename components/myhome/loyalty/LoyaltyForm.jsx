@@ -11,6 +11,7 @@ import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const TARTUFFO =
   '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif';
@@ -253,6 +254,8 @@ export default function LoyaltyForm({
             {...register("customerId")}
           />
           <Field label="Message" type="text" {...register("message")} />
+
+          <ConsentNote className="lg:col-span-2" />
 
           {/* submit — red outline with hover fill */}
           <div className="lg:col-span-2 mt-[8px] lg:mt-[1.302vw]">

@@ -13,6 +13,7 @@ import RichText from "@/components/common/RichText";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const UnderlineField = React.forwardRef(function UnderlineField(
   { label, hasError, errorMessage, type = "text", prefix, ...inputProps },
@@ -329,6 +330,8 @@ export default function ProjectInquiry({
               hasError={false}
               {...register("message")}
             />
+
+            <ConsentNote />
 
             <div className="flex items-center gap-[16px] lg:gap-[1.354vw] flex-wrap">
               <button

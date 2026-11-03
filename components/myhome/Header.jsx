@@ -135,20 +135,26 @@ export default function MyHomeHeader() {
     },
   ];
 
-  useGSAP(() => {
+  useGSAP((context, contextSafe) => {
     registerGsap();
 
     // Start hidden; the reveal is driven by the hero loader when one exists.
     gsap.set(headerRef.current, { yPercent: -110, autoAlpha: 0 });
 
-    const slideIn = () => {
+    // contextSafe keeps this tween in the header's own context. On the
+    // homepage it runs from HeroBanner's `mh:loader-done` timeline callback,
+    // and GSAP files anything created in a callback under the context of the
+    // animation that fired it — so the tween became HeroBanner's, and leaving
+    // the homepage reverted it with HeroBanner, hiding the header on every
+    // page reached by client-side navigation from home.
+    const slideIn = contextSafe(() => {
       gsap.to(headerRef.current, {
         yPercent: 0,
         autoAlpha: 1,
         duration: 1.0,
         ease: "expo.out",
       });
-    };
+    });
 
     // Only the homepage hero renders a loader overlay, and only that overlay
     // fires `mh:loader-done`. Every other page has none, so waiting on the

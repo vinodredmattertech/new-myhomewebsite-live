@@ -130,6 +130,9 @@ export default function Lifestyle({ data }) {
     : [];
 
   const visionQuote = data?.visionQuote || "";
+  // Sign-off under the Chairman's message; falls back to the Chairman's name
+  // when the CMS field is left empty so the footer never shows the role alone.
+  const visionName = data?.visionName || "Dr. Rameswar Rao Jupally";
   const visionImage = mediaUrl(data?.visionImage);
   // `visionImage` is a wide environmental shot, so object-cover on the tall
   // mobile box cropped the Chairman out of frame. `visionImageMobile` is a
@@ -349,7 +352,7 @@ export default function Lifestyle({ data }) {
             >
               <Image
                 src={mobileVisionImage}
-                alt={data.visionName || "Chairman"}
+                alt={visionName}
                 fill
                 unoptimized
                 sizes="100vw"
@@ -359,7 +362,7 @@ export default function Lifestyle({ data }) {
               />
               <Image
                 src={visionImage}
-                alt={data.visionName || "Chairman"}
+                alt={visionName}
                 fill
                 unoptimized
                 sizes="100vw"
@@ -451,20 +454,20 @@ export default function Lifestyle({ data }) {
               )}
             </div>
 
-            {(data.visionName || data.visionRole) && (
+            {(visionName || data.visionRole) && (
               <footer className="mt-[24px] lg:mt-[1.822vw] flex items-center gap-[12px] lg:gap-[0.833vw]">
                 <span
                   aria-hidden="true"
                   className="block h-px bg-[#ef493d] w-[28px] lg:w-[2.083vw]"
                 />
                 <span className="flex flex-col">
-                  {data.visionName && (
+                  {visionName && (
                     <span
                       className="capitalize text-[#333] leading-[1.2]
                                  text-[16px] md:text-[18px] lg:text-[1.041vw]"
                       style={TITLE_FONT}
                     >
-                      {data.visionName}
+                      {visionName}
                     </span>
                   )}
                   {data.visionRole && (

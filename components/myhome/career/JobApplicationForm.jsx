@@ -6,6 +6,7 @@ import CountryCodeSelect, {
 } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { submitJobApplication } from "@/lib/strapi";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const RED = "#ef493d";
 const MONTSERRAT = "Montserrat, sans-serif";
@@ -332,6 +333,8 @@ export default function JobApplicationForm({
           {successMessage}
         </p>
       )}
+
+      <ConsentNote />
 
       {/* Submit */}
       <button

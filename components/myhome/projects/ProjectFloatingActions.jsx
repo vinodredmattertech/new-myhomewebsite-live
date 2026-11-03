@@ -8,6 +8,7 @@ import { STRAPI_URL, submitLead } from "@/lib/strapi";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const MESSAGE_ICON = "/assets/myhome/tabler_message-filled.png";
 
@@ -369,6 +370,8 @@ export default function ProjectFloatingActions({
                   {...register("preferredDate")}
                 />
               </div>
+
+              <ConsentNote />
 
               {submitError && (
                 <p className="text-[#ef493d] text-[13px]" role="alert">

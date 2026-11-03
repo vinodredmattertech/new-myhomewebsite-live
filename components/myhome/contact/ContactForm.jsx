@@ -12,6 +12,7 @@ import SectionLabel from "@/components/myhome/SectionLabel";
 import { mediaUrl, submitLead } from "@/lib/strapi";
 import SectionHeading from "@/components/common/SectionHeading";
 import { pushToCRM } from "@/lib/crm";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const DEFAULT_PROJECT_OPTIONS = ["Apas", "Akrida", "Avali", "Sayuk", "Tridasa", "Vipina", "Other"];
 
@@ -296,6 +297,8 @@ export default function ContactForm({ data }) {
               errorMessage={errors.message?.message}
               {...register("message")}
             />
+
+            <ConsentNote />
 
             <button
               type="submit"

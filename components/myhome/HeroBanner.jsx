@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
@@ -330,13 +329,18 @@ export default function HeroBanner({ data }) {
   return (
     <section
       ref={rootRef}
-      className="relative w-full overflow-hidden bg-[#2a2828] lg:h-[100svh] lg:min-h-[640px]"
+      className="relative w-full overflow-hidden bg-[#2a2828]"
       data-section="hero"
     >
       {/* ---------- Hero image (revealed under the loader) ----------
-          Mobile shows the full uploaded banner at its own ratio. Desktop
-          fills the viewport. */}
-      <div ref={bgRef} className="relative w-full lg:absolute lg:inset-0 will-change-transform">
+          Both breakpoints show the full uploaded banner at its own ratio, so
+          the hero's height follows the screen width instead of cropping to the
+          viewport. A video-only desktop banner has no image to size it, so it
+          falls back to 16:9. */}
+      <div
+        ref={bgRef}
+        className={`relative w-full will-change-transform ${desktopImage ? "" : "lg:aspect-video"}`}
+      >
         {mobileImage && (
           <img
             src={mobileImage}
@@ -345,15 +349,11 @@ export default function HeroBanner({ data }) {
           />
         )}
         {desktopImage && (
-          <Image
+          <img
             src={desktopImage}
             alt="My Home Group flagship tower at twilight"
-            fill
-            priority
-            quality={92}
-            sizes="100vw"
-            unoptimized
-            className="hidden lg:block object-cover object-bottom"
+            fetchPriority="high"
+            className="hidden lg:block w-full h-auto"
           />
         )}
         {/* ---------- Hero video ----------

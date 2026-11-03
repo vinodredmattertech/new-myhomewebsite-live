@@ -20,6 +20,7 @@ import { getFooterData, mediaUrl, submitLead } from "@/lib/strapi";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
+import ConsentNote from "@/components/common/ConsentNote";
 
 const SOCIAL_ICON_MAP = {
   instagram: Instagram,
@@ -360,6 +361,7 @@ export default function MyHomeFooter() {
               </label>
             </div>
 
+            <ConsentNote tone="dark" className="-mt-[4px]" />
             
             <button
               type="submit"

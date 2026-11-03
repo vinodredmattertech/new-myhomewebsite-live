@@ -287,7 +287,7 @@ export default function WhoWeAre({ data }) {
           {/* Know-More button — outlined base, red fill + white text on hover */}
           <a
             ref={btnRef}
-            href={data.ctaLink || "#"}
+            href={data.ctaLink && !data.ctaLink.startsWith("#") ? data.ctaLink : "/about-us"}
             className="group relative inline-flex items-center justify-center self-start whitespace-nowrap overflow-hidden transition-[border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] w-[154px] sm:w-[180px] md:w-[200px] lg:w-[11.667vw] h-[40px] sm:h-[48px] md:h-[54px] lg:h-[3.02vw] px-5 lg:px-[1.5vw] border border-[#ef493d] hover:border-[#ef493d] bg-transparent"
           >
             {/* Hover fill — slides up from the bottom */}

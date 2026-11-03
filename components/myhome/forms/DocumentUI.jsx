@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { HEADING_FONT_FAMILY } from "@/components/common/SectionHeading";
+import ConsentNote from "@/components/common/ConsentNote";
 
 /**
  * The letterhead look shared by the standalone form pages (DynamicForm and the
@@ -114,7 +115,7 @@ export function FormSection({ title, className = "", children }) {
   );
 }
 
-/** "Fields marked * are required" beside the charcoal submit button. */
+/** "Fields marked * are required" and the consent line beside the charcoal submit button. */
 export function SubmitBar({ submitting, label = "Submit", error }) {
   return (
     <div className="flex flex-col gap-[14px]">
@@ -124,9 +125,12 @@ export function SubmitBar({ submitting, label = "Submit", error }) {
         </p>
       )}
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-[18px] border-t border-[#e6e0d6] pt-[28px]">
-        <p className="text-[12.5px] text-[#8a837b]">
-          Fields marked <span className="text-[#ef493d]">*</span> are required.
-        </p>
+        <div className="flex flex-col gap-[6px] sm:max-w-[60%]">
+          <p className="text-[12.5px] text-[#8a837b]">
+            Fields marked <span className="text-[#ef493d]">*</span> are required.
+          </p>
+          <ConsentNote />
+        </div>
         <button
           type="submit"
           disabled={submitting}

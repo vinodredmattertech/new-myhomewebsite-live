@@ -540,32 +540,32 @@ export default function BlogListing({
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_24vw] gap-x-[2.083vw] gap-y-[36px]">
+              {/* With a single article there is nothing to list beside it, so
+                  the "Other Articles" rail is dropped and the featured card
+                  takes the full width. */}
+              <div
+                className={`grid grid-cols-1 gap-x-[2.083vw] gap-y-[36px] ${
+                  sideArticles.length > 0 ? "lg:grid-cols-[1fr_24vw]" : ""
+                }`}
+              >
                 {featured && <FeaturedCard blog={featured} />}
 
-                <aside className="flex flex-col">
-                  <h3
-                    className="text-[#333] mb-[20px] lg:mb-[1.302vw] leading-[1.2]
-                               text-[22px] lg:text-[1.354vw]"
-                    style={{ ...HEADING_FONT, fontWeight: 300 }}
-                  >
-                    {otherArticlesHeading || "Other Articles"}
-                  </h3>
-                  <div className="flex flex-col gap-[18px] lg:gap-[1.042vw]">
-                    {sideArticles.length > 0 ? (
-                      sideArticles.map((b) => (
+                {sideArticles.length > 0 && (
+                  <aside className="flex flex-col">
+                    <h3
+                      className="text-[#333] mb-[20px] lg:mb-[1.302vw] leading-[1.2]
+                                 text-[22px] lg:text-[1.354vw]"
+                      style={{ ...HEADING_FONT, fontWeight: 300 }}
+                    >
+                      {otherArticlesHeading || "Other Articles"}
+                    </h3>
+                    <div className="flex flex-col gap-[18px] lg:gap-[1.042vw]">
+                      {sideArticles.map((b) => (
                         <SideCard key={b.href + b.title} blog={b} />
-                      ))
-                    ) : (
-                      <p
-                        className="font-montserrat text-[#9a9a9a] text-[13px] lg:text-[0.781vw]"
-                        style={BODY_FONT}
-                      >
-                        More stories coming soon.
-                      </p>
-                    )}
-                  </div>
-                </aside>
+                      ))}
+                    </div>
+                  </aside>
+                )}
               </div>
 
               {/* Remaining articles grid */}

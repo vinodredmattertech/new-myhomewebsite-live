@@ -287,24 +287,21 @@ export default function BlogDetail({ blog, related = [] }) {
 
           {/* Sidebar */}
           <aside className="lg:sticky lg:top-[2.604vw] self-start">
-            <h3
-              className="text-[#333] mb-[20px] lg:mb-[1.302vw] leading-[1.2] text-[22px] lg:text-[1.354vw]"
-              style={{ ...HEADING_FONT, fontWeight: 300 }}
-            >
-              Other Articles
-            </h3>
-            <div className="flex flex-col gap-[18px] lg:gap-[1.042vw]">
-              {related.length > 0 ? (
-                related.map((b) => <RelatedCard key={b.id} blog={b} />)
-              ) : (
-                <p
-                  className="font-montserrat text-[#9a9a9a] text-[13px] lg:text-[0.781vw]"
-                  style={BODY_FONT}
+            {/* Only list other articles when there are any; the "View all
+                articles" link stays either way. */}
+            {related.length > 0 && (
+              <>
+                <h3
+                  className="text-[#333] mb-[20px] lg:mb-[1.302vw] leading-[1.2] text-[22px] lg:text-[1.354vw]"
+                  style={{ ...HEADING_FONT, fontWeight: 300 }}
                 >
-                  More stories coming soon.
-                </p>
-              )}
-            </div>
+                  Other Articles
+                </h3>
+                <div className="flex flex-col gap-[18px] lg:gap-[1.042vw]">
+                  {related.map((b) => <RelatedCard key={b.id} blog={b} />)}
+                </div>
+              </>
+            )}
 
             <Link
               href="/blogs"
