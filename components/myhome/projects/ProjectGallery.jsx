@@ -308,10 +308,12 @@ export default function ProjectGallery({
                     {/* Play / disabled */}
                     {hasVideo ? (
                       <a
-                        href={item.videoSrc}
+                        href="javascript:void(0)"
+                        data-src={item.videoSrc}
                         data-fancybox={`walkthrough-${activeTab}`}
                         {...videoFancyboxAttrs(item.videoSrc, item.videoType)}
                         data-caption={item.title || ""}
+                        rel="nofollow"
                         aria-label={`Play walkthrough — ${item.title || "video"}`}
                         className="absolute inset-0 flex items-center justify-center"
                       >
@@ -387,9 +389,11 @@ export default function ProjectGallery({
             {activeItems.map((item, idx) => (
               <SwiperSlide key={`image-${idx}`} className="!h-auto">
                 <a
-                  href={item.image}
+                  href="javascript:void(0)"
+                  data-src={item.image}
                   data-fancybox={`gallery-${activeTab}`}
                   data-caption={item.alt || ""}
+                  rel="nofollow"
                   className="relative w-full aspect-[1398/632] rounded-[12px] overflow-hidden bg-black/30 block group"
                 >
                   {item.image && (

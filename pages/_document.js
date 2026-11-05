@@ -18,6 +18,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Tag Manager */}
+        <meta name="author" content="Myhome Constructions" />
+        <meta name="publisher" content="Myhome Constructions" />
         <link rel="icon" type="image/svg+xml" href="/assets/myhome/logo.svg" />
         <link rel="apple-touch-icon" href="/assets/myhome/logo.svg" />
       </Head>

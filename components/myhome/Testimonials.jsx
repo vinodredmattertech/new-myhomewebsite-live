@@ -405,9 +405,11 @@ export default function Testimonials({ data }) {
                       has no playable source it's rendered disabled. */}
                   {t.videoSrc ? (
                     <a
-                      href={t.videoSrc}
+                      href="javascript:void(0)"
+                      data-src={t.videoSrc}
                       data-fancybox={`testimonial-${effectiveTab}-${i}`}
                       {...(t.videoType ? { "data-type": t.videoType } : {})}
+                      rel="nofollow"
                       aria-label={`Play video testimonial — ${t.name}`}
                       className="absolute inset-0 m-auto inline-flex items-center justify-center
                                  w-[60px] h-[40px] lg:w-[4.125vw] lg:h-[2.719vw]

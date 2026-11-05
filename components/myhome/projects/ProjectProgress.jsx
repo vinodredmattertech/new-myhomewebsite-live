@@ -497,9 +497,11 @@ export default function ProjectProgress({
                     <figure className="flex h-full flex-col bg-white">
                       <div className="relative w-full aspect-[657/520] lg:aspect-auto lg:h-[26vw] rounded-[16px] overflow-hidden bg-[#eee] border border-[#e5e5e5] group">
                         <a
-                          href={img.src}
+                          href="javascript:void(0)"
+                          data-src={img.src}
                           data-fancybox="progress-gallery"
                           data-caption={`${img.formattedDate ? `[${img.formattedDate}] ` : ""}${img.caption || img.alt || ""}`}
+                          rel="nofollow"
                           className="block w-full h-full"
                         >
                           <Image

@@ -148,18 +148,31 @@ function tileLabel(tile) {
 function TileLink({ tile, className = "", children }) {
   if (!tile.href) return <div className={className}>{children}</div>;
 
+  // Lightbox media is not a page. An <a href> to the file is crawled as a page.
+  if (tile.fancyType) {
+    return (
+      <a
+        href="javascript:void(0)"
+        data-src={tile.href}
+        data-fancybox="news-listing"
+        data-type={tile.fancyType}
+        {...(tile.title ? { "data-caption": tile.title } : null)}
+        rel="nofollow"
+        aria-label={tileLabel(tile)}
+        className={className}
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <a
       href={tile.href}
       aria-label={tileLabel(tile)}
       className={className}
-      {...(tile.fancyType
-        ? {
-            "data-fancybox": "news-listing",
-            "data-type": tile.fancyType,
-            ...(tile.title ? { "data-caption": tile.title } : null),
-          }
-        : { target: "_blank", rel: "noopener noreferrer" })}
+      target="_blank"
+      rel="noopener noreferrer"
     >
       {children}
     </a>

@@ -16,7 +16,7 @@ import ProjectInquiry from "@/components/myhome/projects/ProjectInquiry";
 import ProjectConnectivity from "@/components/myhome/projects/ProjectConnectivity";
 import ProjectFloatingActions from "@/components/myhome/projects/ProjectFloatingActions";
 import ProjectSectionNav from "@/components/myhome/projects/ProjectSectionNav";
-import { getProjectBySlug, mediaUrl, STRAPI_URL } from "@/lib/strapi";
+import { getProjectBySlug, mediaUrl, fileMeta } from "@/lib/strapi";
 
 /** Split a newline-separated text field into a trimmed string array. */
 function lines(text) {
@@ -290,14 +290,12 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
   }));
 
   const br = project.brochure || {};
-  const brochureFileUrl = br.brochureFile?.data?.attributes?.url
-    ? `${STRAPI_URL}${br.brochureFile.data.attributes.url}`
-    : "#";
+  const brochureMeta = fileMeta(br.brochureFile);
+  const secondaryMeta = fileMeta(br.secondaryFile);
+  const brochureFileUrl = brochureMeta?.url || "";
   // Optional second download (e.g. the IGBC certificate). The button only
   // renders when a file has actually been uploaded in the CMS.
-  const secondaryFileUrl = br.secondaryFile?.data?.attributes?.url
-    ? `${STRAPI_URL}${br.secondaryFile.data.attributes.url}`
-    : "";
+  const secondaryFileUrl = secondaryMeta?.url || "";
 
   const tm = project.testimonials || {};
   const testimonials = (tm.items || []).map((t) => ({
@@ -358,7 +356,7 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
     hasText(br.heading) ||
     lines(br.highlights).length ||
     mediaUrl(br?.image) ||
-    brochureFileUrl !== "#" ||
+    brochureFileUrl ||
     secondaryFileUrl
   );
   const hasTestimonials = testimonials.some((t) => hasText(t.quote));
@@ -549,8 +547,10 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
           imageSrc={mediaUrl(br?.image) || ""}
           imageAlt={txt(br.imageAlt)}
           brochureHref={brochureFileUrl}
+          brochureFileName={brochureMeta?.name || ""}
           buttonLabel={txt(br.buttonLabel) || "Download Brochure"}
           secondaryHref={secondaryFileUrl}
+          secondaryFileName={secondaryMeta?.name || ""}
           secondaryButtonLabel={txt(br.secondaryButtonLabel) || "IGBC PDF"}
           projectName={project.title}
           projectSlug={project.slug}

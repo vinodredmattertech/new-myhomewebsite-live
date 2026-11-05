@@ -260,9 +260,11 @@ export default function ProjectFloorPlans({
     if (unlocked) {
       return (
         <a
-          href={plan.image}
+          href="javascript:void(0)"
+          data-src={plan.image}
           data-fancybox={`floor-plans-${activeTab}`}
           data-caption={`${plan.bhk} — ${plan.label}`}
+          rel="nofollow"
           className="block cursor-zoom-in"
           aria-label={`Open ${plan.bhk} ${plan.label} floor plan`}
         >

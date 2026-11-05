@@ -13,6 +13,7 @@ export default function PageBanner({
   mobileSrc,
   imageAlt,
   heading,
+  headingAs = "h1",
   breadcrumbLabel,
   gradientClass = "bg-gradient-to-b from-black/20 via-black/10 to-black/80",
   sectionId,
@@ -104,13 +105,15 @@ export default function PageBanner({
 
       <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[9.323vw] pb-[40px] sm:pb-[56px] lg:pb-[2.812vw]">
         <div className="flex flex-col items-start gap-[18px] sm:gap-[22px] lg:gap-[1.562vw] w-full">
-          <SectionHeading as="h1"
+          {heading ? (
+          <SectionHeading as={headingAs}
             ref={headingRef}
             className="capitalize text-white will-change-transform leading-[1.08] tracking-[0.025em]
                        text-[32px] xs:text-[36px] sm:text-[44px] md:text-[56px] lg:text-[3.646vw]"
           >
             {heading}
           </SectionHeading>
+          ) : null}
 
           <div
             ref={lineRef}

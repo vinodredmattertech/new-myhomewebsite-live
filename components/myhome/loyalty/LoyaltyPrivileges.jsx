@@ -65,7 +65,7 @@ function TabIcon({ filter, className }) {
  * renders nothing until the section is populated in the admin.
  * Desktop sizing uses vw (1920 reference); small screens use px.
  */
-export default function LoyaltyPrivileges({ data }) {
+export default function LoyaltyPrivileges({ data, headingAs = "h2" }) {
   const label = data?.label || "";
   const heading = data?.heading || "";
   const paragraphs = useMemo(
@@ -146,6 +146,7 @@ export default function LoyaltyPrivileges({ data }) {
               {/* left: heading + copy */}
               <div className="flex flex-col">
                 <SectionHeading
+                  as={headingAs}
                   ref={headingRef}
                   className="text-[#333] capitalize will-change-transform leading-[1.06] tracking-[0.021em]
                              text-[40px] xs:text-[46px] sm:text-[58px] md:text-[72px] lg:text-[5vw]"
@@ -266,13 +267,15 @@ export default function LoyaltyPrivileges({ data }) {
                       className="object-cover object-center transition-transform duration-[1200ms] ease-premium group-hover:scale-[1.03]"
                     />
                     {item.mediaType === "video" && (
-                      <a
-                        href={item.videoUrl || undefined}
-                        target={item.videoUrl ? "_blank" : undefined}
-                        rel={item.videoUrl ? "noopener noreferrer" : undefined}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          item.videoUrl &&
+                          window.open(item.videoUrl, "_blank", "noopener,noreferrer")
+                        }
                         aria-label="Play video"
                         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                                   flex items-center justify-center rounded-full bg-[#ef493d] text-white
+                                   flex items-center justify-center rounded-full bg-[#ef493d] text-white border-0 p-0
                                    shadow-lg transition-transform duration-300 hover:scale-110
                                    w-[52px] h-[52px] lg:w-[3.6vw] lg:h-[3.6vw]"
                       >
@@ -280,7 +283,7 @@ export default function LoyaltyPrivileges({ data }) {
                           className="ml-[2px] w-[20px] h-[20px] lg:w-[1.25vw] lg:h-[1.25vw] fill-current"
                           strokeWidth={0}
                         />
-                      </a>
+                      </button>
                     )}
                   </div>
                 ))}

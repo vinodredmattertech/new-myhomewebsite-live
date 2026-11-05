@@ -203,15 +203,30 @@ function GalleryTile({ tile }) {
     ? `Open PDF — ${tile.title}`
     : `Read article — ${tile.title}`;
 
+  // Videos open in the lightbox. An <a href> to the file is crawled as a page.
+  if (tile.fancyType) {
+    return (
+      <a
+        href="javascript:void(0)"
+        data-src={tile.href}
+        data-fancybox="media-gallery"
+        data-type={tile.fancyType}
+        rel="nofollow"
+        aria-label={label}
+        className="group flex h-full flex-col"
+      >
+        {frame}
+      </a>
+    );
+  }
+
   return (
     <a
       href={tile.href}
       aria-label={label}
       className="group flex h-full flex-col"
-      // Videos open in the Fancybox lightbox; links and PDFs open in a new tab.
-      {...(tile.fancyType
-        ? { "data-fancybox": "media-gallery", "data-type": tile.fancyType }
-        : { target: "_blank", rel: "noopener noreferrer" })}
+      target="_blank"
+      rel="noopener noreferrer"
     >
       {frame}
     </a>

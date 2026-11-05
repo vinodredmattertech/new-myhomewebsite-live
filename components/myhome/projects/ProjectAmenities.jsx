@@ -204,9 +204,11 @@ export default function ProjectAmenities({
                               ${isActive ? "scale-100" : "scale-[0.9]"}`}
                 >
                   <a
-                    href={cleanImage(a?.image?.data?.attributes?.url)}
+                    href="javascript:void(0)"
+                    data-src={cleanImage(a?.image?.data?.attributes?.url)}
                     data-fancybox="amenities-gallery"
                     data-caption={a.title}
+                    rel="nofollow"
                     className="block w-full h-full"
                   >
                     <Image

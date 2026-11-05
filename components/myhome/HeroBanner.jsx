@@ -28,6 +28,13 @@ export default function HeroBanner({ data }) {
   // The banner image is the link. A blank CMS destination means it stays static.
   const ctaHref = String(data?.ctaLink || "").trim();
   const ctaLabel = String(data?.ctaText || "").trim();
+  const headingLine1 = String(data?.headingLine1 || "").trim();
+  const headingLine2 = String(data?.headingLine2 || "").trim();
+  // The hero copy is the page heading when the CMS fills it. When both lines
+  // are empty, the loader title ("Welcome HOME") is the only heading, so that
+  // text is the H1 instead of an empty one.
+  const hasCopyHeading = Boolean(headingLine1 || headingLine2);
+  const LoaderTitle = hasCopyHeading ? "h2" : "h1";
 
   // Which breakpoint we're on — `null` until hydration so the server and the
   // first client render agree. Only the matching video is ever mounted, so we
@@ -392,20 +399,24 @@ export default function HeroBanner({ data }) {
           <div
             className="text-white w-full lg:max-w-[52vw] xl:max-w-[51.7vw]"
           >
+            {hasCopyHeading && (
             <h1
               ref={copyHeadingRef}
               className="will-change-transform leading-[1.4] tracking-[0.025em] capitalize"
               style={{ fontFamily:  '"Tartuffo_Trial_Light","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
             >
               <span className="Tartuffo_Trial_Regular block text-[18px] xs:text-[20px] sm:text-[24px] md:text-[30px] lg:text-[2.083vw] tracking-[0.044em] font-[300] leading-[1.4]">
-                {data.headingLine1}
+                {headingLine1}
               </span>
+              {headingLine2 && (
               <span className="Tartuffo_Trial_Regular block italic mt-[2px] sm:mt-1.5 md:mt-2 text-[30px] xs:text-[34px] sm:text-[40px] md:text-[48px] lg:text-[3.125vw] font-[300] leading-[1.4]">
                 <i className="Tartuffo_Trial_Regular font-[300]">
-                  {data.headingLine2}
+                  {headingLine2}
                 </i>
               </span>
+              )}
             </h1>
+            )}
             <p
               ref={copyBodyRef}
               className="font-montserrat font-medium mt-3 sm:mt-4 md:mt-5 lg:mt-[1.25vw] text-[12px] xs:text-[13px] md:text-[15px] lg:text-[0.938vw] leading-[22px] sm:leading-[1.65] lg:leading-[1.667vw] text-white/95 max-w-[309px] sm:max-w-[36ch] lg:max-w-none"
@@ -421,7 +432,7 @@ export default function HeroBanner({ data }) {
         ref={loaderRef}
         data-mh-loader
         className="absolute inset-0 z-[80] bg-[#2a2828] flex flex-col items-center justify-center will-change-transform"
-        aria-hidden={!loading}
+        aria-hidden={hasCopyHeading ? !loading : undefined}
       >
         {/* subtle noise/texture for premium feel */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
@@ -441,7 +452,7 @@ export default function HeroBanner({ data }) {
 
         {/* mask container for "Welcome HOME" */}
         <div className="overflow-hidden h-[80px] xs:h-[96px] sm:h-[120px] md:h-[140px] lg:h-[7.812vw] flex items-center justify-center px-5">
-          <h2
+          <LoaderTitle
             ref={welcomeRef}
             className="Tartuffo_Trial_Regular capitalize text-white text-center leading-[1] tracking-[0.04em] text-[44px] xs:text-[56px] sm:text-[72px] md:text-[88px] lg:text-[5.286vw] font-[300] will-change-transform"
             style={{
@@ -455,7 +466,7 @@ export default function HeroBanner({ data }) {
             }}
           >
             {data.loaderTitle}
-          </h2>
+          </LoaderTitle>
         </div>
 
         {/* mask container for subtitle */}

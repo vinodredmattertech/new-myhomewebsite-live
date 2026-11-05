@@ -200,9 +200,16 @@ export default function CareerWorkplace({ section }) {
       {featuredImage && (
         <div data-reveal className="mt-[28px] lg:mt-[2.5vw] px-5 md:px-10 lg:px-[8.333vw]">
           <a
-            href={videoUrl || undefined}
-            target={videoUrl ? "_blank" : undefined}
-            rel={videoUrl ? "noopener noreferrer" : undefined}
+            role={videoUrl ? "button" : undefined}
+            tabIndex={videoUrl ? 0 : undefined}
+            onClick={
+              videoUrl
+                ? (e) => {
+                    e.preventDefault();
+                    window.open(videoUrl, "_blank", "noopener,noreferrer");
+                  }
+                : undefined
+            }
             className={`group relative block w-full overflow-hidden rounded-[8px] lg:rounded-[0.417vw] aspect-[1616/725] ${
               videoUrl ? "cursor-pointer" : "cursor-default"
             }`}

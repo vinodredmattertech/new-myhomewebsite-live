@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import { startPendingBrochureDownload } from "@/lib/brochureDownload";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -22,6 +23,10 @@ export default function ThankYou() {
   const headingRef = useRef(null);
   const bodyRef = useRef(null);
   const ctasRef = useRef(null);
+
+  useEffect(() => {
+    startPendingBrochureDownload();
+  }, []);
 
   useGSAP(
     () => {

@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { useGSAP } from "@gsap/react";
@@ -11,6 +12,10 @@ import SectionHeading from "@/components/common/SectionHeading";
 import CountryCodeSelect from "@/components/common/CountryCodeSelect";
 import { dialCodeFor, registerPhone } from "@/lib/phone";
 import { pushToCRM } from "@/lib/crm";
+import {
+  rememberBrochureDownload,
+  savedBrochureName,
+} from "@/lib/brochureDownload";
 import ConsentNote from "@/components/common/ConsentNote";
 
 const DEFAULT_HIGHLIGHTS = [
@@ -21,37 +26,19 @@ const DEFAULT_HIGHLIGHTS = [
   "IGBC Gold Rated Green Building Features",
 ];
 
-// localStorage namespaced per project so unlocking Akrida's brochure
-// doesn't auto-unlock every other project's PDF.
-const STORAGE_PREFIX = "mh:brochure-unlocked:";
-
-/** Trigger an actual download of the given URL in a way that respects
- *  CORS and same-origin. For external URLs we open in a new tab so the
- *  browser handles the file headers. */
-function triggerBrochureDownload(href) {
-  if (!href || href === "#") return;
-  if (typeof document === "undefined") return;
-  const a = document.createElement("a");
-  a.href = href;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  a.download = "";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
 export default function ProjectBrochure({
   sidebarLabel = "Your Journey Starts Here",
   heading = "The Akrida Handbook",
   highlights = DEFAULT_HIGHLIGHTS,
   imageSrc = "/assets/myhome/projects/brochure-clubhouse.jpg",
   imageAlt = "My Home Akrida clubhouse",
-  brochureHref = "/images/pdf-sample_0.pdf",
+  brochureHref = "",
+  brochureFileName = "",
   buttonLabel = "Download Brochure",
   // Optional second document (e.g. the IGBC certificate). Its button renders
   // only when the CMS has a file for it, and it reuses the same unlock form.
   secondaryHref = "",
+  secondaryFileName = "",
   secondaryButtonLabel = "IGBC PDF",
   projectName = "Project Brochure",
   projectSlug,
@@ -63,12 +50,7 @@ export default function ProjectBrochure({
   const buttonRef = useRef(null);
   const imageRef = useRef(null);
 
-  const storageKey = `${STORAGE_PREFIX}${projectName}`;
-  // The second document unlocks separately, so its own lead is still captured
-  // even after the brochure has been downloaded.
-  const secondaryStorageKey = `${STORAGE_PREFIX}${projectName}:secondary`;
-  const [unlocked, setUnlocked] = useState(false);
-  const [secondaryUnlocked, setSecondaryUnlocked] = useState(false);
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   // Which document the open modal is collecting details for: "brochure" | "secondary".
   const [activeDoc, setActiveDoc] = useState("brochure");
@@ -83,41 +65,28 @@ export default function ProjectBrochure({
     formState: { errors },
   } = useForm({ mode: "onBlur" });
 
-  // Read unlocked flags from localStorage on the client (SSR-safe).
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.localStorage.getItem(storageKey) === "1") setUnlocked(true);
-    if (window.localStorage.getItem(secondaryStorageKey) === "1") {
-      setSecondaryUnlocked(true);
-    }
-  }, [storageKey, secondaryStorageKey]);
-
   const isSecondary = activeDoc === "secondary";
   const activeHref = isSecondary ? secondaryHref : brochureHref;
-  const activeStorageKey = isSecondary ? secondaryStorageKey : storageKey;
+  const activeName = savedBrochureName(
+    projectName,
+    isSecondary ? secondaryFileName : brochureFileName,
+    isSecondary ? secondaryButtonLabel : "Brochure"
+  );
 
   const handleDownloadClick = (e) => {
     e.preventDefault();
     // Brochure file missing in CMS → don't open the modal; just show a no-op
     // (the button is also disabled visually below).
-    if (!brochureHref || brochureHref === "/images/pdf-sample_0.pdf") return;
+    if (!brochureHref || brochureHref === "#" || brochureHref === "/images/pdf-sample_0.pdf") return;
     setActiveDoc("brochure");
-    if (unlocked) {
-      triggerBrochureDownload(brochureHref);
-    } else {
-      setModalOpen(true);
-    }
+    setModalOpen(true);
   };
 
   const handleSecondaryClick = (e) => {
     e.preventDefault();
     if (!secondaryHref || secondaryHref === "#") return;
     setActiveDoc("secondary");
-    if (secondaryUnlocked) {
-      triggerBrochureDownload(secondaryHref);
-    } else {
-      setModalOpen(true);
-    }
+    setModalOpen(true);
   };
 
   const onUnlockSubmit = async (data) => {
@@ -149,16 +118,10 @@ export default function ProjectBrochure({
         submitLead(payload),
       ]);
       if (crmRes.ok || leadOk) {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(activeStorageKey, "1");
-        }
-        if (isSecondary) setSecondaryUnlocked(true);
-        else setUnlocked(true);
+        rememberBrochureDownload(activeHref, activeName);
         setModalOpen(false);
         reset();
-        // Kick off the download in the next tick so the modal close
-        // animation isn't blocked by the file open dialog.
-        setTimeout(() => triggerBrochureDownload(activeHref), 50);
+        router.push("/thank-you");
       } else {
         setSubmitError("Couldn't save your details. Please try again.");
       }
@@ -226,7 +189,8 @@ export default function ProjectBrochure({
     { scope: rootRef }
   );
 
-  const noFile = !brochureHref || brochureHref === "/images/pdf-sample_0.pdf";
+  const noFile =
+    !brochureHref || brochureHref === "#" || brochureHref === "/images/pdf-sample_0.pdf";
   const hasSecondary = Boolean(secondaryHref && secondaryHref !== "#");
 
   return (
@@ -313,11 +277,7 @@ export default function ProjectBrochure({
                 onClick={handleDownloadClick}
                 disabled={noFile}
                 aria-label={
-                  noFile
-                    ? "Brochure coming soon"
-                    : unlocked
-                    ? buttonLabel
-                    : `${buttonLabel} — fill form to download`
+                  noFile ? "Brochure coming soon" : `${buttonLabel} — fill form to download`
                 }
                 className="inline-flex items-center justify-between gap-[16px]
                            border border-white text-white capitalize
@@ -338,11 +298,7 @@ export default function ProjectBrochure({
                 <button
                   type="button"
                   onClick={handleSecondaryClick}
-                  aria-label={
-                    secondaryUnlocked
-                      ? secondaryButtonLabel
-                      : `${secondaryButtonLabel} — fill form to download`
-                  }
+                  aria-label={`${secondaryButtonLabel} — fill form to download`}
                   className="inline-flex items-center justify-between gap-[16px]
                              border border-white text-white capitalize
                              h-[48px] sm:h-[54px] lg:h-[3.021vw]
@@ -377,9 +333,7 @@ export default function ProjectBrochure({
         <button
           type="button"
           onClick={handleDownloadClick}
-          aria-label={
-            unlocked ? buttonLabel : `${buttonLabel} — fill form to download`
-          }
+          aria-label={`${buttonLabel} — fill form to download`}
           className="group fixed z-[70]
                      left-[12px] sm:left-[16px] lg:left-[1.25vw]
                      bottom-[68px] sm:bottom-[72px] lg:bottom-[1.25vw]

@@ -1,3 +1,5 @@
+import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import { STRAPI_URL } from "@/lib/strapi";
 
 /**
@@ -52,30 +54,38 @@ export default async function handler(req, res) {
   }
 
   try {
-    const upstream = await fetch(target.toString());
-    if (!upstream.ok) {
-      return res.status(upstream.status).json({ error: "Upstream fetch failed" });
+    const upstream = await fetch(target.toString(), {
+      method: req.method === "HEAD" ? "HEAD" : "GET",
+    });
+    if (!upstream.ok || (req.method !== "HEAD" && !upstream.body)) {
+      return res.status(upstream.status || 502).json({ error: "Upstream fetch failed" });
     }
 
-    const buffer = Buffer.from(await upstream.arrayBuffer());
     const filename = safeFilename(
       name,
       safeFilename(decodeURIComponent(target.pathname), "document")
     );
 
+    res.status(200);
     res.setHeader(
       "Content-Type",
       upstream.headers.get("content-type") || "application/octet-stream"
     );
-    res.setHeader("Content-Length", buffer.length);
+    const length = upstream.headers.get("content-length");
+    if (length) res.setHeader("Content-Length", length);
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`
     );
-    res.setHeader("Cache-Control", "public, max-age=3600");
-    return res.status(200).send(buffer);
+    res.setHeader("Cache-Control", "private, no-store");
+    if (req.method === "HEAD") return res.end();
+    await pipeline(Readable.fromWeb(upstream.body), res);
   } catch (err) {
     console.warn("[api/download] proxy error:", err.message);
+    if (res.headersSent) {
+      res.destroy();
+      return;
+    }
     return res.status(502).json({ error: "Download failed" });
   }
 }

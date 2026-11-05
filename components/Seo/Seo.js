@@ -2,9 +2,32 @@
 import Head from "next/head";
 import React from "react";
 import { cleanImage } from "../common/ImageClear";
+
+/** The site serves pages without a trailing slash. CMS canonicals often
+ *  include one (`/csr/`); the tag should match the address in the browser. */
+function canonicalHref(url) {
+  if (!url || typeof url !== "string") return "";
+  const trimmed = url.trim();
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.pathname !== "/" && parsed.pathname.endsWith("/")) {
+      parsed.pathname = parsed.pathname.replace(/\/+$/, "");
+    }
+    // URL serialization adds a slash to a bare origin. Keep the stored
+    // homepage form when it was saved without one.
+    if (parsed.pathname === "/" && !trimmed.endsWith("/")) {
+      return trimmed.split(/[?#]/)[0];
+    }
+    return parsed.toString();
+  } catch {
+    return trimmed.length > 1 ? trimmed.replace(/\/+$/, "") : trimmed;
+  }
+}
+
 const Seo = (props) => {
   const imgUrl = cleanImage(props?.seo?.metaImage?.data?.attributes?.url);
   const schema = props?.seo?.schema;
+  const canonical = canonicalHref(props?.seo?.canonicalURL);
   // console.log("seo", props);
   return (
     <Head>
@@ -23,7 +46,7 @@ const Seo = (props) => {
       />
       <link
         rel="canonical"
-        href={props?.seo?.canonicalURL == null ? "" : props?.seo?.canonicalURL}
+        href={canonical}
       />
       <meta
         name="robots"
@@ -45,9 +68,7 @@ const Seo = (props) => {
       />
       <meta
         property="og:url"
-        content={
-          props?.seo?.canonicalURL == null ? "" : props?.seo?.canonicalURL
-        }
+        content={canonical}
       />
       <meta property="og:image" content={imgUrl == null ? "" : imgUrl} />
       {/*twitter card*/}

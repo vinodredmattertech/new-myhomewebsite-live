@@ -136,7 +136,7 @@ function DocumentRow({ doc, viewLabel, downloadLabel }) {
 }
 
 /** One titled block — heading, underline rule, optional intro, then the rows. */
-function DocumentBlock({ block }) {
+function DocumentBlock({ block, headingAs = "h2" }) {
   const docs = useMemo(() => {
     const list = (Array.isArray(block?.documents) ? block.documents : [])
       .map(normaliseDoc)
@@ -164,6 +164,7 @@ function DocumentBlock({ block }) {
 
       <div className="flex flex-col items-center text-center">
         <SectionHeading
+          as={headingAs}
           data-reveal
           className="uppercase leading-[1.15] tracking-[0.06em]
                      text-[26px] xs:text-[30px] sm:text-[38px] md:text-[46px] lg:text-[2.708vw]"
@@ -234,7 +235,7 @@ function DocumentBlock({ block }) {
  * Responsive: desktop (lg+) sizes in vw off the 1920 design; below that the
  * row switches to a stacked layout with full-width buttons and fixed-px type.
  */
-export default function InvestorDocuments({ sections }) {
+export default function InvestorDocuments({ sections, titleAs = "h2" }) {
   const rootRef = useRef(null);
 
   const blocks = useMemo(() => {
@@ -292,8 +293,12 @@ export default function InvestorDocuments({ sections }) {
         className="mx-auto w-full px-5 sm:px-8 lg:px-[11.146vw]
                    flex flex-col gap-[48px] lg:gap-[4.167vw]"
       >
-        {blocks.map((block) => (
-          <DocumentBlock key={block._key} block={block} />
+        {blocks.map((block, index) => (
+          <DocumentBlock
+            key={block._key}
+            block={block}
+            headingAs={index === 0 ? titleAs : "h2"}
+          />
         ))}
       </div>
     </section>

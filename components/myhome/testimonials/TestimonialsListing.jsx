@@ -140,9 +140,11 @@ function VideoCard({ t, idx }) {
 
         {t.videoSrc ? (
           <a
-            href={t.videoSrc}
+            href="javascript:void(0)"
+            data-src={t.videoSrc}
             data-fancybox={`testimonial-${idx}`}
             data-type={t.videoType}
+            rel="nofollow"
             aria-label={`Play video testimonial — ${t.name}`}
             className="absolute inset-0 m-auto inline-flex items-center justify-center
                        w-[52px] h-[52px] lg:w-[3.4vw] lg:h-[3.4vw] rounded-full text-white

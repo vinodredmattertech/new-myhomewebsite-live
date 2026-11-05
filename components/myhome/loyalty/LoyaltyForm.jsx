@@ -63,6 +63,7 @@ const Field = React.forwardRef(function Field(
 export default function LoyaltyForm({
   label = "Join The Programme",
   heading = "Unlock Your Privileges",
+  headingAs = "h2",
   background = "/assets/myhome/loyalty/form-bg.jpg",
   submitText = "Submit",
 }) {
@@ -188,6 +189,7 @@ export default function LoyaltyForm({
 
       <div className="relative z-[1] px-5 md:px-12 lg:px-[15.625vw]">
         <SectionHeading
+          as={headingAs}
           ref={headingRef}
           className="text-[#333] capitalize text-center will-change-transform leading-[1.05] tracking-[0.021em]
                      text-[38px] xs:text-[44px] sm:text-[56px] md:text-[72px] lg:text-[5vw]"

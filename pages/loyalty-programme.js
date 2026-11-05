@@ -7,6 +7,8 @@ import { getLoyaltyData, mediaUrl } from "@/lib/strapi";
 
 export default function LoyaltyProgrammePage({ page }) {
   const banner = page?.banner;
+  const bannerHeading = String(banner?.heading || "").trim();
+  const privilegesHeading = String(page?.privileges?.heading || "").trim();
   return (
     <>
       <Seo seo={page?.seo} />
@@ -15,13 +17,16 @@ export default function LoyaltyProgrammePage({ page }) {
         desktopSrc={mediaUrl(banner?.desktopImage)}
         mobileSrc={mediaUrl(banner?.mobileImage) || mediaUrl(banner?.desktopImage)}
         imageAlt={banner?.imageAlt}
-        heading={banner?.heading}
+        heading={bannerHeading}
         breadcrumbLabel={banner?.breadcrumbLabel}
         gradientClass="bg-gradient-to-b from-black/10 via-black/10 to-black/80"
       />
-      <LoyaltyPrivileges data={page?.privileges} />
+      <LoyaltyPrivileges
+        data={page?.privileges}
+        headingAs={!bannerHeading && privilegesHeading ? "h1" : "h2"}
+      />
       {/* Form UI is fixed in the frontend; submissions are stored in Strapi. */}
-      <LoyaltyForm />
+      <LoyaltyForm headingAs={!bannerHeading && !privilegesHeading ? "h1" : "h2"} />
     </>
   );
 }
