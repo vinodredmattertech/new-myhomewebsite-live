@@ -549,31 +549,30 @@ export default function AgreementForm() {
             </FormSection>
 
             <FormSection title="Organisation Type*">
-              <div className="grid grid-cols-1 gap-[8px]">
-                {ORGANISATION_TYPES.map((o) => (
-                  <Choice
-                    key={o}
-                    tile
-                    type="radio"
-                    label={o}
-                    value={o}
-                    {...register("organisationType", {
-                      required: "Select your organisation type",
-                      // The authorisation letter is optional for a sole
-                      // proprietor; clear an error already showing for it.
-                      onChange: () => errors.authorisationFile && trigger("authorisationFile"),
-                    })}
-                  />
-                ))}
-              </div>
+              <FieldRow error={errors.organisationType}>
+                <select
+                  aria-invalid={!!errors.organisationType || undefined}
+                  className={`${inputCls} cursor-pointer ${orgType ? "" : "text-[#a59d92]"}`}
+                  {...register("organisationType", {
+                    required: "Select your organisation type",
+                    // The authorisation letter is optional for a sole
+                    // proprietor; clear an error already showing for it.
+                    onChange: () => errors.authorisationFile && trigger("authorisationFile"),
+                  })}
+                >
+                  <option value="">Select</option>
+                  {ORGANISATION_TYPES.map((o) => (
+                    <option key={o} value={o} className="text-[#1f1d1b]">
+                      {o}
+                    </option>
+                  ))}
+                </select>
+              </FieldRow>
               {orgType === "Others" &&
                 text("organisationTypeOther", "Please specify*", {
                   validate: (val) =>
                     getValues("organisationType") !== "Others" || !!val.trim() || "Please specify the organisation type",
                 })}
-              {errors.organisationType && (
-                <span className={errorCls}>{errors.organisationType.message}</span>
-              )}
             </FormSection>
           </div>
 

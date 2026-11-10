@@ -22,5 +22,5 @@ export default function VanaAllotmentLetterPage() {
   );
 }
 
-VanaAllotmentLetterPage.getLayout = (page) => <MyHomeLayout minimal>{page}</MyHomeLayout>;
+VanaAllotmentLetterPage.getLayout = (page) => <MyHomeLayout minimal noHeader>{page}</MyHomeLayout>;
 VanaAllotmentLetterPage.formPage = true;
