@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Paperclip, X } from "lucide-react";
 import CountryCodeSelect, { DEFAULT_COUNTRY_CODE } from "@/components/common/CountryCodeSelect";
@@ -152,6 +152,13 @@ export default function DynamicForm({ config }) {
   // full number, so re-validating doesn't call the backend again.
   const [registered, setRegistered] = useState({});
   const phoneChecks = useRef(new Map());
+  // `honeypot`: a hidden field only bots fill in, and when the form opened —
+  // both go to the backend, which quietly drops a submission that trips them.
+  const honeypotRef = useRef(null);
+  const openedAt = useRef(0);
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   const defaultValues = useMemo(() => defaultValuesFor(config), [config]);
   const {
@@ -435,6 +442,10 @@ export default function DynamicForm({ config }) {
     setSubmitting(true);
     setSubmitError(null);
     const { data, files } = toPayload(config, v);
+    if (config.honeypot) {
+      data.hpWebsite = honeypotRef.current?.value || "";
+      data.hpElapsedMs = Date.now() - openedAt.current;
+    }
     const ok = await submitPublicForm(config.endpoint, data, files);
     setSubmitting(false);
     if (ok) {
@@ -481,6 +492,7 @@ export default function DynamicForm({ config }) {
         <SuccessMessage title={config.success.title} text={config.success.text} />
       ) : (
         <DocumentForm onSubmit={handleSubmit(onSubmit, onInvalid)}>
+            {config.honeypot && <Honeypot inputRef={honeypotRef} />}
           {config.sections.filter(visible).map((section) => (
             <FormSection key={section.title} title={section.title}>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-[24px] gap-y-[22px]">
@@ -548,6 +560,22 @@ function RegisteredResponse({ response }) {
           </React.Fragment>
         ))}
       </dl>
+    </div>
+  );
+}
+
+/**
+ * Bot trap: a "Website" field moved off-screen and out of the tab order, so
+ * people never see or reach it while form-filling bots tend to complete it.
+ * Not display:none — some bots skip fields that are plainly hidden.
+ */
+function Honeypot({ inputRef }) {
+  return (
+    <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+      <label>
+        Website
+        <input ref={inputRef} type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" />
+      </label>
     </div>
   );
 }

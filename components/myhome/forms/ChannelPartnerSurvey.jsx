@@ -10,7 +10,7 @@ import { lookupChannelPartner, verifyChannelPartner } from "@/lib/strapi";
  * own links (`?uid=<CP Unique ID>`), so every response is tagged with the
  * partner who sent it.
  *
- *   no uid       → the partner enters their Company Partner Name; a match in
+ *   no uid       → the partner enters their Company / Firm Name; a match in
  *                  CP Data shows their link (?uid=…) with a Copy button
  *   valid uid    → the survey, tagged with that partner
  *   unknown uid  → back to the name step, with a note that the link is invalid
@@ -60,7 +60,7 @@ export default function ChannelPartnerSurvey({ config }) {
       config={config}
       notice={
         link.status === "invalid"
-          ? "This survey link isn't valid. Enter your company partner name to get the correct link."
+          ? "This survey link isn't valid. Enter your company name to get the correct link."
           : link.status === "error"
             ? "We couldn't check this survey link. Please try again."
             : null
@@ -69,7 +69,7 @@ export default function ChannelPartnerSurvey({ config }) {
   );
 }
 
-/** Step 1: find the partner by their Company Partner Name. */
+/** Step 1: find the partner by their Company / Firm Name. */
 function PartnerNameStep({ config, notice }) {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -105,7 +105,7 @@ function PartnerNameStep({ config, notice }) {
     const value = name.trim().replace(/\s+/g, " ");
     setMatches([]);
     setPartner(null);
-    if (value.length < 2) return setError({ message: "Please enter the company partner name" });
+    if (value.length < 2) return setError({ message: "Please enter your company name" });
     setError(null);
     setBusy(true);
     const found = await lookupChannelPartner(value);
@@ -113,7 +113,7 @@ function PartnerNameStep({ config, notice }) {
     if (found === null) return setError({ message: "Couldn't check the name right now. Please try again." });
     if (found.length === 0) {
       return setError({
-        message: "No channel partner is registered with this name. Check the spelling, or contact My Home Group.",
+        message: "No channel partner is registered with this company name. Check the spelling, or contact My Home Group.",
       });
     }
     if (found.length === 1) return showLink(found[0]);
@@ -125,7 +125,7 @@ function PartnerNameStep({ config, notice }) {
     <DocumentSheet
       eyebrow={config.label}
       heading={config.heading}
-      intro={["Channel partners: enter your company partner name to get your survey link."]}
+      intro={["Channel partners: enter your company name to get your survey link."]}
     >
       <form noValidate onSubmit={submit} className="relative mt-[48px] md:mt-[56px] mx-auto max-w-[520px] flex flex-col gap-[20px]">
         {notice && (
@@ -133,10 +133,10 @@ function PartnerNameStep({ config, notice }) {
             {notice}
           </p>
         )}
-        <FieldRow label="Company Partner Name*" error={error}>
+        <FieldRow label="Company Name*" error={error}>
           <input
             type="text"
-            autoComplete="name"
+            autoComplete="organization"
             value={name}
             onChange={(e) => setName(e.target.value)}
             aria-invalid={!!error || undefined}
@@ -146,7 +146,7 @@ function PartnerNameStep({ config, notice }) {
 
         {matches.length > 0 && (
           <div className="flex flex-col gap-[8px]">
-            <p className={`text-[#3d3935] ${textCls}`}>This name is registered with more than one firm. Choose yours:</p>
+            <p className={`text-[#3d3935] ${textCls}`}>This company name is registered more than once. Choose your partner ID:</p>
             {matches.map((m) => (
               <button
                 key={m.uniqueId}
@@ -157,7 +157,7 @@ function PartnerNameStep({ config, notice }) {
                               partner?.uniqueId === m.uniqueId ? "border-[#ef493d] bg-[#fef7f6]" : "border-[#e6e0d6] bg-white/70"
                             }`}
               >
-                {m.companyName}
+                {m.companyName} <span className="text-[#8a837b]">({m.uniqueId})</span>
               </button>
             ))}
           </div>
