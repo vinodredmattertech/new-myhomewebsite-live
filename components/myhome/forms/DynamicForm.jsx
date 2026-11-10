@@ -19,7 +19,7 @@ import {
   DocumentForm,
 } from "@/components/myhome/forms/DocumentUI";
 import { dialCodeFor, validatePhone } from "@/lib/phone";
-import { submitPublicForm } from "@/lib/strapi";
+import { checkSurveyPhone, submitPublicForm } from "@/lib/strapi";
 
 /**
  * DynamicForm — renders one of the printed My Home forms from a config in
@@ -147,6 +147,11 @@ export default function DynamicForm({ config }) {
   // Bumped per document to remount its file input, so removing a file also
   // clears the filename the browser holds on the DOM node.
   const [fileKeys, setFileKeys] = useState({});
+  // Phone fields with `uniqueCheck`: the existing response for the number
+  // typed, by field name (null = not registered), and the answers so far by
+  // full number, so re-validating doesn't call the backend again.
+  const [registered, setRegistered] = useState({});
+  const phoneChecks = useRef(new Map());
 
   const defaultValues = useMemo(() => defaultValuesFor(config), [config]);
   const {
@@ -178,10 +183,10 @@ export default function DynamicForm({ config }) {
     style: { textTransform: "uppercase" },
   };
 
-  const renderOther = (f, selected) => {
+  const renderOther = (f, selected, full = false) => {
     if (!f.other || !selected) return null;
     return (
-      <div className="mt-[6px] lg:max-w-[50%]">
+      <div className={`mt-[6px] ${full ? "" : "lg:max-w-[50%]"}`}>
         <FieldRow label={`${f.other.label}*`} error={errors[f.other.name]}>
           <input
             type="text"
@@ -241,9 +246,22 @@ export default function DynamicForm({ config }) {
           </FieldRow>
         );
 
-      case "phone":
+      case "phone": {
+        // `uniqueCheck`: one response per number — a number already in the
+        // backend fails validation (and so blocks submitting), and what was
+        // saved against it is shown below the field.
+        const checkUnique = async (val, cc) => {
+          const full = `${dialCodeFor(cc)} ${String(val).trim()}`;
+          if (!phoneChecks.current.has(full)) phoneChecks.current.set(full, checkSurveyPhone(full));
+          const result = await phoneChecks.current.get(full);
+          if (result === null) phoneChecks.current.delete(full); // couldn't check; the backend still refuses duplicates
+          setRegistered((r) => ({ ...r, [f.name]: result?.exists ? result.response : null }));
+          return result?.exists ? "This mobile number is already registered. You can't submit the survey again." : true;
+        };
+        const existing = f.uniqueCheck ? registered[f.name] : null;
         return (
-          <FieldRow key={key} label={label} error={err} className={span}>
+          <div key={key} className={`flex flex-col gap-[10px] ${span}`}>
+          <FieldRow label={label} error={err}>
             <CountryCodeSelect
               {...register(`${f.name}CountryCode`, {
                 onChange: () => getValues(f.name) && trigger(f.name),
@@ -256,18 +274,53 @@ export default function DynamicForm({ config }) {
               className={inputCls}
               {...register(f.name, {
                 required: f.required ? requiredMsg(f.label) : false,
-                validate: (val, all) => !val || validatePhone(val, all[`${f.name}CountryCode`]),
+                validate: async (val, all) => {
+                  const cc = all[`${f.name}CountryCode`];
+                  if (!val) {
+                    if (f.uniqueCheck) setRegistered((r) => ({ ...r, [f.name]: null }));
+                    return true;
+                  }
+                  const valid = validatePhone(val, cc);
+                  if (valid !== true || !f.uniqueCheck) return valid;
+                  return checkUnique(val, cc);
+                },
               })}
             />
           </FieldRow>
+          {existing && <RegisteredResponse response={existing} />}
+          </div>
+        );
+      }
+
+      // Single-choice questions are dropdowns — far less scrolling on mobile
+      // than a grid of radio tiles.
+      case "radio":
+        return (
+          <div key={key} className={`flex flex-col ${span}`}>
+            <FieldRow label={label} error={err}>
+              <select
+                aria-invalid={!!err || undefined}
+                className={`${inputCls} cursor-pointer ${values[f.name] ? "" : "text-[#a59d92]"}`}
+                {...register(f.name, {
+                  validate: (val) => !f.required || !!val || `Please select ${f.label.replace(/\s*\(.*\)$/, "").toLowerCase()}`,
+                })}
+              >
+                <option value="">Select</option>
+                {f.options.map((o) => (
+                  <option key={o} value={o} className="text-[#1f1d1b]">
+                    {o}
+                  </option>
+                ))}
+              </select>
+            </FieldRow>
+            {renderOther(f, f.other && values[f.name] === f.other.value, true)}
+          </div>
         );
 
-      case "radio":
       case "checkboxes": {
-        const isRadio = f.type === "radio";
         const current = values[f.name];
-        const count = isRadio ? 0 : (current || []).length;
-        const otherSelected = f.other && (isRadio ? current === f.other.value : (current || []).includes(f.other.value));
+        const count = (current || []).length;
+        const otherSelected = f.other && (current || []).includes(f.other.value);
         return (
           <div key={key} role="group" aria-label={f.label} className="lg:col-span-2 flex flex-col gap-[10px]">
             <Label as="p" text={label} />
@@ -275,15 +328,14 @@ export default function DynamicForm({ config }) {
               {f.options.map((o) => (
                 <Choice
                   key={o}
-                  type={isRadio ? "radio" : "checkbox"}
+                  type="checkbox"
                   tile
                   label={o}
                   value={o}
                   // "Choose up to N": lock the rest once N are ticked.
-                  disabled={!isRadio && f.max && count >= f.max && !(current || []).includes(o)}
+                  disabled={f.max && count >= f.max && !(current || []).includes(o)}
                   {...register(f.name, {
                     validate: (val) => {
-                      if (isRadio) return !f.required || !!val || `Please select ${f.label.toLowerCase()}`;
                       const n = (val || []).length;
                       if (f.required && n === 0) return "Select at least one";
                       if (f.max && n > f.max) return `Choose up to ${f.max}`;
@@ -468,5 +520,34 @@ export default function DynamicForm({ config }) {
         </DocumentForm>
       )}
     </DocumentSheet>
+  );
+}
+
+/** What's already saved against a number (masked by the backend). */
+function RegisteredResponse({ response }) {
+  const rows = [
+    ["Name", response.name],
+    ["Mobile", response.phone],
+    ["Email", response.email],
+    ["City", response.city],
+    ["Channel partner", response.channelPartner],
+    [
+      "Submitted on",
+      response.submittedAt &&
+        new Date(response.submittedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+    ],
+  ].filter(([, v]) => v);
+  return (
+    <div role="status" className="rounded-[3px] border border-[#e0897f] bg-[#fdf6f5] px-[16px] py-[14px] flex flex-col gap-[8px]">
+      <p className="text-[#1f1d1b] text-[13.5px] font-semibold">A survey has already been submitted with this number</p>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-[16px] gap-y-[4px] text-[13px]">
+        {rows.map(([k, v]) => (
+          <React.Fragment key={k}>
+            <dt className="text-[#8a837b]">{k}</dt>
+            <dd className="text-[#1f1d1b]">{v}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    </div>
   );
 }
