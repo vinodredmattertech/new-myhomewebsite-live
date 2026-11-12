@@ -83,6 +83,13 @@ const nextConfig = {
         destination: "/sitemap_index.xml",
         statusCode: 301,
       },
+      {
+        source:
+          "/how-nri-preferences-are-reshaping-residential-development-in-west-hyderabad",
+        destination:
+          "/blogs/how-nri-preferences-are-reshaping-residential-development-in-west-hyderabad",
+        statusCode: 301,
+      },
     ];
   },
 };

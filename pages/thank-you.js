@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import Head from "next/head";
 import { startPendingBrochureDownload } from "@/lib/brochureDownload";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
@@ -70,6 +71,12 @@ export default function ThankYou() {
   );
 
   return (
+    <>
+    <Head>
+      <link rel="canonical" href="https://www.myhomeconstructions.com/thank-you" />
+      <meta name="robots" content="noindex, nofollow" />
+      <meta name="googlebot" content="noindex, nofollow" />
+    </Head>
     <section
       ref={rootRef}
       className="relative w-full bg-white overflow-hidden flex items-center justify-center
@@ -240,6 +247,7 @@ export default function ThankYou() {
         </p>
       </div>
     </section>
+    </>
   );
 }
 

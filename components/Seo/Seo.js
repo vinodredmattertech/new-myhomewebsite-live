@@ -4,19 +4,22 @@ import React from "react";
 import { cleanImage } from "../common/ImageClear";
 
 /** The site serves pages without a trailing slash. CMS canonicals often
- *  include one (`/csr/`); the tag should match the address in the browser. */
+ *  include one (`/csr/` or `https://www.myhomeconstructions.com/`); the tag
+ *  should match the address without that slash. */
 function canonicalHref(url) {
   if (!url || typeof url !== "string") return "";
   const trimmed = url.trim();
   try {
     const parsed = new URL(trimmed);
-    if (parsed.pathname !== "/" && parsed.pathname.endsWith("/")) {
-      parsed.pathname = parsed.pathname.replace(/\/+$/, "");
+    parsed.search = "";
+    parsed.hash = "";
+    if (parsed.pathname === "/") {
+      // WHATWG URL always serializes origin as `https://host/`. Drop the
+      // homepage slash so canonical matches the rest of the site.
+      return parsed.origin;
     }
-    // URL serialization adds a slash to a bare origin. Keep the stored
-    // homepage form when it was saved without one.
-    if (parsed.pathname === "/" && !trimmed.endsWith("/")) {
-      return trimmed.split(/[?#]/)[0];
+    if (parsed.pathname.endsWith("/")) {
+      parsed.pathname = parsed.pathname.replace(/\/+$/, "");
     }
     return parsed.toString();
   } catch {
@@ -24,9 +27,35 @@ function canonicalHref(url) {
   }
 }
 
+function withoutHomepageSlash(value) {
+  if (typeof value !== "string") return value;
+  return value.replace(
+    /^(https?:\/\/[^/?#]+)\/(?=$|[?#])/i,
+    "$1"
+  );
+}
+
+function normalizeSchemaUrls(schema) {
+  if (!schema) return schema;
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.map(walk);
+    if (!node || typeof node !== "object") return node;
+    const next = {};
+    for (const [key, value] of Object.entries(node)) {
+      if (typeof value === "string" && (key === "url" || key === "@id")) {
+        next[key] = withoutHomepageSlash(value);
+      } else {
+        next[key] = walk(value);
+      }
+    }
+    return next;
+  };
+  return Array.isArray(schema) ? schema.map(walk) : walk(schema);
+}
+
 const Seo = (props) => {
   const imgUrl = cleanImage(props?.seo?.metaImage?.data?.attributes?.url);
-  const schema = props?.seo?.schema;
+  const schema = normalizeSchemaUrls(props?.seo?.schema);
   const canonical = canonicalHref(props?.seo?.canonicalURL);
   // console.log("seo", props);
   return (
