@@ -1,15 +1,10 @@
 import Head from "next/head";
 import MyHomeHeader from "@/components/myhome/Header";
 import MyHomeFooter from "@/components/myhome/Footer";
-import FormHeader from "@/components/myhome/FormHeader";
 import SmoothScroll from "@/components/common/SmoothScroll";
 
 export default function MyHomeLayout({
   children,
-  // Form pages: logo-only static header, no footer.
-  minimal = false,
-  // Form pages that go out unbranded: no header at all.
-  noHeader = false,
   title = "My Home Group | Welcome Home — Where life finds its rhythm",
   description = "Since 1981, My Home Group has shaped Hyderabad's skyline through 25+ landmark addresses, 37M+ sq.ft. delivered, and an unwavering commitment to design, integrity, and sustainability.",
 }) {
@@ -25,11 +20,11 @@ export default function MyHomeLayout({
       </Head>
 
       <SmoothScroll>
-        {!noHeader && (minimal ? <FormHeader /> : <MyHomeHeader />)}
+        <MyHomeHeader />
         <main className="mh-page relative w-full overflow-x-clip">
           {children}
         </main>
-        {!minimal && <MyHomeFooter />}
+        <MyHomeFooter />
       </SmoothScroll>
     </>
   );
