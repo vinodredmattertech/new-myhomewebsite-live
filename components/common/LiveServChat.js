@@ -82,6 +82,14 @@ function useChatCollapsedFlag() {
 export default function LiveServChat() {
   useChatCollapsedFlag();
 
+  // Vendor injects #liv-prop-chat-root onto <body>; remove it when this
+  // component unmounts so pages that opt out (disableLiveChat) stay clear.
+  useEffect(() => {
+    return () => {
+      document.getElementById(CHAT_ROOT_ID)?.remove();
+    };
+  }, []);
+
   return (
     <>
       <Script
