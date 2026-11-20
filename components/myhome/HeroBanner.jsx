@@ -3,13 +3,14 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
+import HomeBannerLeadPopup from "@/components/myhome/HomeBannerLeadPopup";
 
 /**
  * Hero banner — opens with a cinematic "Welcome HOME" loader on a #2a2828
  * panel. The loader text fades + mask-reveals, the text slides down out of
  * its clip mask, then the entire dark panel slides up off-screen to reveal
- * the property image with bottom-left copy. The whole image links to the
- * banner destination.
+ * the property image with bottom-left copy. Clicking the banner opens the
+ * homepage lead popup (SMTP email form).
  *
  * Animation states (replicated from Figma 2609:2746 → 2609:2774 → 2609:2808).
  */
@@ -24,9 +25,8 @@ export default function HeroBanner({ data }) {
   const copyBodyRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+  const [leadOpen, setLeadOpen] = useState(false);
 
-  // The banner image is the link. A blank CMS destination means it stays static.
-  const ctaHref = String(data?.ctaLink || "").trim();
   const ctaLabel = String(data?.ctaText || "").trim();
   const headingLine1 = String(data?.headingLine1 || "").trim();
   const headingLine2 = String(data?.headingLine2 || "").trim();
@@ -383,12 +383,13 @@ export default function HeroBanner({ data }) {
         )}
       </div>
 
-      {/* The whole banner is the link. Copy sits above it but lets clicks through. */}
-      {ctaHref && (
-        <a
-          href={ctaHref}
-          aria-label={ctaLabel || data.headingLine1 || "Banner"}
-          className="absolute inset-0 z-[4] cursor-pointer"
+      {/* Whole banner opens the lead popup (after the loader finishes). */}
+      {!loading && (
+        <button
+          type="button"
+          onClick={() => setLeadOpen(true)}
+          aria-label={ctaLabel || data.headingLine1 || "Enquire now"}
+          className="absolute inset-0 z-[4] cursor-pointer border-0 bg-transparent p-0"
         />
       )}
 
@@ -501,6 +502,8 @@ export default function HeroBanner({ data }) {
           100% { transform: translateX(360%); }
         }
       `}</style>
+
+      <HomeBannerLeadPopup open={leadOpen} onClose={() => setLeadOpen(false)} />
     </section>
   );
 }
