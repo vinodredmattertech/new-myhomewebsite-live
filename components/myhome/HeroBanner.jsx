@@ -407,14 +407,19 @@ export default function HeroBanner({ data, slides: pageSlides }) {
         )}
       </div>
 
-      {/* Bottom numbered pagination — same frosted style as Contact Us, placed like dots. */}
+      {/* Bottom numbered pagination — frosted red glass + thin connecting line. */}
       {isSlider && !loading && (
         <nav
           aria-label="Banner slides"
-          className="pointer-events-none absolute inset-x-0 bottom-[18px] sm:bottom-[22px] lg:bottom-[1.4vw] z-[6]
+          className="pointer-events-none absolute inset-x-0 bottom-[48px] sm:bottom-[52px] lg:bottom-[calc(1.4vw+30px)] z-[6]
                      flex justify-center"
         >
-          <div className="pointer-events-auto flex items-center gap-[10px] sm:gap-[12px] lg:gap-[0.7vw]">
+          <div className="pointer-events-auto relative flex items-center gap-[22px] sm:gap-[28px] lg:gap-[1.6vw]">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-[14px] right-[14px] top-1/2 h-px -translate-y-1/2
+                         bg-white/70 sm:left-[16px] sm:right-[16px] lg:left-[0.95vw] lg:right-[0.95vw]"
+            />
             {items.map((item, i) => {
               const active = i === activeIndex;
               return (
@@ -424,17 +429,20 @@ export default function HeroBanner({ data, slides: pageSlides }) {
                   onClick={() => swiperRef.current?.slideToLoop(i)}
                   aria-label={`Go to banner ${i + 1}`}
                   aria-current={active}
-                  className={`grid place-items-center rounded-full border border-white/80
+                  className={`relative z-[1] grid place-items-center rounded-full border border-white/70
                               font-montserrat font-medium text-white transition-all duration-300
                               h-[28px] w-[28px] text-[12px] sm:h-[32px] sm:w-[32px] sm:text-[13px]
                               lg:h-[1.9vw] lg:w-[1.9vw] lg:text-[0.75vw]
                               ${
                                 active
-                                  ? "bg-white/25 opacity-100 scale-110 shadow-[0_0_0_1px_rgba(255,255,255,0.35)]"
-                                  : "bg-white/10 opacity-70 hover:opacity-95 hover:bg-white/18"
+                                  ? "opacity-100 scale-110 shadow-[0_0_0_1px_rgba(255,255,255,0.35)]"
+                                  : "opacity-80 hover:opacity-100"
                               }`}
                   style={{
                     fontFamily: "Montserrat, sans-serif",
+                    backgroundColor: active
+                      ? "rgba(239, 73, 61, 0.72)"
+                      : "rgba(239, 73, 61, 0.38)",
                     backdropFilter: "blur(8px)",
                     WebkitBackdropFilter: "blur(8px)",
                   }}
@@ -447,7 +455,7 @@ export default function HeroBanner({ data, slides: pageSlides }) {
         </nav>
       )}
 
-      <div className="absolute inset-x-0 bottom-0 z-[5] pointer-events-none px-5 md:px-12 lg:px-[8.333vw] pb-[58px] sm:pb-16 md:pb-[4.5rem] lg:pb-[8.2vw]">
+      <div className="absolute inset-x-0 bottom-0 z-[5] pointer-events-none px-5 md:px-12 lg:px-[8.333vw] pb-[88px] sm:pb-20 md:pb-[5.5rem] lg:pb-[calc(8.2vw+30px)]">
         <div className="flex flex-col gap-[14px] sm:gap-6 md:gap-7 lg:flex-row lg:items-end lg:justify-between lg:gap-10 xl:gap-[4vw]">
           <div className="text-white w-full lg:max-w-[52vw] xl:max-w-[51.7vw]">
             {hasCopyHeading && (
