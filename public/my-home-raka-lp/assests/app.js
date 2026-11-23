@@ -158,16 +158,8 @@
     track.async = true;
     document.body.appendChild(track);
 
-    var chat1 = document.createElement('script');
-    chat1.src = 'https://cwc.livserv.in/chat.js?lid=1488';
-    chat1.id = 'lp_cwc_xqzyihjdskw';
-    chat1.async = true;
-    document.body.appendChild(chat1);
-
-    var chat2 = document.createElement('script');
-    chat2.src = 'https://cw1.livserv.in?did=1488&ampid=1';
-    chat2.async = true;
-    document.body.appendChild(chat2);
+    // LiveServ chat is mounted once from pages/_app.js (LiveServChat).
+    // Do not inject a second copy here — duplicate scripts break the launcher.
   }
 
   ['scroll', 'click', 'touchstart', 'keydown', 'mousemove'].forEach(function (evt) {

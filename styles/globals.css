@@ -949,6 +949,16 @@ select {
   }
 }
 
+/* LP mobile enquire bars (.float-bottom) sit under the LiveServ launcher. */
+@media (max-width: 767.98px) {
+  body:has(.apas-lp .float-bottom) #liv-prop-chat-root,
+  body:has(.raka-lp .float-bottom) #liv-prop-chat-root,
+  body:has(.grava-lp .float-bottom) #liv-prop-chat-root {
+    bottom: 72px !important;
+    max-height: calc(100vh - 180px) !important;
+  }
+}
+
 /* Shrink the collapsed launcher ("We are Online!" bubble + icon), more so on
    phones. `data-lp-collapsed` is set by LiveServChat.js only while the chat is
    closed, so the open chat window keeps its full, readable size. A transform

@@ -94,7 +94,6 @@ export default function MyHomeGravaLanding({ html, progress }) {
 MyHomeGravaLanding.getLayout = (page) => page;
 MyHomeGravaLanding.formPage = true;
 MyHomeGravaLanding.ownFloatingActions = true;
-MyHomeGravaLanding.disableLiveChat = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(
