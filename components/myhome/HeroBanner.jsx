@@ -10,7 +10,7 @@ import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
 import HomeBannerLeadPopup from "@/components/myhome/HomeBannerLeadPopup";
 
-const AUTOPLAY_DELAY = 5000;
+const AUTOPLAY_DELAY = 15000;
 
 /**
  * Homepage-only hero banner (used by `pages/index.js`).
@@ -414,11 +414,11 @@ export default function HeroBanner({ data, slides: pageSlides }) {
           className="pointer-events-none absolute inset-x-0 bottom-[48px] sm:bottom-[52px] lg:bottom-[calc(1.4vw+30px)] z-[6]
                      flex justify-center"
         >
-          <div className="pointer-events-auto relative flex items-center gap-[22px] sm:gap-[28px] lg:gap-[1.6vw]">
+          <div className="pointer-events-auto relative flex items-center gap-[18px] sm:gap-[22px] lg:gap-[1.25vw]">
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute left-[14px] right-[14px] top-1/2 h-px -translate-y-1/2
-                         bg-white/70 sm:left-[16px] sm:right-[16px] lg:left-[0.95vw] lg:right-[0.95vw]"
+              className="pointer-events-none absolute left-[11px] right-[11px] top-1/2 h-px -translate-y-1/2
+                         bg-white/70 sm:left-[13px] sm:right-[13px] lg:left-[0.75vw] lg:right-[0.75vw]"
             />
             {items.map((item, i) => {
               const active = i === activeIndex;
@@ -431,8 +431,8 @@ export default function HeroBanner({ data, slides: pageSlides }) {
                   aria-current={active}
                   className={`relative z-[1] grid place-items-center rounded-full border border-white/70
                               font-montserrat font-medium text-white transition-all duration-300
-                              h-[28px] w-[28px] text-[12px] sm:h-[32px] sm:w-[32px] sm:text-[13px]
-                              lg:h-[1.9vw] lg:w-[1.9vw] lg:text-[0.75vw]
+                              h-[22px] w-[22px] text-[10px] sm:h-[26px] sm:w-[26px] sm:text-[11px]
+                              lg:h-[1.45vw] lg:w-[1.45vw] lg:text-[0.6vw]
                               ${
                                 active
                                   ? "opacity-100 scale-110 shadow-[0_0_0_1px_rgba(255,255,255,0.35)]"
