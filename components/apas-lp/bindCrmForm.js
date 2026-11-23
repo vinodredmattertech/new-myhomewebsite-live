@@ -1,48 +1,59 @@
 import { pushToCRM } from "@/lib/crm";
 import { submitLead } from "@/lib/strapi";
+import { formatUtmBlock, getUtm } from "@/lib/utm";
+import { apasLeadFormHtml } from "@/components/apas-lp/apasLeadFormHtml";
 
 const PROJECT_SLUG = "my-home-apas";
 const PROJECT_NAME = "My Home Apas";
 
-function field(form, name) {
-  const el = form.querySelector(`[name="${name}"]`);
-  return el ? String(el.value || "").trim() : "";
+function formSourceForSlot(slot) {
+  if (slot.closest("#downloadModal")) return "My Home Apas LP Brochure";
+  if (slot.closest("#booksitevisitModal")) return "My Home Apas LP Site Visit";
+  if (slot.closest("#unlockModal")) return "My Home Apas LP Unlock Price";
+  if (slot.closest("#exampleModal")) return "My Home Apas LP Enquire";
+  if (slot.classList.contains("selldo-eager")) return "My Home Apas LP Footer";
+  return "My Home Apas LP";
 }
 
-function phoneNumber(form) {
-  const input = form.querySelector('[name="sell_do[form][lead][phone]"]');
-  if (!input) return "";
-  const jq = window.selldojQuery;
-  if (jq) {
-    try {
-      const widget = jq(input);
-      if (!widget.intlTelInput("isValidNumber")) return "";
-      return widget.intlTelInput("getNumber");
-    } catch (err) {
-      /* The phone widget is not ready yet; use the typed value. */
-    }
-  }
-  return input.value.trim();
+function setStatus(form, message, kind) {
+  const note = form.querySelector(".apas-lead-status");
+  if (!note) return;
+  note.textContent = message || "";
+  note.classList.remove("is-error", "is-success");
+  if (kind) note.classList.add(kind === "error" ? "is-error" : "is-success");
 }
 
-function showError(form, message) {
-  let note = form.querySelector(".apas-crm-error");
-  if (!note) {
-    note = document.createElement("div");
-    note.className = "apas-crm-error";
-    note.setAttribute("role", "alert");
-    note.style.cssText = "color:#b00020;font-size:14px;margin-top:8px;";
-    const button = form.querySelector('[type="submit"]');
-    (button ? button.parentElement : form).appendChild(note);
-  }
-  note.textContent = message;
+function validate(form) {
+  const name = form.name?.value?.trim() || "";
+  const email = form.email?.value?.trim() || "";
+  const phoneDigits = String(form.phone?.value || "").replace(/\D/g, "");
+  const consent = !!form.consent?.checked;
+
+  if (name.length < 2) return "Please enter your full name.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email.";
+  if (phoneDigits.length < 10) return "Please enter a valid 10-digit phone number.";
+  if (!consent) return "Please accept the privacy consent to continue.";
+  return "";
+}
+
+function mountApasLeadForms() {
+  document.querySelectorAll(".apas-lp .selldo-slot, .apas-lp .selldo-eager").forEach((slot) => {
+    if (slot.getAttribute("data-apas-form") === "1") return;
+    if (!slot.closest(".fform") && !slot.closest(".modal")) return;
+    slot.setAttribute("data-apas-form", "1");
+    slot.setAttribute("data-loaded", "1");
+    slot.innerHTML = apasLeadFormHtml(formSourceForSlot(slot));
+  });
 }
 
 /**
- * Route Sell.do embeds on the Apas LP through /api/pushToCRM so leads land
- * in the My Home Apas CRM project used by the rest of the site.
+ * Swap Sell.do script slots for native forms and bind submit → Strapi + CRM.
  */
 export function bindApasCrmForm() {
+  if (typeof window === "undefined") return;
+
+  mountApasLeadForms();
+
   if (window.__apasCrmBound) return;
   window.__apasCrmBound = true;
 
@@ -51,42 +62,51 @@ export function bindApasCrmForm() {
     async (event) => {
       const form = event.target;
       if (!(form instanceof HTMLFormElement)) return;
+      if (!form.classList.contains("apas-lead-form")) return;
       if (!form.closest(".apas-lp")) return;
-      if (!form.querySelector('[name="sell_do[form][lead][name]"]')) return;
-
-      const name = field(form, "sell_do[form][lead][name]");
-      const email = field(form, "sell_do[form][lead][email]");
-      const phone = phoneNumber(form);
-      if (!name || !email || !phone) return;
 
       event.preventDefault();
       event.stopPropagation();
 
-      const button = form.querySelector('[type="submit"]');
-      const previousLabel = button ? button.value : "";
-      if (button) {
-        button.disabled = true;
-        button.value = "Please wait";
+      const error = validate(form);
+      if (error) {
+        setStatus(form, error, "error");
+        return;
       }
 
-      const disclaimer = form.querySelector(
-        '[name="sell_do[form][custom][custom_disclaimer]"]'
-      );
-      const isBrochure = !!form.closest("#downloadModal");
-      const formSource = isBrochure
-        ? "My Home Apas LP Brochure"
-        : "My Home Apas LP";
+      const button = form.querySelector('[type="submit"]');
+      const previousLabel = button ? button.textContent : "";
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Please wait…";
+      }
+      setStatus(form, "", null);
+
+      const phoneDigits = String(form.phone.value || "").replace(/\D/g, "");
+      const phone = `+91 ${phoneDigits}`;
+      const formSource = form.getAttribute("data-form-source") || "My Home Apas LP";
+      const isBrochure = formSource.includes("Brochure");
+      const utm = getUtm();
+      const utmBlock = formatUtmBlock(utm);
+      const message = [utmBlock].filter(Boolean).join("\n\n");
+
       const payload = {
-        name,
-        email,
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
         phone,
+        countryCode: "IN",
         projectSlug: PROJECT_SLUG,
         project_name: PROJECT_NAME,
         project: PROJECT_NAME,
         FormSource: formSource,
         formSource,
-        disclaimer: disclaimer && disclaimer.checked ? "yes" : "",
-        consent: !!(disclaimer && disclaimer.checked),
+        message,
+        consent: true,
+        disclaimer: "yes",
+        pageUrl: typeof window !== "undefined" ? window.location.href : "",
+        referrer: typeof document !== "undefined" ? document.referrer || "" : "",
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent || "" : "",
+        utm,
       };
 
       try {
@@ -97,7 +117,9 @@ export function bindApasCrmForm() {
         const body = crmRes.ok ? await crmRes.json().catch(() => ({})) : {};
         const selldoError = body?.data?.error || body?.error;
         const rejected = Array.isArray(selldoError) && selldoError.length > 0;
+
         if (crmRes.ok && !rejected) {
+          setStatus(form, "Thank you! Redirecting…", "success");
           if (isBrochure) {
             try {
               window.sessionStorage.setItem(
@@ -108,32 +130,35 @@ export function bindApasCrmForm() {
                 })
               );
             } catch (err) {
-              /* ignore storage errors */
+              /* ignore */
             }
           }
           window.location.assign("/my-home-apas-lp/thank-you");
           return;
         }
+
         if (leadOk && !crmRes.ok) {
-          showError(
+          setStatus(
             form,
-            "Saved on the website, but the CRM did not accept it. Please try again."
+            "Saved on the website, but the CRM did not accept it. Please try again.",
+            "error"
           );
         } else {
-          showError(
+          setStatus(
             form,
             rejected
               ? "The CRM did not accept this enquiry. Please use a different phone or email."
-              : "Couldn't save your details. Please try again."
+              : "Couldn't save your details. Please try again.",
+            "error"
           );
         }
       } catch (err) {
-        showError(form, "Network error. Please try again.");
+        setStatus(form, "Network error. Please try again.", "error");
       }
 
       if (button) {
         button.disabled = false;
-        button.value = previousLabel || "Submit";
+        button.textContent = previousLabel || "Submit";
       }
     },
     true

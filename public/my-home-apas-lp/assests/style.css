@@ -5651,3 +5651,82 @@ background-color: #3651ab;
 .owl-next{
 	float:right
 }
+
+/* Native Apas LP lead forms (replaces Sell.do slots) */
+.apas-lead-form {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+.apas-lead-field input,
+.apas-lead-phone input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 0;
+  background: #fff;
+  color: #1a1a18;
+  font-size: 15px;
+}
+.apas-lead-phone {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+}
+.apas-lead-dial {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  background: #e8eef2;
+  color: #1a1a18;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.apas-lead-phone input {
+  border-left: 1px solid #d5dee4;
+}
+.apas-lead-consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+.apas-lead-consent input {
+  margin-top: 3px;
+  flex: 0 0 auto;
+}
+.apas-lead-status {
+  min-height: 1.2em;
+  font-size: 13px;
+}
+.apas-lead-status.is-error {
+  color: #ffd7d7;
+}
+.apas-lead-status.is-success {
+  color: #d7ffe0;
+}
+.apas-lead-submit {
+  border: 0;
+  background: #1a1a18;
+  color: #fff;
+  padding: 12px 18px;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%;
+}
+.apas-lead-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+.modal .apas-lead-consent {
+  color: #1a1a18;
+}
+.modal .apas-lead-status.is-error {
+  color: #8a1f1f;
+}
+.modal .apas-lead-status.is-success {
+  color: #1f6b3a;
+}

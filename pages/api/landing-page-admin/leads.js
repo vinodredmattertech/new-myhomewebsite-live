@@ -5,9 +5,19 @@ import {
   isLandingPageLead,
   matchLandingPage,
 } from "@/lib/landingPages";
+import {
+  filterOutDeletedLeads,
+  markLeadsDeleted,
+} from "@/lib/lpAdminDeletedLeads";
 
 const STRAPI_URL =
   process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:3132";
+
+function authHeaders() {
+  const token = process.env.STRAPI_PREVIEW_TOKEN;
+  if (!token) throw new Error("STRAPI_PREVIEW_TOKEN is not configured");
+  return { Authorization: `Bearer ${token}` };
+}
 
 function parseUtmFromMessage(message = "") {
   const text = String(message || "");
@@ -58,10 +68,7 @@ function normaliseLead(entry) {
 }
 
 async function fetchLandingPageLeads() {
-  const token = process.env.STRAPI_PREVIEW_TOKEN;
-  if (!token) {
-    throw new Error("STRAPI_PREVIEW_TOKEN is not configured");
-  }
+  authHeaders();
   if (!LANDING_PAGES.length) return [];
 
   const pageSize = 100;
@@ -76,7 +83,6 @@ async function fetchLandingPageLeads() {
       "sort[0]": "submittedAt:desc",
     });
 
-    // OR across every registered LP formSource prefix.
     LANDING_PAGES.forEach((lp, index) => {
       query.set(
         `filters[$or][${index}][formSource][$startsWith]`,
@@ -85,7 +91,7 @@ async function fetchLandingPageLeads() {
     });
 
     const res = await fetch(`${STRAPI_URL}/api/leads?${query}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeaders(),
       cache: "no-store",
     });
 
@@ -106,18 +112,34 @@ async function fetchLandingPageLeads() {
     if (page > 50) break;
   }
 
-  return leads;
+  return filterOutDeletedLeads(leads);
 }
 
-function applyFilters(leads, { q, project, source, from, to }) {
+function parseIdsParam(ids) {
+  if (Array.isArray(ids)) {
+    return new Set(ids.map((id) => String(id).trim()).filter(Boolean));
+  }
+  const raw = String(ids || "").trim();
+  if (!raw) return null;
+  return new Set(
+    raw
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean)
+  );
+}
+
+function applyFilters(leads, { q, project, source, from, to, ids }) {
   const needle = String(q || "").trim().toLowerCase();
   const projectFilter = String(project || "").trim();
   const sourceFilter = String(source || "").trim().toLowerCase();
   const fromTs = from ? Date.parse(from) : NaN;
   const toTs = to ? Date.parse(to) : NaN;
   const selectedLp = projectFilter ? getLandingPage(projectFilter) : null;
+  const idSet = parseIdsParam(ids);
 
   return leads.filter((lead) => {
+    if (idSet && idSet.size > 0 && !idSet.has(String(lead.id))) return false;
     if (selectedLp && lead.landingPageId !== selectedLp.id) return false;
     if (
       sourceFilter &&
@@ -156,6 +178,18 @@ function applyFilters(leads, { q, project, source, from, to }) {
   });
 }
 
+function buildProjectCounts(all) {
+  return LANDING_PAGES.map((lp) => {
+    const count = all.filter((l) => l.landingPageId === lp.id).length;
+    return {
+      id: lp.id,
+      label: lp.label,
+      path: lp.path,
+      count,
+    };
+  });
+}
+
 function toCsv(leads) {
   const headers = [
     "id",
@@ -188,13 +222,89 @@ function toCsv(leads) {
   return lines.join("\n");
 }
 
-export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
+async function deleteLeads(ids) {
+  const uniqueIds = [...new Set(ids.map((id) => String(id).trim()).filter(Boolean))];
+  if (!uniqueIds.length) {
+    return { deleted: [], failed: [{ id: null, error: "No ids provided" }] };
   }
 
+  // Only allow deleting leads that belong to registered landing pages.
+  // fetchLandingPageLeads already excludes previously soft-deleted rows.
+  const all = await fetchLandingPageLeads();
+  const allowed = new Set(
+    all.map((l) => String(l.id)).filter((id) => id && id !== "null")
+  );
+
+  const deleted = [];
+  const softDeleted = [];
+  const failed = [];
+
+  for (const id of uniqueIds) {
+    if (!allowed.has(id)) {
+      failed.push({ id, error: "Not a landing-page lead or unknown id" });
+      continue;
+    }
+    try {
+      const res = await fetch(`${STRAPI_URL}/api/leads/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (res.ok) {
+        deleted.push(id);
+        continue;
+      }
+      // Preview/read tokens often cannot DELETE in Strapi (403). Fall back to
+      // soft-delete so the admin UI can still remove leads from the desk.
+      const text = await res.text().catch(() => "");
+      if (res.status === 403 || res.status === 401 || res.status === 405) {
+        softDeleted.push(id);
+        continue;
+      }
+      failed.push({ id, error: `Strapi ${res.status}: ${text.slice(0, 160)}` });
+    } catch (err) {
+      softDeleted.push(id);
+      console.warn("[landing-page-admin] Strapi delete failed, soft-deleting:", err.message);
+    }
+  }
+
+  if (softDeleted.length) {
+    await markLeadsDeleted(softDeleted);
+    deleted.push(...softDeleted);
+  }
+
+  return { deleted, softDeleted, failed };
+}
+
+export default async function handler(req, res) {
   if (!readSession(req)) {
     return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (req.method === "DELETE") {
+    try {
+      const ids = Array.isArray(req.body?.ids)
+        ? req.body.ids
+        : req.body?.id
+          ? [req.body.id]
+          : [];
+      const result = await deleteLeads(ids);
+      const ok = result.deleted.length > 0;
+      return res.status(ok ? 200 : 400).json({
+        message: ok
+          ? `Deleted ${result.deleted.length} lead(s)`
+          : "No leads deleted",
+        ...result,
+      });
+    } catch (err) {
+      console.error("[landing-page-admin] delete error:", err.message);
+      return res
+        .status(502)
+        .json({ message: err.message || "Failed to delete leads" });
+    }
+  }
+
+  if (req.method !== "GET") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
@@ -204,20 +314,28 @@ export default async function handler(req, res) {
       source = "",
       from = "",
       to = "",
+      ids = "",
       format = "json",
     } = req.query || {};
 
     const all = await fetchLandingPageLeads();
-    const leads = applyFilters(all, { q, project, source, from, to });
+    const leads = applyFilters(all, { q, project, source, from, to, ids });
+    const projectCounts = buildProjectCounts(all);
 
     if (String(format).toLowerCase() === "csv") {
       const csv = toCsv(leads);
+      const selectedLp = String(project || "").trim()
+        ? getLandingPage(String(project).trim())
+        : null;
+      const idSet = parseIdsParam(ids);
+      const slug = idSet?.size
+        ? `selected-${idSet.size}`
+        : selectedLp?.id || "all";
+      const date = new Date().toISOString().slice(0, 10);
       res.setHeader("Content-Type", "text/csv; charset=utf-8");
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="landing-page-leads-${new Date()
-          .toISOString()
-          .slice(0, 10)}.csv"`
+        `attachment; filename="landing-page-leads-${slug}-${date}.csv"`
       );
       return res.status(200).send(csv);
     }
@@ -234,6 +352,7 @@ export default async function handler(req, res) {
       count: leads.length,
       total: all.length,
       projects: LANDING_PAGES.map(({ id, label, path }) => ({ id, label, path })),
+      projectCounts,
       sources,
       leads,
     });

@@ -1,0 +1,760 @@
+
+
+
+
+/*********************************************
+                Banner Section
+**********************************************/
+
+section.banner_section {
+    position: relative;
+}
+.banner_section .banner_block {
+    width: 100%;
+    
+}
+.banner_section .banner_block img {
+    width: inherit;
+    height: inherit;
+}
+.banner_section .callback_req_section {
+    padding: 30px 15px 60px;
+}
+.callback_req_block {
+    max-width: 500px;
+    margin: auto;
+}
+@media (min-width: 992px) {
+    .banner_section .callback_req_section {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 70px 80px 30px;
+    }
+    .callback_req_block {
+        width: 350px;
+        float: right;
+    }
+}
+@media (min-width: 769px){
+	.callback_req_block .contact_form {
+    padding: 25px 30px;
+    border-radius: 10px;
+	background: #2A51A3;
+	margin-top: 85px;
+	color: #fff;
+    /* box-shadow: 0 0 5px 2px #ccc; */
+}
+}
+@media (min-device-width: 320px) and (max-device-width: 768px) {
+		.callback_req_block .contact_form {
+    padding: 25px 30px;
+    border-radius: 10px;
+	background: #2A51A3;
+    /* box-shadow: 0 0 5px 2px #ccc; 
+	margin-top: 85px;*/
+	color: #fff;
+}  
+}
+
+
+.callback_req_block .contact_form .form_heading {
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+.callback_req_block .contact_form .input_fields input {
+    color: #989898;
+    background-color: #FFF;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    height: 50px;
+}
+
+.callback_req_block .contact_form .input_fields select{
+    color: #989898;
+    background-color: #FFF;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    height: 50px;
+}
+
+.callback_req_block .contact_form .input_fields textarea{
+    color: #989898;
+    background-color: #FFF;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    
+}
+
+.callback_req_block .contact_form .btns {
+    text-align: right;
+}
+.callback_req_block .contact_form .btns > .btn {
+    background-color: #e57213;
+    color: #fff;
+    border-radius: 0;
+    /* min-width: 120px; */
+	width: 100%;
+	padding: 5px;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/*********************************************
+                About Section
+**********************************************/
+
+section.about_section {
+    background-color: #F5F5F5;
+    padding: 40px 45px 60px;
+    text-align: center;
+}
+.about_section .block_heading {
+    margin-bottom: 30px;
+    display: inline-block;
+	font-weight: 700;
+    font-size: 32px;
+    color: #47536e;
+}
+.about_section .desc {
+    color: #444444;
+    font-size: 1.4rem;
+    line-height: 2;
+    /* max-width: 900px; */
+    margin: auto;
+}
+
+/*********************************************
+                Package Section
+**********************************************/
+
+section.package_section {
+    padding: 0;
+}
+.package_section .heading_block {
+    padding: 20px 15px 30px;
+    text-align: center;
+}
+.package_section .block_heading {
+    text-align: center;
+    line-height: 1.8;
+    margin-bottom: 0;
+}
+.package_section .package_block {
+    display: flex;
+    align-items: stretch;
+}
+.package_section .package_block .img_block {
+    flex: 1 1 40%;
+}
+.package_section .package_block .img_block img {
+    width: 110%;
+    height: 100%;
+}
+.package_section .package_block .content_block {
+    flex: 1 1 40%;
+    background-color: #2F5695;
+    padding: 20px 50px
+}
+.package_block .content_block h4 {
+    color: #fff;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+.package_block .content_block ul.package_list {
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+.package_block .content_block ul.package_list > li {
+    color: #ddd;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin-bottom: 5px;
+}
+
+/* 
+.package_block .content_block ul.package_list > li::marker  {
+       font-size: 1.6rem;
+        line-height: 1;
+}*/
+
+.price_table {
+    background-color: #F5F5F5;
+    border-radius: 10px;
+}
+.price_table table thead tr th:first-of-type {
+    border-radius: 10px 0 0 0;
+}
+.price_table table thead tr th:last-of-type {
+    border-radius: 0 10px 0 0;
+}
+.price_table table thead {
+    background-color: #28A887;
+    color: #fff;
+}
+
+
+.package_section .btns {
+   /*  padding: 50px 15px 20px; */
+    text-align: center;
+}
+.package_section a.btn_request_callback {
+   /*  min-width: 300px; */
+    padding: 12px 14px;
+}
+
+
+
+/*********************************************
+                Testimonials Section
+**********************************************/
+
+section.testimonials_section {
+    padding: 20px 60px;
+}
+
+.testimonials_block {
+    display: flex;
+    align-items: flex-end;
+}
+.testimonials_block .info_block {
+    flex: 1 1 40%;
+}
+.testimonials_block .info_block:nth-of-type(2) {
+    margin-left: 50px;
+}
+.testimonials_block .info_block .cstm_card p {
+    margin-bottom: 0;
+}
+.testimonials_block .info_block .cstm_card.card_1 p.testimony {
+    margin-bottom: 30px;
+}
+.testimonials_block .info_block .cstm_card.card_1 p.signature {
+    text-align: right;
+    position: relative;
+    bottom: -20px;
+    font-size: 1.4rem;
+}
+.testimonials_block .info_block .cstm_card.card_1 {
+    background-color: #28A887;
+    padding: 60px 50px;
+    position: relative;
+}
+.testimonials_block .info_block .cstm_card.card_1 p {
+    color: #ddd;
+    line-height: 1.8;
+}
+.testimonials_block .info_block .cstm_card.card_1 p.testimony:before {
+    display: inline-block;
+    content: "";
+    background: url(../img/asterimg/qoute-white-1.png) no-repeat 0 0;
+    background-size: 100%;
+    width: 30px;
+    height: 25px;
+    margin-right: 5px;
+    position: absolute;
+    top: 30px;
+    left: 20px;
+}
+.testimonials_block .info_block .cstm_card.card_1 p.testimony:after {
+    display: inline-block;
+    content: "";
+    background: url(../img/asterimg/qoute-white-2.png) no-repeat 0 0;
+    background-size: 100%;
+    width: 30px;
+    height: 25px;
+    margin-right: 5px;
+    position: absolute;
+    bottom: 95px;
+    right: 20px;
+}
+
+
+.testimonials_block .info_block .cstm_card.card_2 {
+    background-color: #F5F5F5;
+    padding: 60px 80px;
+    position: relative;
+}
+.testimonials_block .info_block .cstm_card.card_2 p {
+    color: #707070;
+    line-height: 1.8;
+}
+.testimonials_block .info_block .cstm_card.card_2 p.testimony:before {
+    display: inline-block;
+    content: "";
+    background: url(../img/asterimg/qoute-black-1.png) no-repeat 0 0;
+    background-size: 100%;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    position: absolute;
+    top: 30px;
+    left: 20px;
+}
+.testimonials_block .info_block .cstm_card.card_2 p.testimony:after {
+    display: inline-block;
+    content: "";
+    background: url(../img/asterimg/qoute-black-2.png) no-repeat 0 0;
+    background-size: 100%;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    position: absolute;
+    bottom: 30px;
+    right: 20px;
+}
+
+
+/*********************************************
+                Doctors Section
+**********************************************/
+
+section.doctors_section .heading_block {
+    padding: 0 60px;
+}
+.doctors_block {
+    margin-bottom: 60px;
+}
+ul.doctors_list {
+    list-style: none;
+    padding-left: 0;
+}
+ul.doctors_list > li {
+    display: flex;
+    align-items: stretch;
+}
+ul.doctors_list > li > .img_block {
+    flex: 1 1 3%;
+    position: relative;
+}
+ul.doctors_list > li > .content_block {
+    flex: 1 1 40%;
+}
+ul.doctors_list > li:nth-of-type(even) .img_block {
+    order: 3;
+}
+
+ul.doctors_list > li > .img_block img {
+    width: 100%;
+    height: 100%;
+}
+ul.doctors_list > li .about_block {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #2F5695;
+    opacity: 82%;
+    padding: 20px 0 20px;
+    padding-left: 50px;
+}
+.doctors_block.block_2 ul.doctors_list > li .about_block {
+    background-color: #28A887;
+}
+ul.doctors_list > li .about_block p {
+    color: #fff;
+    line-height: 1.4;
+}
+ul.doctors_list > li .about_block p.name {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+ul.doctors_list > li .about_block p.degree {
+    font-size: 1.2rem;
+}
+ul.doctors_list > li .about_block p.desg {
+    font-size: 1.2rem;
+}
+
+ul.doctors_list > li .content_block {
+    background-color: #F5F5F5;
+    padding: 50px 20px 0px 60px;
+}
+ul.doctors_list > li .content_block ul {
+    list-style: none;
+    padding-left: 0;
+}
+ul.doctors_list > li .content_block ul > li {
+    color: #707070;
+    font-size: 1rem;
+    line-height: 2;
+    margin-bottom: 5px;
+}
+
+
+
+/*********************************************
+                Benifits Section
+**********************************************/
+
+section.benifits_section {
+    padding: 0;
+}
+.benifits_block {
+    display: flex;
+    align-items: stretch;
+}
+.benifits_block .img_block {
+    flex: 0 0 35%;
+}
+.benifits_block .img_block img {
+    width: 100%;
+    height: 100%;
+}
+.benifits_block .content_block {
+    flex: 1 1 50%;
+    background-color: #F5F5F5;
+    padding: 50px 60px 30px 60px;
+}
+.benifits_block .content_block ul {
+    list-style: none;
+    padding-left: 0;
+}
+.benifits_block .content_block ul > li {
+    color: #373737;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 45px;
+}
+
+
+section.booking_redirect {
+    
+    padding-top : 30px 15px;
+    text-align: center;
+    margin-bottom: -80px;
+}
+section.booking_redirect .btn_book_appointment {
+    background-color: #e57213;
+    color: #fff !important;
+}
+section.booking_redirect .btn_book_appointment:hover {
+    border: 1px solid #fff;
+}
+section.details .btn_book_appointment {
+    background-color: #e57213;
+    color: #fff !important;
+}
+section.details .btn_book_appointment:hover {
+    border: 1px solid #fff;
+}
+@media (max-width: 991px) {
+    .banner_section .callback_req_section {
+        position: unset;
+    }
+    .banner_section .callback_req_section .callback_req_block {
+        float: unset;
+    }
+    .package_section .btns {
+        padding: 2px 15px 20px;
+        text-align: center;
+    }
+    .package_section .package_block {
+        display: block;
+    }
+    .package_section .package_block .content_block {
+        padding: 50px 80px 0;
+    }
+    .price_table {
+        margin-left: -80px;
+        margin-right: -80px;
+        border-radius: 0;
+    }
+    .price_table table thead tr th:first-of-type {
+        border-radius: 0;
+    }
+    .price_table table thead tr th:last-of-type {
+        border-radius: 0;
+    }
+
+    .testimonials_block {
+        display: block;
+    }
+    .testimonials_block .info_block {
+        margin-bottom: 30px;
+        margin-left: 0!important;
+    }
+    ul.doctors_list > li {
+        display: block;
+    }
+     /*
+    ul.doctors_list > li {
+       margin-bottom: 50px;
+    }*/
+    ul.doctors_list > li .about_block {
+        padding-left: 70px;
+    }
+    ul.doctors_list > li .about_block p.name {
+        font-size: 1.2rem;
+    }
+    ul.doctors_list > li .about_block p.degree {
+        font-size: 1rem;
+    }
+    ul.doctors_list > li .about_block p.desg {
+        font-size: 1rem;
+    }
+    ul.doctors_list > li .content_block {
+        padding-top: 40px;
+        padding-bottom: 70px;
+    }
+
+    .benifits_block {
+        display: block;
+    }
+}
+
+@media (max-width: 575px) {
+    header .content_block .info {
+        margin-bottom: 15px;
+    }
+	.fixed-top-mobile{position: fixed;
+		z-index: 1030;
+		right: 0;
+		left: 0;
+		background: #fff;}
+		.banner_section{margin-top: 26px;}
+}
+@media (max-width: 550px) {
+	.banner_block{
+		height:auto !important;
+	}
+	.package_section a.btn_request_callback{
+		width: auto !important;
+	}
+    h2.block_heading {
+        font-size: 1.8rem;
+    }
+    h3.block_heading {
+        font-size: 2rem;
+    }
+
+    section.doctors_section .heading_block {
+        padding: 0 20px;
+    }
+
+    .package_section .package_block .content_block {
+        padding: 50px 40px 0;
+    }
+    .package_block .content_block ul.package_list > li {
+        font-size: 1.3rem;
+    }
+    .price_table {
+        margin-left: -40px;
+        margin-right: -40px;
+        border-radius: 0;
+    }
+    .price_table table thead tr th:first-of-type {
+        border-radius: 0;
+    }
+    .price_table table thead tr th:last-of-type {
+        border-radius: 0;
+    }
+
+
+    section.testimonials_section {
+        padding: 20px 0;
+    }
+    section.testimonials_section .block_heading {
+        text-align: center;
+    }
+
+    ul.doctors_list > li .about_block {
+        padding: 10px 20px;;
+    }
+    ul.doctors_list > li .content_block {
+        padding: 40px 20px 30px 20px;
+    }
+    .benifits_block .content_block {
+        padding: 45px 20px 20px 20px;
+    }
+	.headingh4{position: absolute;
+    margin-top: 95px;
+    padding: 15px;}
+
+}
+.h4bottomtext{color:#fff; padding:10px;}
+.h4textmiddle{color:#fff; padding:10px;}
+.mobileShow {
+  display: none;
+}
+.imgshow{width:16px;}
+.callnowbtn{font-size: 16px; margin: 10px; font-weight: bold;}
+@media (min-width: 769px){
+	.btn-same{font-size: 15px;
+    font-weight: bold;}
+	
+	 #call-to-action{ background-image: url(../img/1920.png);}
+	 .btn-tra{padding: 14px 30px;}
+}
+@media (min-device-width: 320px) and (max-device-width: 768px) {
+		  .mobileShow {
+				
+				display: inline;
+				width: 100%;
+				position: fixed;
+				bottom: 0;
+				z-index: 1000;
+				/* margin-left: auto; */
+				/* text-align: center; */
+				/* margin-right: auto; */
+				/* background: #a2669d; 
+				background: #aa2159;*/
+				background: #28a745 !important;
+				padding: 10px 0px;
+				margin-bottom: -6px;
+				text-align: center;
+		  }
+		 .mobileShowimg{width: 35px;} 
+		  .calnow{ font-family: "verdana"; color:#fff; font-size: 20px;
+			font-weight: 600;}
+		#call-to-action{ background-image: url(../img/500.png);}
+		.btn-tra{margin-top: 20px;
+    width: 100%;padding: 14px 0px;}
+}
+
+#call-to-action {
+   
+    background-attachment: fixed !important;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    padding-top: 130px;
+    padding-bottom: 130px;
+}
+.calsbtn {
+    background-color: var(--btn_primary) !important;
+    color: #fff;
+    border-color: var(--btn_primary) !important;
+	font-size: 13px;
+    font-weight: 900;
+    padding: 14px 30px;
+}
+.calsbtn:hover{
+	color: #fff;
+}
+.btn-tra {
+    font-size: 13px;
+    font-weight: 900;
+    
+}
+.white-color .btn.btn-tra {
+    background-color: transparent;
+    color: #fff;
+    border-color: #fff;
+}
+.cta-buttons .btn {
+    margin-right: 10px;
+}
+.clicktoclah3{
+	color: #fff;
+	font-size: 32px;
+	font-weight: bold;
+	
+}
+
+
+/* ************************************************************
+
+            specialization section
+
+******************************************************************/
+
+/*
+.card_container img{
+
+    width: 75%;
+    margin-left: 15%;
+
+
+}*/
+
+.card_container {
+    
+margin: 1%;
+}
+
+.card_container > div{
+    display: grid;
+    justify-content: center;
+    
+    
+    
+}
+.card_container p{
+    text-align: center;
+
+    
+}
+.card_1 b{
+    font-size: 1.2rem;
+}
+
+
+
+
+.card_1 img{
+    width: 100%;
+}
+
+.card_1{
+    border: 2px solid  #e57213;
+    margin: 10px;
+}
+
+.card_1 .show_onhover{
+    display: none;
+}
+.card_1:hover .show_onhover{
+    display: contents;
+    
+}
+.card_1:hover .not_hover{
+    display: none;
+}
+
+@media screen and (max-width: 550px){
+
+    .card_container {
+        display: block;
+    }
+
+    .card_container p{
+        text-align: center;
+    
+        
+    }
+    
+
+}
+
+
+
+/* ************************************************************
+
+            branches section
+
+******************************************************************/
+
+
+.branches_section{
+
+    background-color: #F5F5F5;
+ 
+}
+
+
+
+/*===============================================================================
+
+      sticky button
+
+================================================================================*/
+#mobile_form{
+	margin: 10px;
+}

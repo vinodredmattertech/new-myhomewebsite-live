@@ -32,15 +32,16 @@ const STRAPI_URL =
  * Sell.Do's two attribution fields.
  *
  *   source     <- utm_source
- *   sub_source <- utm_medium + " - " + utm_campaign
+ *   sub_source <- medium - campaign_name - campaign_id
  *
- * The separator is only emitted between two present values, so a hit with
- * just utm_medium=cpc reports "cpc", not "cpc - ".
+ * Missing pieces are skipped so you never get trailing separators.
  */
 function buildAttribution(utm = {}, fallbackSubSource = "") {
   const source = utm.utm_source || "Website";
   const sub_source =
-    [utm.utm_medium, utm.utm_campaign].filter(Boolean).join(" - ") ||
+    [utm.utm_medium, utm.utm_campaign, utm.utm_campaign_id]
+      .filter(Boolean)
+      .join(" - ") ||
     fallbackSubSource ||
     "";
   return { source, sub_source };

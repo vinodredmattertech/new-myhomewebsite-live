@@ -282,48 +282,6 @@
     });
   });
 
-  var sellDoFormSrc =
-    "//forms.cdn.sell.do/t/forms/60d5d009ed23e9203e3db96c/64e457ffc825610c0a6e72ef.js";
-  var sellDoFormId = "64e457ffc825610c0a6e72ef";
-  var thirdPartyLoaded = false;
-
-  function injectSellDo(slot) {
-    if (!slot || slot.getAttribute("data-loaded") === "1") return;
-    slot.setAttribute("data-loaded", "1");
-    var s = document.createElement("script");
-    s.src = sellDoFormSrc;
-    s.setAttribute("data-form-id", sellDoFormId);
-    slot.appendChild(s);
-  }
-
-  function loadThirdParty() {
-    if (thirdPartyLoaded) return;
-    thirdPartyLoaded = true;
-
-    document.querySelectorAll(".apas-lp .selldo-eager").forEach(injectSellDo);
-
-    if (!document.querySelector('script[src*="forms.cdn.sell.do/t/60d5d009ed23e9203e3db96c.js"]')) {
-      var track = document.createElement("script");
-      track.src = "//forms.cdn.sell.do/t/60d5d009ed23e9203e3db96c.js";
-      track.async = true;
-      document.body.appendChild(track);
-    }
-  }
-
-  ["scroll", "click", "touchstart", "keydown", "mousemove"].forEach(function (evt) {
-    window.addEventListener(evt, loadThirdParty, { once: true, passive: true });
-  });
-  setTimeout(loadThirdParty, 4000);
-
-  document.querySelectorAll(".apas-lp .modal").forEach(function (modal) {
-    modal.addEventListener("show.bs.modal", function () {
-      loadThirdParty();
-      injectSellDo(modal.querySelector(".selldo-slot"));
-    });
-  });
-
-  // Mobile enquire form and any visible selldo-slot outside modals
-  document.querySelectorAll(".apas-lp .fform .selldo-slot").forEach(function (slot) {
-    if (!slot.closest(".modal")) injectSellDo(slot);
-  });
+  // Lead forms are native HTML (mounted by bindApasCrmForm). Sell.do
+  // form scripts are no longer injected on this LP.
 })();

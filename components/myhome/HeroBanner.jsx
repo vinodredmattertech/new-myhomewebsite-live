@@ -407,19 +407,14 @@ export default function HeroBanner({ data, slides: pageSlides }) {
         )}
       </div>
 
-      {/* Bottom numbered pagination — frosted red glass + thin connecting line. */}
+      {/* Right-side vertical dots — gray inactive, elongated blue active. */}
       {isSlider && !loading && (
         <nav
           aria-label="Banner slides"
-          className="pointer-events-none absolute inset-x-0 bottom-[48px] sm:bottom-[52px] lg:bottom-[calc(1.4vw+30px)] z-[6]
-                     flex justify-center"
+          className="pointer-events-none absolute right-[28px] sm:right-[40px] lg:right-[3.2vw]
+                     top-1/2 -translate-y-1/2 z-[6] hidden sm:flex"
         >
-          <div className="pointer-events-auto relative flex items-center gap-[18px] sm:gap-[22px] lg:gap-[1.25vw]">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute left-[11px] right-[11px] top-1/2 h-px -translate-y-1/2
-                         bg-white/70 sm:left-[13px] sm:right-[13px] lg:left-[0.75vw] lg:right-[0.75vw]"
-            />
+          <div className="pointer-events-auto flex flex-col items-center gap-[10px] sm:gap-[12px] lg:gap-[0.7vw]">
             {items.map((item, i) => {
               const active = i === activeIndex;
               return (
@@ -428,27 +423,42 @@ export default function HeroBanner({ data, slides: pageSlides }) {
                   type="button"
                   onClick={() => swiperRef.current?.slideToLoop(i)}
                   aria-label={`Go to banner ${i + 1}`}
-                  aria-current={active}
-                  className={`relative z-[1] grid place-items-center rounded-full border border-white/70
-                              font-montserrat font-medium text-white transition-all duration-300
-                              h-[22px] w-[22px] text-[10px] sm:h-[26px] sm:w-[26px] sm:text-[11px]
-                              lg:h-[1.45vw] lg:w-[1.45vw] lg:text-[0.6vw]
+                  aria-current={active ? "true" : undefined}
+                  className={`block shrink-0 rounded-full border-0 p-0 transition-all duration-300
                               ${
                                 active
-                                  ? "opacity-100 scale-110 shadow-[0_0_0_1px_rgba(255,255,255,0.35)]"
-                                  : "opacity-80 hover:opacity-100"
+                                  ? "w-[8px] h-[24px] sm:w-[9px] sm:h-[28px] lg:w-[0.48vw] lg:h-[1.45vw] bg-[#ef493d]"
+                                  : "w-[9px] h-[9px] sm:w-[10px] sm:h-[10px] lg:w-[0.55vw] lg:h-[0.55vw] bg-[#E8E8E8] hover:bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.12)]"
                               }`}
-                  style={{
-                    fontFamily: "Montserrat, sans-serif",
-                    backgroundColor: active
-                      ? "rgba(239, 73, 61, 0.72)"
-                      : "rgba(239, 73, 61, 0.38)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                  }}
-                >
-                  {i + 1}
-                </button>
+                />
+              );
+            })}
+          </div>
+        </nav>
+      )}
+      {/* Mobile: compact horizontal dots at bottom (vertical pills crowd small screens). */}
+      {isSlider && !loading && (
+        <nav
+          aria-label="Banner slides"
+          className="pointer-events-none absolute inset-x-0 bottom-[20px] z-[6] flex justify-center sm:hidden"
+        >
+          <div className="pointer-events-auto flex items-center gap-[8px]">
+            {items.map((item, i) => {
+              const active = i === activeIndex;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => swiperRef.current?.slideToLoop(i)}
+                  aria-label={`Go to banner ${i + 1}`}
+                  aria-current={active ? "true" : undefined}
+                  className={`block shrink-0 rounded-full border-0 p-0 transition-all duration-300
+                              ${
+                                active
+                                  ? "w-[22px] h-[8px] bg-[#ef493d]"
+                                  : "w-[9px] h-[9px] bg-[#E8E8E8] shadow-[0_0_0_1px_rgba(0,0,0,0.12)]"
+                              }`}
+                />
               );
             })}
           </div>

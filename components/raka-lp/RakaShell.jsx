@@ -464,6 +464,76 @@ const PAGE_STYLE = `
       max-width: 25%;
     }
   }
+
+  .raka-lp .raka-lead-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .raka-lp .raka-lead-field input {
+    width: 100%;
+    border: 1px solid #cfd6dd;
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 15px;
+    background: #fff;
+    color: #222;
+  }
+  .raka-lp .raka-lead-phone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #cfd6dd;
+    border-radius: 4px;
+    padding: 0 12px;
+    background: #fff;
+  }
+  .raka-lp .raka-lead-phone input {
+    border: 0;
+    padding: 12px 0;
+    outline: none;
+  }
+  .raka-lp .raka-lead-dial {
+    color: #555;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .raka-lp .raka-lead-consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #444;
+  }
+  .raka-lp .fform .raka-lead-consent,
+  .raka-lp .fform .raka-lead-dial,
+  .raka-lp .fformm .raka-lead-consent,
+  .raka-lp .fformm .raka-lead-dial,
+  .raka-lp .modal-content .raka-lead-consent,
+  .raka-lp .modal-content .raka-lead-dial {
+    color: #fff !important;
+  }
+  .raka-lp .raka-lead-status {
+    min-height: 18px;
+    font-size: 13px;
+  }
+  .raka-lp .raka-lead-status.is-error { color: #b00020; }
+  .raka-lp .raka-lead-status.is-success { color: #0a7a32; }
+  .raka-lp .raka-lead-submit {
+    border: 0;
+    border-radius: 4px;
+    padding: 12px 18px;
+    background: #004589;
+    color: #fff !important;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .raka-lp .raka-lead-submit:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
 `;
 
 export default function RakaShell({ title, canonical, styles, html, onReady }) {

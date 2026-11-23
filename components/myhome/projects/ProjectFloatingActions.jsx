@@ -44,6 +44,9 @@ export default function ProjectFloatingActions({
   projectSlug,
 }) {
   const router = useRouter();
+  // Homepage hero uses right-side vertical dots — sit the site-visit pill
+  // a bit lower so the two don't overlap on first viewport.
+  const isHome = router.pathname === "/";
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -143,7 +146,11 @@ export default function ProjectFloatingActions({
   return (
     <>
       {/* ===== Desktop: right-edge expanding pill (site visit only) ===== */}
-      <div className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-[70] flex-col items-end gap-[0.833vw]">
+      <div
+        className={`hidden lg:flex fixed right-0 z-[70] flex-col items-end gap-[0.833vw] -translate-y-1/2 ${
+          isHome ? "top-[68%]" : "top-1/2"
+        }`}
+      >
         <button
           type="button"
           onClick={() => setModalOpen(true)}

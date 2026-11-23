@@ -17,6 +17,7 @@ import ProjectConnectivity from "@/components/myhome/projects/ProjectConnectivit
 import ProjectFloatingActions from "@/components/myhome/projects/ProjectFloatingActions";
 import ProjectSectionNav from "@/components/myhome/projects/ProjectSectionNav";
 import { getProjectBySlug, mediaUrl, fileMeta } from "@/lib/strapi";
+import { extractProgressImages } from "@/lib/projectProgress";
 
 /** Split a newline-separated text field into a trimmed string array. */
 function lines(text) {
@@ -226,62 +227,8 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
     sublabel: m.sublabel,
     value: typeof m.value === "number" ? m.value : Number(m.value) || 0,
   }));
-  // Each progress image carries the photo and its printed caption as separate
-  // fields on the same repeatable entry. `progress.images` used to be a plain
-  // media list, so tolerate both shapes: a Strapi instance running the old
-  // schema still answers with `{ data: [...] }`, which is not an array.
-  const progressImages = (Array.isArray(pr.images)
-    ? pr.images
-    : Array.isArray(pr.images?.data)
-      ? pr.images.data
-      : []
-  )
-    .map((it) => {
-      const media = it.image || it.attributes || it; // component vs. bare media
-      return {
-        src: mediaUrl(it.image ? it.image : { data: it }),
-        caption: it.caption || media.caption || "",
-        alt:
-          it.altText ||
-          it.caption ||
-          media.alternativeText ||
-          project.title,
-        date: it.date || media.date || "",
-      };
-    })
-    .filter((it) => it.src);
-
-  // Extract repeatable progress entries (each with date & multiple images)
-  const progressEntries = (Array.isArray(pr.entries) ? pr.entries : []).flatMap((entry) => {
-    const date = entry.date || "";
-    const entryTitle = entry.title || "";
-    const rawImgs = Array.isArray(entry.images)
-      ? entry.images
-      : Array.isArray(entry.images?.data)
-        ? entry.images.data
-        : [];
-    if (rawImgs.length === 0 && (date || entryTitle)) {
-      return [{
-        src: "",
-        caption: entryTitle,
-        alt: entryTitle,
-        date,
-      }];
-    }
-    return rawImgs.map((imgItem) => {
-      const src = mediaUrl(imgItem.attributes ? { data: imgItem } : imgItem);
-      const caption = imgItem.caption || imgItem.attributes?.caption || entryTitle || "";
-      const alt = imgItem.altText || imgItem.attributes?.alternativeText || caption || project.title;
-      return {
-        src,
-        caption,
-        alt,
-        date,
-      };
-    });
-  });
-
-  const combinedProgressImages = progressEntries.length > 0 ? [...progressEntries, ...progressImages] : progressImages;
+  // Shared with landing pages — Admin progress is the single source of truth.
+  const { images: combinedProgressImages } = extractProgressImages(project);
 
   const co = project.connectivity || {};
   const connectivityCategories = (co.categories || []).map((c) => ({

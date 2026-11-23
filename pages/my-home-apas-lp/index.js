@@ -3,7 +3,12 @@ import path from "path";
 import { useCallback } from "react";
 import ApasShell from "../../components/apas-lp/ApasShell";
 import { bindApasCrmForm } from "../../components/apas-lp/bindCrmForm";
+import { mountLpProjectStatus } from "@/components/lp/mountLpProjectStatus";
+import { extractProgressImages } from "@/lib/projectProgress";
+import { getProjectProgressBySlug } from "@/lib/strapi";
+import { captureUtm } from "@/lib/utm";
 
+const PROJECT_SLUG = "my-home-apas";
 const TITLE = "3 BHK flats for sale in kokapet | apartments in Hyderabad | My Home Apas";
 const STYLES = [
   "https://fonts.googleapis.com/css2?family=PT+Serif&display=swap",
@@ -15,11 +20,6 @@ const STYLES = [
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/v4-shims.min.css",
   "/my-home-apas-lp/assests/style.css",
 ];
-
-function utmValue(params, key) {
-  const value = params.get(key);
-  return value ? value : "Website";
-}
 
 function loadScript(src, force) {
   return new Promise((resolve) => {
@@ -39,49 +39,12 @@ function loadScript(src, force) {
   });
 }
 
-export default function MyHomeApasLanding({ html }) {
+export default function MyHomeApasLanding({ html, progress }) {
   const onReady = useCallback(() => {
+    // Capture UTMs from the landing URL before the visitor navigates / opens modals.
+    captureUtm();
     bindApasCrmForm();
-
-    const params = new URLSearchParams(window.location.search);
-    const source = utmValue(params, "utm_source");
-    const subSource = utmValue(params, "utm_medium") + " - " + utmValue(params, "utm_campaign");
-
-    window.sell_do_form_successfully_submitted = function () {
-      try {
-        const openBrochure = document.querySelector("#downloadModal.show");
-        if (openBrochure) {
-          window.sessionStorage.setItem(
-            "apas-lp-brochure",
-            JSON.stringify({
-              href: "/my-home-apas-lp/assests/brochure/my-home-apas-brochure.pdf",
-              name: "My Home Apas Brochure.pdf",
-            })
-          );
-        }
-      } catch (err) {
-        /* ignore */
-      }
-      window.location = "/my-home-apas-lp/thank-you";
-    };
-    window.sell_do_form_rendered = function () {
-      document.querySelectorAll(".sell_do_form_actual_container").forEach(function (el) {
-        if (el.getAttribute("data-utm") === "1") return;
-        el.setAttribute("data-utm", "1");
-        el.insertAdjacentHTML(
-          "beforeend",
-          '<input type="hidden" value="667945d12f31c6c6ca6eef3d" name="sell_do[campaign][srd]">'
-        );
-        el.insertAdjacentHTML(
-          "beforeend",
-          '<input type="hidden" value="' + source.replace(/"/g, "") + '" name="sell_do[form][lead][source]">'
-        );
-        el.insertAdjacentHTML(
-          "beforeend",
-          '<input type="hidden" value="' + subSource.replace(/"/g, "") + '" name="sell_do[form][lead][sub_source]">'
-        );
-      });
-    };
+    mountLpProjectStatus(document, progress);
 
     let cancelled = false;
     (async () => {
@@ -105,14 +68,17 @@ export default function MyHomeApasLanding({ html }) {
         console.error("apas-lp lightbox refresh failed", err);
       }
       await loadScript("/my-home-apas-lp/assests/boot.js", !window.__apasBooted);
+      // Remount forms if slots were late; listener stays single-bound.
+      if (!cancelled) {
+        bindApasCrmForm();
+        mountLpProjectStatus(document, progress);
+      }
     })();
 
     return () => {
       cancelled = true;
-      delete window.sell_do_form_successfully_submitted;
-      delete window.sell_do_form_rendered;
     };
-  }, []);
+  }, [progress]);
 
   return (
     <ApasShell
@@ -132,5 +98,10 @@ MyHomeApasLanding.disableLiveChat = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(path.join(process.cwd(), "content/apas-lp/index.html"), "utf8");
-  return { props: { html } };
+  const project = await getProjectProgressBySlug(PROJECT_SLUG);
+  const progress = extractProgressImages(project || {});
+  return {
+    props: { html, progress },
+    revalidate: 60,
+  };
 }

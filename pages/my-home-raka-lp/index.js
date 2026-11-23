@@ -3,7 +3,12 @@ import path from "path";
 import { useCallback } from "react";
 import RakaShell from "../../components/raka-lp/RakaShell";
 import { bindRakaCrmForm } from "../../components/raka-lp/bindCrmForm";
+import { mountLpProjectStatus } from "@/components/lp/mountLpProjectStatus";
+import { extractProgressImages } from "@/lib/projectProgress";
+import { getProjectProgressBySlug } from "@/lib/strapi";
+import { captureUtm } from "@/lib/utm";
 
+const PROJECT_SLUG = "my-home-raka";
 const TITLE = "Luxury Apartments & 3 BHK Flats for Sale in Madinaguda, Miyapur";
 const STYLES = [
   "https://fonts.googleapis.com/css2?family=PT+Serif&display=swap",
@@ -187,9 +192,12 @@ function initHighlightsSlider() {
   };
 }
 
-export default function MyHomeRakaLanding({ html }) {
+export default function MyHomeRakaLanding({ html, progress }) {
   const onReady = useCallback(() => {
+    // First-touch UTMs from the landing URL (kept for CRM + Strapi admin).
+    captureUtm();
     bindRakaCrmForm();
+    mountLpProjectStatus(document, progress);
 
     const hero = document.getElementById("hero-desktop");
     if (hero && !hero.getAttribute("src")) {
@@ -250,6 +258,10 @@ export default function MyHomeRakaLanding({ html }) {
         console.error("raka-lp lightbox refresh failed", err);
       }
       await loadScript("/my-home-raka-lp/assests/app.js", !window.__rakaBooted);
+      if (!cancelled) {
+        bindRakaCrmForm();
+        mountLpProjectStatus(document, progress);
+      }
     })();
 
     return () => {
@@ -258,7 +270,7 @@ export default function MyHomeRakaLanding({ html }) {
       delete window.sell_do_form_successfully_submitted;
       delete window.sell_do_form_rendered;
     };
-  }, []);
+  }, [progress]);
 
   return <RakaShell title={TITLE} canonical="/my-home-raka-lp" styles={STYLES} html={html} onReady={onReady} />;
 }
@@ -269,5 +281,10 @@ MyHomeRakaLanding.ownFloatingActions = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(path.join(process.cwd(), "content/raka-lp/index.html"), "utf8");
-  return { props: { html } };
+  const project = await getProjectProgressBySlug(PROJECT_SLUG);
+  const progress = extractProgressImages(project || {});
+  return {
+    props: { html, progress },
+    revalidate: 60,
+  };
 }
