@@ -1,20 +1,34 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectFade, A11y } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-fade";
 import { registerGsap, ScrollTrigger } from "@/lib/gsapSetup";
 import { mediaUrl } from "@/lib/strapi";
 import HomeBannerLeadPopup from "@/components/myhome/HomeBannerLeadPopup";
 
+const AUTOPLAY_DELAY = 5000;
+
 /**
- * Hero banner — opens with a cinematic "Welcome HOME" loader on a #2a2828
- * panel. The loader text fades + mask-reveals, the text slides down out of
- * its clip mask, then the entire dark panel slides up off-screen to reveal
- * the property image with bottom-left copy. Clicking the banner opens the
- * homepage lead popup (SMTP email form).
+ * Homepage-only hero banner (used by `pages/index.js`).
  *
- * Animation states (replicated from Figma 2609:2746 → 2609:2774 → 2609:2808).
+ * Cinematic "Welcome HOME" loader, then CMS-driven media.
+ *
+ * Unlimited slides come from the Home Page admin field `heroSlides`
+ * (or nested `hero.slides`). Add as many entries as you need in Strapi —
+ * each can have its own image + anchor/URL.
+ *
+ * Click behaviour:
+ *   - slide has link  → navigate there
+ *   - no link         → open enquire popup
+ *
+ * With zero published slides, falls back to the legacy single hero image /
+ * video + optional `ctaLink`.
  */
-export default function HeroBanner({ data }) {
+export default function HeroBanner({ data, slides: pageSlides }) {
   const rootRef = useRef(null);
   const bgRef = useRef(null);
   const loaderRef = useRef(null);
@@ -23,26 +37,21 @@ export default function HeroBanner({ data }) {
   const shimmerRef = useRef(null);
   const copyHeadingRef = useRef(null);
   const copyBodyRef = useRef(null);
+  const swiperRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
   const [leadOpen, setLeadOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const ctaLabel = String(data?.ctaText || "").trim();
   const headingLine1 = String(data?.headingLine1 || "").trim();
   const headingLine2 = String(data?.headingLine2 || "").trim();
-  // The hero copy is the page heading when the CMS fills it. When both lines
-  // are empty, the loader title ("Welcome HOME") is the only heading, so that
-  // text is the H1 instead of an empty one.
   const hasCopyHeading = Boolean(headingLine1 || headingLine2);
   const LoaderTitle = hasCopyHeading ? "h2" : "h1";
 
-  // Which breakpoint we're on — `null` until hydration so the server and the
-  // first client render agree. Only the matching video is ever mounted, so we
-  // never download both the desktop and the mobile file.
   const [isMobileView, setIsMobileView] = useState(null);
 
   useEffect(() => {
-    // 1023px = just under Tailwind's `lg`, matching the image swap below.
     const mq = window.matchMedia("(max-width: 1023px)");
     const apply = () => setIsMobileView(mq.matches);
     apply();
@@ -50,30 +59,72 @@ export default function HeroBanner({ data }) {
     return () => mq.removeEventListener("change", apply);
   }, []);
 
+  const items = useMemo(() => {
+    const raw = [
+      ...(Array.isArray(data?.slides) ? data.slides : []),
+      ...(Array.isArray(pageSlides) ? pageSlides : []),
+    ];
+
+    const normalised = raw
+      .map((slide, i) => {
+        const desktop = mediaUrl(slide?.desktopImage);
+        const mobile = mediaUrl(slide?.mobileImage);
+        if (!desktop && !mobile) return null;
+        const href = String(
+          slide?.link ||
+            slide?.url ||
+            slide?.href ||
+            slide?.anchor ||
+            slide?.ctaLink ||
+            ""
+        ).trim();
+        return {
+          key: slide?.id ?? `slide-${i}`,
+          desktop: desktop || mobile,
+          mobile: mobile || desktop,
+          alt: slide?.imageAlt || slide?.alt || ctaLabel || "My Home Group",
+          href: href || null,
+          newTab: Boolean(slide?.openInNewTab),
+        };
+      })
+      .filter(Boolean);
+
+    if (normalised.length) return normalised;
+
+    const desktop = mediaUrl(data?.desktopImage);
+    const mobile = mediaUrl(data?.mobileImage) || desktop;
+    if (!desktop && !mobile) return [];
+
+    const href = String(data?.ctaLink || "").trim();
+    return [
+      {
+        key: "hero-fallback",
+        desktop: desktop || mobile,
+        mobile: mobile || desktop,
+        alt: ctaLabel || "My Home Group",
+        href: href || null,
+        newTab: false,
+      },
+    ];
+  }, [data, pageSlides, ctaLabel]);
+
+  const isSlider = items.length > 1;
+
   useGSAP(
     () => {
       registerGsap();
 
       const lockScroll = () => {
         if (typeof window === "undefined" || typeof document === "undefined") return;
-
-        // Store scroll position + preserve styles
         const docEl = document.documentElement;
         const body = document.body;
-
         const scrollY = window.scrollY || window.pageYOffset || 0;
-
-        // Avoid double-locking
         if (body?.dataset?.mhScrollLocked === "true") return;
         if (!body || !docEl) return;
-
         body.dataset.mhScrollLocked = "true";
         body.dataset.mhScrollY = String(scrollY);
-
         body.style.overflow = "hidden";
         docEl.style.overflow = "hidden";
-
-        // Prevent viewport jump by fixing body in place
         body.style.position = "fixed";
         body.style.top = `-${scrollY}px`;
         body.style.left = "0";
@@ -83,40 +134,26 @@ export default function HeroBanner({ data }) {
 
       const unlockScroll = () => {
         if (typeof window === "undefined" || typeof document === "undefined") return;
-
         const docEl = document.documentElement;
         const body = document.body;
         if (!body || !docEl) return;
-
         if (body?.dataset?.mhScrollLocked !== "true") return;
-
         const scrollY = Number(body.dataset.mhScrollY || "0");
-
         body.dataset.mhScrollLocked = "false";
-
         body.style.overflow = "";
         docEl.style.overflow = "";
-
         body.style.position = "";
         body.style.top = "";
         body.style.left = "";
         body.style.right = "";
         body.style.width = "";
-
-        // Restore scroll position
         window.scrollTo(0, scrollY);
       };
 
-      const preventScroll = (e) => {
-        // wheel / trackpad
-        e.preventDefault();
-      };
-
+      const preventScroll = (e) => e.preventDefault();
       const preventTouch = (e) => {
-        // touch drag
         if (e.cancelable) e.preventDefault();
       };
-
       const preventKeys = (e) => {
         const keysToBlock = [
           "ArrowDown",
@@ -127,32 +164,23 @@ export default function HeroBanner({ data }) {
           "PageUp",
           "Home",
           "End",
-          " ", // Space
+          " ",
           "Spacebar",
         ];
-
-        if (keysToBlock.includes(e.key)) {
-          e.preventDefault();
-        }
+        if (keysToBlock.includes(e.key)) e.preventDefault();
       };
 
-      // Initial visual state
       gsap.set(bgRef.current, { scale: 1.18, autoAlpha: 0.7, filter: "blur(8px)" });
       gsap.set(welcomeRef.current, { y: 0, yPercent: 105, autoAlpha: 0 });
       gsap.set(subtitleRef.current, { y: 0, yPercent: 110, autoAlpha: 0 });
-      gsap.set(
-        [copyHeadingRef.current, copyBodyRef.current].filter(Boolean),
-        {
-          y: 50,
-          autoAlpha: 0,
-        }
-      );
+      gsap.set([copyHeadingRef.current, copyBodyRef.current].filter(Boolean), {
+        y: 50,
+        autoAlpha: 0,
+      });
 
-      // Lock scroll while loader plays
       lockScroll();
 
       if (typeof window !== "undefined") {
-        // Passive must be false so preventDefault works
         window.addEventListener("wheel", preventScroll, { passive: false });
         window.addEventListener("touchmove", preventTouch, { passive: false });
         window.addEventListener("keydown", preventKeys);
@@ -161,11 +189,9 @@ export default function HeroBanner({ data }) {
       window.dispatchEvent(new CustomEvent("mh:loader-start"));
 
       const tl = gsap.timeline({
-        // Held until the display webfont is ready — see `startTimeline` below.
         paused: true,
         defaults: { ease: "expo.out" },
         onComplete: () => {
-          // Remove scroll lock only after the final frame is revealed
           if (typeof window !== "undefined") {
             window.removeEventListener("wheel", preventScroll);
             window.removeEventListener("touchmove", preventTouch);
@@ -175,70 +201,33 @@ export default function HeroBanner({ data }) {
         },
       });
 
-
-
-      // Phase 1 — "Welcome HOME" rises into its mask + fades in
       tl.to(
         welcomeRef.current,
-        {
-          yPercent: 0,
-          autoAlpha: 1,
-          duration: 0.9,
-          ease: "expo.out",
-        },
+        { yPercent: 0, autoAlpha: 1, duration: 0.9, ease: "expo.out" },
         0.25
       )
-        // subtitle staggered just after
         .to(
           subtitleRef.current,
-          {
-            yPercent: 0,
-            autoAlpha: 1,
-            duration: 0.8,
-            ease: "expo.out",
-          },
+          { yPercent: 0, autoAlpha: 1, duration: 0.8, ease: "expo.out" },
           0.5
         )
-        // Phase 2 — hold (let the eye breathe)
         .addLabel("hold", "+=0.55")
-        // Phase 3 — text slides DOWN out of mask
         .to(
           welcomeRef.current,
-          {
-            yPercent: 115,
-            autoAlpha: 0,
-            duration: 0.6,
-            ease: "power3.in",
-          },
+          { yPercent: 115, autoAlpha: 0, duration: 0.6, ease: "power3.in" },
           "hold"
         )
         .to(
           subtitleRef.current,
-          {
-            yPercent: 120,
-            autoAlpha: 0,
-            duration: 0.55,
-            ease: "power3.in",
-          },
+          { yPercent: 120, autoAlpha: 0, duration: 0.55, ease: "power3.in" },
           "hold+=0.06"
         )
-        // shimmer line fades out
-        .to(
-          shimmerRef.current,
-          { autoAlpha: 0, duration: 0.35 },
-          "hold"
-        )
-        // Phase 4 — dark loader slides UP off-screen + slight blur
+        .to(shimmerRef.current, { autoAlpha: 0, duration: 0.35 }, "hold")
         .to(
           loaderRef.current,
-          {
-            yPercent: -101,
-            duration: 0.9,
-            ease: "expo.inOut",
-          },
+          { yPercent: -101, duration: 0.9, ease: "expo.inOut" },
           "hold+=0.45"
         )
-        // image scales in & un-blurs simultaneously
         .to(
           bgRef.current,
           {
@@ -250,12 +239,10 @@ export default function HeroBanner({ data }) {
           },
           "hold+=0.35"
         )
-        // Phase 5 — notify header to slide in
         .add(() => {
           window.dispatchEvent(new CustomEvent("mh:loader-done"));
           setLoading(false);
         }, "hold+=0.6")
-        // Phase 6 — bottom-left copy fades in
         .to(
           copyHeadingRef.current,
           { y: 0, autoAlpha: 1, duration: 0.8, ease: "expo.out" },
@@ -267,11 +254,6 @@ export default function HeroBanner({ data }) {
           "hold+=0.85"
         );
 
-      // The loader title is set in "Tartuffo_Trial_Regular", declared without a
-      // `font-display`, so the browser blocks its text while the .otf loads.
-      // The Montserrat subtitle has no such delay — start the sequence only
-      // after the face resolves, otherwise the subtitle is the first (and for a
-      // moment the only) text on screen.
       let fontTimeout = null;
       const startTimeline = () => {
         if (fontTimeout) clearTimeout(fontTimeout);
@@ -281,7 +263,6 @@ export default function HeroBanner({ data }) {
       };
 
       if (typeof document !== "undefined" && document.fonts?.load) {
-        // Never let a slow or failed font hold the loader hostage.
         fontTimeout = setTimeout(startTimeline, 2000);
         document.fonts
           .load('88px "Tartuffo_Trial_Regular"')
@@ -292,7 +273,6 @@ export default function HeroBanner({ data }) {
         startTimeline();
       }
 
-      // Scroll parallax on the hero image — kicks in after loader is gone
       gsap.to(bgRef.current, {
         yPercent: 14,
         ease: "none",
@@ -305,7 +285,6 @@ export default function HeroBanner({ data }) {
       });
 
       return () => {
-        // Always clean up in case the component unmounts mid-animation
         if (fontTimeout) clearTimeout(fontTimeout);
         if (typeof window !== "undefined") {
           window.removeEventListener("wheel", preventScroll);
@@ -314,24 +293,65 @@ export default function HeroBanner({ data }) {
         }
         unlockScroll();
       };
-
     },
     { scope: rootRef }
   );
 
   if (!data) return null;
 
-  const desktopImage = mediaUrl(data.desktopImage);
-  // Fall back to the desktop image if a mobile-specific upload isn't set.
-  const mobileImage = mediaUrl(data.mobileImage) || desktopImage;
-
-  // Same desktop/mobile pairing for video, gated behind the `isVideo` toggle.
   const desktopVideo = mediaUrl(data.desktopVideo);
   const mobileVideo = mediaUrl(data.mobileVideo) || desktopVideo;
   const activeVideo =
     isMobileView === null ? null : isMobileView ? mobileVideo : desktopVideo;
-  const activePoster = isMobileView ? mobileImage : desktopImage;
-  const showVideo = Boolean(data.isVideo && activeVideo);
+  const fallbackDesktop = items[0]?.desktop;
+  const fallbackMobile = items[0]?.mobile || fallbackDesktop;
+  const activePoster = isMobileView ? fallbackMobile : fallbackDesktop;
+  const showVideo = Boolean(data.isVideo && activeVideo && !isSlider);
+
+  function openLead() {
+    setLeadOpen(true);
+  }
+
+  function renderSlideMedia(item, index) {
+    return (
+      <>
+        {item.mobile && (
+          <img
+            src={item.mobile}
+            alt={item.alt}
+            className="lg:hidden block w-full h-auto"
+            fetchPriority={index === 0 ? "high" : undefined}
+          />
+        )}
+        {item.desktop && (
+          <img
+            src={item.desktop}
+            alt={item.alt}
+            className="hidden lg:block w-full h-auto"
+            fetchPriority={index === 0 ? "high" : undefined}
+          />
+        )}
+        {!loading &&
+          (item.href ? (
+            <Link
+              href={item.href}
+              target={item.newTab ? "_blank" : undefined}
+              rel={item.newTab ? "noopener noreferrer" : undefined}
+              aria-label={item.alt || ctaLabel || "Banner"}
+              className="absolute inset-0 z-[4]"
+              draggable={false}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={openLead}
+              aria-label={ctaLabel || item.alt || "Enquire now"}
+              className="absolute inset-0 z-[4] cursor-pointer border-0 bg-transparent p-0"
+            />
+          ))}
+      </>
+    );
+  }
 
   return (
     <section
@@ -339,84 +359,117 @@ export default function HeroBanner({ data }) {
       className="relative w-full overflow-hidden bg-[#2a2828]"
       data-section="hero"
     >
-      {/* ---------- Hero image (revealed under the loader) ----------
-          Both breakpoints show the full uploaded banner at its own ratio, so
-          the hero's height follows the screen width instead of cropping to the
-          viewport. A video-only desktop banner has no image to size it, so it
-          falls back to 16:9. */}
       <div
         ref={bgRef}
-        className={`relative w-full will-change-transform ${desktopImage ? "" : "lg:aspect-video"}`}
+        className={`relative w-full will-change-transform ${
+          fallbackDesktop || fallbackMobile ? "" : "lg:aspect-video"
+        }`}
       >
-        {mobileImage && (
-          <img
-            src={mobileImage}
-            alt="My Home Group flagship tower at twilight"
-            className="lg:hidden block w-full h-auto"
-          />
-        )}
-        {desktopImage && (
-          <img
-            src={desktopImage}
-            alt="My Home Group flagship tower at twilight"
-            fetchPriority="high"
-            className="hidden lg:block w-full h-auto"
-          />
-        )}
-        {/* ---------- Hero video ----------
-            Layered over the image, which stays as the poster/fallback so the
-            hero still paints if the file is slow or fails. Mounted only after
-            the breakpoint is known, so exactly one source is requested. */}
-        {showVideo && (
-          <video
-            key={activeVideo}
-            className="absolute inset-0 h-full w-full object-contain lg:object-cover object-bottom"
-            src={activeVideo}
-            poster={activePoster || undefined}
-            autoPlay
+        {isSlider ? (
+          <Swiper
+            modules={[Autoplay, EffectFade, A11y]}
+            effect="fade"
+            fadeEffect={{ crossFade: true }}
             loop
-            muted
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-          />
+            speed={900}
+            autoplay={{ delay: AUTOPLAY_DELAY, disableOnInteraction: false }}
+            allowTouchMove
+            onSwiper={(s) => {
+              swiperRef.current = s;
+            }}
+            onSlideChange={(s) => setActiveIndex(s.realIndex)}
+            className="w-full"
+          >
+            {items.map((item, i) => (
+              <SwiperSlide key={item.key} className="relative">
+                {renderSlideMedia(item, i)}
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          <div className="relative w-full">
+            {items[0] ? renderSlideMedia(items[0], 0) : null}
+            {showVideo && (
+              <video
+                key={activeVideo}
+                className="absolute inset-0 h-full w-full object-contain lg:object-cover object-bottom"
+                src={activeVideo}
+                poster={activePoster || undefined}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                aria-hidden="true"
+              />
+            )}
+          </div>
         )}
       </div>
 
-      {/* Whole banner opens the lead popup (after the loader finishes). */}
-      {!loading && (
-        <button
-          type="button"
-          onClick={() => setLeadOpen(true)}
-          aria-label={ctaLabel || data.headingLine1 || "Enquire now"}
-          className="absolute inset-0 z-[4] cursor-pointer border-0 bg-transparent p-0"
-        />
+      {/* Vertical numbered pagination — same style as the glasses-model slider. */}
+      {isSlider && !loading && (
+        <nav
+          aria-label="Banner slides"
+          className="pointer-events-none absolute right-4 sm:right-6 lg:right-[2.5vw] top-1/2 z-[6]
+                     -translate-y-1/2 flex flex-col items-center"
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-[18px] bottom-[18px] left-1/2 w-px -translate-x-1/2 bg-white/70"
+          />
+          <div className="relative flex flex-col items-center gap-[22px] sm:gap-[26px] lg:gap-[1.6vw]">
+            {items.map((item, i) => {
+              const active = i === activeIndex;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => swiperRef.current?.slideToLoop(i)}
+                  aria-label={`Go to banner ${i + 1}`}
+                  aria-current={active}
+                  className={`pointer-events-auto relative z-[1] grid place-items-center rounded-full
+                              border border-white font-montserrat font-medium transition-all duration-300
+                              h-[34px] w-[34px] text-[13px] sm:h-[38px] sm:w-[38px] sm:text-[14px]
+                              lg:h-[2.4vw] lg:w-[2.4vw] lg:text-[0.85vw]
+                              ${
+                                active
+                                  ? "bg-white/20 text-white opacity-100 scale-110"
+                                  : "bg-transparent text-white/80 opacity-55 hover:opacity-90"
+                              }`}
+                  style={{ fontFamily: "Montserrat, sans-serif" }}
+                >
+                  {i + 1}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
       )}
 
-      {/* ---------- Bottom hero block: copy ---------- */}
       <div className="absolute inset-x-0 bottom-0 z-[5] pointer-events-none px-5 md:px-12 lg:px-[8.333vw] pb-[40px] sm:pb-12 md:pb-14 lg:pb-[7.291vw]">
         <div className="flex flex-col gap-[14px] sm:gap-6 md:gap-7 lg:flex-row lg:items-end lg:justify-between lg:gap-10 xl:gap-[4vw]">
-          {/* Copy */}
-          <div
-            className="text-white w-full lg:max-w-[52vw] xl:max-w-[51.7vw]"
-          >
+          <div className="text-white w-full lg:max-w-[52vw] xl:max-w-[51.7vw]">
             {hasCopyHeading && (
-            <h1
-              ref={copyHeadingRef}
-              className="will-change-transform leading-[1.4] tracking-[0.025em] capitalize"
-              style={{ fontFamily:  '"Tartuffo_Trial_Light","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif' }}
-            >
-              <span className="Tartuffo_Trial_Regular block text-[18px] xs:text-[20px] sm:text-[24px] md:text-[30px] lg:text-[2.083vw] tracking-[0.044em] font-[300] leading-[1.4]">
-                {headingLine1}
-              </span>
-              {headingLine2 && (
-              <span className="Tartuffo_Trial_Regular block italic mt-[2px] sm:mt-1.5 md:mt-2 text-[30px] xs:text-[34px] sm:text-[40px] md:text-[48px] lg:text-[3.125vw] font-[300] leading-[1.4]">
-                <i className="Tartuffo_Trial_Regular font-[300]">
-                  {headingLine2}
-                </i>
-              </span>
-              )}
-            </h1>
+              <h1
+                ref={copyHeadingRef}
+                className="will-change-transform leading-[1.4] tracking-[0.025em] capitalize"
+                style={{
+                  fontFamily:
+                    '"Tartuffo_Trial_Light","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
+                }}
+              >
+                <span className="Tartuffo_Trial_Regular block text-[18px] xs:text-[20px] sm:text-[24px] md:text-[30px] lg:text-[2.083vw] tracking-[0.044em] font-[300] leading-[1.4]">
+                  {headingLine1}
+                </span>
+                {headingLine2 && (
+                  <span className="Tartuffo_Trial_Regular block italic mt-[2px] sm:mt-1.5 md:mt-2 text-[30px] xs:text-[34px] sm:text-[40px] md:text-[48px] lg:text-[3.125vw] font-[300] leading-[1.4]">
+                    <i className="Tartuffo_Trial_Regular font-[300]">
+                      {headingLine2}
+                    </i>
+                  </span>
+                )}
+              </h1>
             )}
             <p
               ref={copyBodyRef}
@@ -428,40 +481,33 @@ export default function HeroBanner({ data }) {
         </div>
       </div>
 
-      {/* ============== LOADER OVERLAY ============== */}
       <div
         ref={loaderRef}
         data-mh-loader
         className="absolute inset-0 z-[80] bg-[#2a2828] flex flex-col items-center justify-center will-change-transform"
         aria-hidden={hasCopyHeading ? !loading : undefined}
       >
-        {/* subtle noise/texture for premium feel */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
+        <div
+          className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
           }}
         />
-
-        {/* radial glow accent */}
-        <div className="absolute inset-0 pointer-events-none"
+        <div
+          className="absolute inset-0 pointer-events-none"
           style={{
             background:
               "radial-gradient(ellipse at center, rgba(239,73,61,0.05) 0%, transparent 55%)",
           }}
         />
-
-        {/* mask container for "Welcome HOME" */}
         <div className="overflow-hidden h-[80px] xs:h-[96px] sm:h-[120px] md:h-[140px] lg:h-[7.812vw] flex items-center justify-center px-5">
           <LoaderTitle
             ref={welcomeRef}
             className="Tartuffo_Trial_Regular capitalize text-white text-center leading-[1] tracking-[0.04em] text-[44px] xs:text-[56px] sm:text-[72px] md:text-[88px] lg:text-[5.286vw] font-[300] will-change-transform"
             style={{
-              fontFamily: '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
-              // Hidden until the timeline reveals it — otherwise the raw markup
-              // flashes before GSAP's initial `set` runs. Deliberately no
-              // `transform` here: GSAP folds any existing translate into its
-              // own `y` and adds `yPercent` on top of it.
+              fontFamily:
+                '"Tartuffo_Trial_Regular","Tartuffo Trial","Cormorant Garamond","Playfair Display",serif',
               visibility: "hidden",
               opacity: 0,
             }}
@@ -469,16 +515,12 @@ export default function HeroBanner({ data }) {
             {data.loaderTitle}
           </LoaderTitle>
         </div>
-
-        {/* mask container for subtitle */}
         <div className="overflow-hidden mt-5 sm:mt-7 lg:mt-[2.083vw] h-[24px] sm:h-[32px] md:h-[40px] lg:h-[2.5vw] px-5">
           <p
             ref={subtitleRef}
             className="font-montserrat font-normal uppercase text-white/90 text-center text-[10px] xs:text-[11px] sm:text-[14px] md:text-[18px] lg:text-[1.458vw] tracking-[0.22em] sm:tracking-[0.28em] md:tracking-[0.32em] leading-[1.3] will-change-transform"
             style={{
               fontFamily: "Montserrat, sans-serif",
-              // Same guard as the title — Montserrat resolves instantly, so
-              // without this the subtitle paints before "Welcome Home" does.
               visibility: "hidden",
               opacity: 0,
             }}
@@ -486,8 +528,6 @@ export default function HeroBanner({ data }) {
             {data.loaderSubtitle}
           </p>
         </div>
-
-        {/* thin shimmer progress line */}
         <div
           ref={shimmerRef}
           className="absolute bottom-12 md:bottom-16 left-1/2 -translate-x-1/2 w-[220px] md:w-[260px] h-px bg-white/15 overflow-hidden"
@@ -498,8 +538,12 @@ export default function HeroBanner({ data }) {
 
       <style jsx>{`
         @keyframes loaderShimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(360%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(360%);
+          }
         }
       `}</style>
 

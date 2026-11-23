@@ -16,7 +16,8 @@ export default function Home({ home }) {
   return (
     <>
       <Seo seo={home?.seo} />
-      <HeroBanner data={home?.hero} />
+      {/* Homepage-only: CMS hero slider + enquire popup (not used on other pages). */}
+      <HeroBanner data={home?.hero} slides={home?.heroSlides} />
       <WhoWeAre data={home?.whoWeAre} />
       <WhyMyHome data={home?.whyMyHome} />
       <Statistics data={home?.statistics} />
