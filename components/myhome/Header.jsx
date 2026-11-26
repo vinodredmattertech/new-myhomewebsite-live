@@ -213,7 +213,7 @@ export default function MyHomeHeader() {
           }`}
       >
         <div className="relative h-[66px] md:h-[80px] lg:h-[5.77vw] flex items-center px-5 md:px-10 lg:px-[8.333vw]">
-          {/* ===== Mobile (<md): logo LEFT, Menu RIGHT (matches Figma 3189:5437) ===== */}
+          {/* ===== Mobile (<md): logo LEFT, Contact + Menu RIGHT ===== */}
           <Link href="/" className="block md:hidden">
             <Image
               src={LOGO}
@@ -226,30 +226,42 @@ export default function MyHomeHeader() {
             />
           </Link>
 
-          <button
-            type="button"
-            aria-label="Menu"
-            aria-expanded={open}
-            onClick={() => setOpen((o) => !o)}
-            className="md:hidden ml-auto flex h-[42px] w-[42px] items-center justify-center text-white
-                       bg-white/10 backdrop-blur-md border border-white/25 rounded-full
-                       shadow-[0_2px_10px_rgba(0,0,0,0.18)]
-                       active:scale-95 active:bg-white/20 transition-all duration-300"
-          >
-            {open ? (
-              <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
-                <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
-            ) : (
-              <span className="flex flex-col items-center gap-[5px] w-[18px]">
-                <span className="block h-[1.5px] w-full rounded-full bg-white" />
-                <span className="block h-[1.5px] w-full rounded-full bg-white" />
-                <span className="block h-[1.5px] w-[60%] mr-auto rounded-full bg-white" />
-              </span>
-            )}
-          </button>
+          <div className="md:hidden ml-auto flex items-center gap-2">
+            <Link
+              href={CONTACT_CTA_LINK}
+              className="inline-flex items-center font-montserrat font-medium capitalize text-white
+                         text-[12px] tracking-[0.06em]
+                         bg-white/10 backdrop-blur-md border border-white/25 rounded-full
+                         px-[14px] py-[9px]
+                         active:scale-95 active:bg-white/20 transition-all duration-300"
+            >
+              {CONTACT_CTA_LABEL}
+            </Link>
+            <button
+              type="button"
+              aria-label="Menu"
+              aria-expanded={open}
+              onClick={() => setOpen((o) => !o)}
+              className="flex h-[42px] w-[42px] items-center justify-center text-white
+                         bg-white/10 backdrop-blur-md border border-white/25 rounded-full
+                         shadow-[0_2px_10px_rgba(0,0,0,0.18)]
+                         active:scale-95 active:bg-white/20 transition-all duration-300"
+            >
+              {open ? (
+                <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+              ) : (
+                <span className="flex flex-col items-center gap-[5px] w-[18px]">
+                  <span className="block h-[1.5px] w-full rounded-full bg-white" />
+                  <span className="block h-[1.5px] w-full rounded-full bg-white" />
+                  <span className="block h-[1.5px] w-[60%] mr-auto rounded-full bg-white" />
+                </span>
+              )}
+            </button>
+          </div>
 
-          {/* ===== Desktop (md+): Menu LEFT, Logo CENTER, Contact RIGHT ===== */}
+          {/* ===== Desktop (md+): Menu LEFT, Logo CENTER, Contact far RIGHT ===== */}
           <button
             type="button"
             aria-label="Menu"

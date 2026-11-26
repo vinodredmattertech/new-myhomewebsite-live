@@ -25,8 +25,37 @@ export default function ProjectDetailBanner({
   const lineRef = useRef(null);
   const crumbRef = useRef(null);
   const logoCardRef = useRef(null);
-  const reraRef = useRef(null);
   const hasRera = Boolean(reraNumber || buildingPermissionNo || reraUrl);
+
+  const reraInner = (
+    <>
+      {reraNumber ? (
+        <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium">
+          {/^rera\b/i.test(reraNumber.trim())
+            ? reraNumber
+            : `RERA NO : ${reraNumber}`}
+        </p>
+      ) : null}
+      {buildingPermissionNo ? (
+        <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium mt-[2px]">
+          {/building\s*permission/i.test(buildingPermissionNo.trim())
+            ? buildingPermissionNo
+            : `Building Permission no.: ${buildingPermissionNo}`}
+        </p>
+      ) : null}
+      {reraUrl ? (
+        <Link
+          href={reraUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium
+                     mt-[2px] break-all hover:text-[#ef493d] transition-colors"
+        >
+          {reraUrl.replace(/\/$/, "")}
+        </Link>
+      ) : null}
+    </>
+  );
 
   useGSAP(
     () => {
@@ -84,8 +113,9 @@ export default function ProjectDetailBanner({
         });
       }
 
-      if (reraRef.current) {
-        gsap.from(reraRef.current, {
+      const reraBoxes = rootRef.current?.querySelectorAll("[data-rera-box]");
+      if (reraBoxes?.length) {
+        gsap.from(reraBoxes, {
           y: 20,
           autoAlpha: 0,
           duration: 0.9,
@@ -121,6 +151,23 @@ export default function ProjectDetailBanner({
         <div className="absolute inset-0 bg-gradient-to-b from-transparent from-[56.759%] to-black to-[119.35%]" />
       </div>
 
+      {/* RERA — top-right under header (Contact Us / menu), desktop + mobile */}
+      {hasRera ? (
+        <div
+          data-rera-box
+          className="absolute z-[6]
+                     top-[74px] right-5 max-w-[min(100%-2.5rem,280px)]
+                     md:top-[92px] md:right-10 md:max-w-[320px]
+                     lg:top-[calc(5.77vw+0.6vw)] lg:right-[3.5vw] lg:max-w-[28vw]
+                     border border-white/85 text-white
+                     px-[14px] py-[12px] sm:px-[18px] sm:py-[14px]
+                     lg:px-[1.042vw] lg:py-[0.729vw]"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          {reraInner}
+        </div>
+      ) : null}
+
       <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[9.323vw] pb-[40px] sm:pb-[56px] lg:pb-[1.794vw]">
         <div className="flex flex-col items-start gap-[18px] sm:gap-[22px] lg:gap-[1.562vw] w-full">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-[16px] sm:gap-[20px] lg:gap-[2vw] w-full">
@@ -142,43 +189,6 @@ export default function ProjectDetailBanner({
                 {location}
               </p>
             </div>
-
-            {hasRera ? (
-              <div
-                ref={reraRef}
-                className="shrink-0 border border-white/85 text-white
-                           px-[14px] py-[12px] sm:px-[18px] sm:py-[14px]
-                           lg:px-[1.042vw] lg:py-[0.729vw]
-                           max-w-full lg:max-w-[34vw]"
-                style={{ fontFamily: "Montserrat, sans-serif" }}
-              >
-                {reraNumber ? (
-                  <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium">
-                    {/^rera\b/i.test(reraNumber.trim())
-                      ? reraNumber
-                      : `RERA NO : ${reraNumber}`}
-                  </p>
-                ) : null}
-                {buildingPermissionNo ? (
-                  <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium mt-[2px]">
-                    {/building\s*permission/i.test(buildingPermissionNo.trim())
-                      ? buildingPermissionNo
-                      : `Building Permission no.: ${buildingPermissionNo}`}
-                  </p>
-                ) : null}
-                {reraUrl ? (
-                  <Link
-                    href={reraUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium
-                               mt-[2px] break-all hover:text-[#ef493d] transition-colors"
-                  >
-                    {reraUrl.replace(/\/$/, "")}
-                  </Link>
-                ) : null}
-              </div>
-            ) : null}
           </div>
 
           <div
