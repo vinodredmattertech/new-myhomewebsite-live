@@ -14,6 +14,9 @@ export default function ProjectDetailBanner({
   title = "My Home Akrida",
   location = "Gopanpally, Hyderabad",
   logoSrc = "/assets/myhome/projects/akrida-logo.png",
+  reraNumber = "",
+  buildingPermissionNo = "",
+  reraUrl = "",
 }) {
   const rootRef = useRef(null);
   const imgRef = useRef(null);
@@ -22,6 +25,8 @@ export default function ProjectDetailBanner({
   const lineRef = useRef(null);
   const crumbRef = useRef(null);
   const logoCardRef = useRef(null);
+  const reraRef = useRef(null);
+  const hasRera = Boolean(reraNumber || buildingPermissionNo || reraUrl);
 
   useGSAP(
     () => {
@@ -78,6 +83,16 @@ export default function ProjectDetailBanner({
           delay: 1.1,
         });
       }
+
+      if (reraRef.current) {
+        gsap.from(reraRef.current, {
+          y: 20,
+          autoAlpha: 0,
+          duration: 0.9,
+          ease: "expo.out",
+          delay: 0.75,
+        });
+      }
     },
     { scope: rootRef }
   );
@@ -108,23 +123,62 @@ export default function ProjectDetailBanner({
 
       <div className="absolute inset-x-0 bottom-0 z-[5] px-5 md:px-12 lg:px-[9.323vw] pb-[40px] sm:pb-[56px] lg:pb-[1.794vw]">
         <div className="flex flex-col items-start gap-[18px] sm:gap-[22px] lg:gap-[1.562vw] w-full">
-          <div className="flex flex-col gap-[8px] sm:gap-[10px] lg:gap-[0.521vw]">
-            <SectionHeading as="h1"
-              ref={headingRef}
-              className="capitalize text-white will-change-transform leading-[1.08] tracking-[0.03em]
-                         text-[36px] xs:text-[40px] sm:text-[48px] md:text-[58px] lg:text-[3.646vw]"
-            >
-              {title}
-            </SectionHeading>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-[16px] sm:gap-[20px] lg:gap-[2vw] w-full">
+            <div className="flex flex-col gap-[8px] sm:gap-[10px] lg:gap-[0.521vw] min-w-0">
+              <SectionHeading as="h1"
+                ref={headingRef}
+                className="capitalize text-white will-change-transform leading-[1.08] tracking-[0.03em]
+                           text-[36px] xs:text-[40px] sm:text-[48px] md:text-[58px] lg:text-[3.646vw]"
+              >
+                {title}
+              </SectionHeading>
 
-            <p
-              ref={subRef}
-              className="capitalize text-white leading-[1.2] tracking-[0.03em]
-                         text-[16px] sm:text-[20px] md:text-[24px] lg:text-[1.562vw]"
-              style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-            >
-              {location}
-            </p>
+              <p
+                ref={subRef}
+                className="capitalize text-white leading-[1.2] tracking-[0.03em]
+                           text-[16px] sm:text-[20px] md:text-[24px] lg:text-[1.562vw]"
+                style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
+              >
+                {location}
+              </p>
+            </div>
+
+            {hasRera ? (
+              <div
+                ref={reraRef}
+                className="shrink-0 border border-white/85 text-white
+                           px-[14px] py-[12px] sm:px-[18px] sm:py-[14px]
+                           lg:px-[1.042vw] lg:py-[0.729vw]
+                           max-w-full lg:max-w-[34vw]"
+                style={{ fontFamily: "Montserrat, sans-serif" }}
+              >
+                {reraNumber ? (
+                  <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium">
+                    {/^rera\b/i.test(reraNumber.trim())
+                      ? reraNumber
+                      : `RERA NO : ${reraNumber}`}
+                  </p>
+                ) : null}
+                {buildingPermissionNo ? (
+                  <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium mt-[2px]">
+                    {/building\s*permission/i.test(buildingPermissionNo.trim())
+                      ? buildingPermissionNo
+                      : `Building Permission no.: ${buildingPermissionNo}`}
+                  </p>
+                ) : null}
+                {reraUrl ? (
+                  <Link
+                    href={reraUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium
+                               mt-[2px] break-all hover:text-[#ef493d] transition-colors"
+                  >
+                    {reraUrl.replace(/\/$/, "")}
+                  </Link>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <div
