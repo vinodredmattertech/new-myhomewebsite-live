@@ -39,7 +39,7 @@ export default function ProjectDetailBanner({
   const reraInner = (
     <div className="flex flex-col gap-[3px]">
       {reraNumber ? (
-        <p className="m-0 text-[9px] leading-none font-bold">
+        <p className="m-0 text-[10px] leading-none font-bold">
           {/^tg\s*rera\b/i.test(reraNumber.trim())
             ? reraNumber
             : /^rera\b/i.test(reraNumber.trim())
@@ -49,10 +49,10 @@ export default function ProjectDetailBanner({
       ) : null}
       {buildingPermissionValue ? (
         <>
-          <p className="m-0 text-[9px] leading-none font-medium whitespace-nowrap">
+          <p className="m-0 text-[10px] leading-none font-medium whitespace-nowrap">
             {buildingPermissionLabel}
           </p>
-          <p className="m-0 text-[9px] leading-none font-medium break-all">
+          <p className="m-0 text-[10px] leading-none font-medium break-all">
             {buildingPermissionValue}
           </p>
         </>
@@ -62,7 +62,7 @@ export default function ProjectDetailBanner({
           href={reraUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block m-0 text-[9px] leading-none font-medium
+          className="block m-0 text-[10px] leading-none font-medium
                      break-all hover:text-[#ef493d] transition-colors"
         >
           {reraUrl.replace(/\/$/, "")}
