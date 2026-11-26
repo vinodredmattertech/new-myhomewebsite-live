@@ -1,7 +1,11 @@
 import { pushToCRM } from "@/lib/crm";
 import { submitLead } from "@/lib/strapi";
-import { formatUtmBlock, getUtm } from "@/lib/utm";
 import { apasLeadFormHtml } from "@/components/apas-lp/apasLeadFormHtml";
+import {
+  buildLpLeadPayload,
+  validateLpLeadForm,
+  wireLpPhoneInput,
+} from "@/components/lp/lpLeadFormHelpers";
 
 const PROJECT_SLUG = "my-home-apas";
 const PROJECT_NAME = "My Home Apas";
@@ -11,7 +15,19 @@ function formSourceForSlot(slot) {
   if (slot.closest("#booksitevisitModal")) return "My Home Apas LP Site Visit";
   if (slot.closest("#unlockModal")) return "My Home Apas LP Unlock Price";
   if (slot.closest("#exampleModal")) return "My Home Apas LP Enquire";
+  if (
+    slot.closest(".apas-banner-form") ||
+    slot.closest("#main-banner") ||
+    slot.closest("#hero-section-one") ||
+    slot.closest(".apas-banner-section") ||
+    slot.closest(".apas-mobile-banner-form-wrap")
+  ) {
+    return "My Home Apas LP Banner";
+  }
   if (slot.classList.contains("selldo-eager")) return "My Home Apas LP Footer";
+  if (slot.closest("footer") || slot.closest(".footer") || slot.closest(".footer-new")) {
+    return "My Home Apas LP Footer";
+  }
   return "My Home Apas LP";
 }
 
@@ -23,19 +39,6 @@ function setStatus(form, message, kind) {
   if (kind) note.classList.add(kind === "error" ? "is-error" : "is-success");
 }
 
-function validate(form) {
-  const name = form.name?.value?.trim() || "";
-  const email = form.email?.value?.trim() || "";
-  const phoneDigits = String(form.phone?.value || "").replace(/\D/g, "");
-  const consent = !!form.consent?.checked;
-
-  if (name.length < 2) return "Please enter your full name.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email.";
-  if (phoneDigits.length < 10) return "Please enter a valid 10-digit phone number.";
-  if (!consent) return "Please accept the privacy consent to continue.";
-  return "";
-}
-
 function mountApasLeadForms() {
   document.querySelectorAll(".apas-lp .selldo-slot, .apas-lp .selldo-eager").forEach((slot) => {
     if (slot.getAttribute("data-apas-form") === "1") return;
@@ -43,6 +46,8 @@ function mountApasLeadForms() {
     slot.setAttribute("data-apas-form", "1");
     slot.setAttribute("data-loaded", "1");
     slot.innerHTML = apasLeadFormHtml(formSourceForSlot(slot));
+    const form = slot.querySelector(".apas-lead-form");
+    if (form) wireLpPhoneInput(form);
   });
 }
 
@@ -68,7 +73,7 @@ export function bindApasCrmForm() {
       event.preventDefault();
       event.stopPropagation();
 
-      const error = validate(form);
+      const error = validateLpLeadForm(form);
       if (error) {
         setStatus(form, error, "error");
         return;
@@ -82,32 +87,13 @@ export function bindApasCrmForm() {
       }
       setStatus(form, "", null);
 
-      const phoneDigits = String(form.phone.value || "").replace(/\D/g, "");
-      const phone = `+91 ${phoneDigits}`;
       const formSource = form.getAttribute("data-form-source") || "My Home Apas LP";
       const isBrochure = formSource.includes("Brochure");
-      const utm = getUtm();
-      const utmBlock = formatUtmBlock(utm);
-      const message = [utmBlock].filter(Boolean).join("\n\n");
-
-      const payload = {
-        name: form.name.value.trim(),
-        email: form.email.value.trim(),
-        phone,
-        countryCode: "IN",
+      const payload = buildLpLeadPayload(form, {
         projectSlug: PROJECT_SLUG,
-        project_name: PROJECT_NAME,
-        project: PROJECT_NAME,
-        FormSource: formSource,
+        projectName: PROJECT_NAME,
         formSource,
-        message,
-        consent: true,
-        disclaimer: "yes",
-        pageUrl: typeof window !== "undefined" ? window.location.href : "",
-        referrer: typeof document !== "undefined" ? document.referrer || "" : "",
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent || "" : "",
-        utm,
-      };
+      });
 
       try {
         const [crmRes, leadOk] = await Promise.all([

@@ -1,7 +1,11 @@
 import { pushToCRM } from "@/lib/crm";
 import { submitLead } from "@/lib/strapi";
-import { formatUtmBlock, getUtm } from "@/lib/utm";
 import { rakaLeadFormHtml } from "@/components/raka-lp/rakaLeadFormHtml";
+import {
+  buildLpLeadPayload,
+  validateLpLeadForm,
+  wireLpPhoneInput,
+} from "@/components/lp/lpLeadFormHelpers";
 
 const PROJECT_SLUG = "my-home-raka";
 const PROJECT_NAME = "My Home Raka";
@@ -11,6 +15,15 @@ function formSourceForSlot(slot) {
   if (slot.closest("#booksitevisitModal")) return "My Home Raka LP Site Visit";
   if (slot.closest("#unlockModal")) return "My Home Raka LP Unlock Price";
   if (slot.closest("#exampleModal")) return "My Home Raka LP Enquire";
+  if (
+    slot.closest(".raka-banner-form") ||
+    slot.closest("#main-banner") ||
+    slot.closest("#main-banner-desktop") ||
+    slot.closest(".raka-banner-section") ||
+    slot.closest(".raka-mobile-banner-form-wrap")
+  ) {
+    return "My Home Raka LP Banner";
+  }
   if (slot.classList.contains("selldo-eager")) return "My Home Raka LP Footer";
   if (slot.closest("footer") || slot.closest(".footer") || slot.closest(".footer-new")) {
     return "My Home Raka LP Footer";
@@ -26,19 +39,6 @@ function setStatus(form, message, kind) {
   if (kind) note.classList.add(kind === "error" ? "is-error" : "is-success");
 }
 
-function validate(form) {
-  const name = form.name?.value?.trim() || "";
-  const email = form.email?.value?.trim() || "";
-  const phoneDigits = String(form.phone?.value || "").replace(/\D/g, "");
-  const consent = !!form.consent?.checked;
-
-  if (name.length < 2) return "Please enter your full name.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email.";
-  if (phoneDigits.length < 10) return "Please enter a valid 10-digit phone number.";
-  if (!consent) return "Please accept the privacy consent to continue.";
-  return "";
-}
-
 function mountRakaLeadForms() {
   document
     .querySelectorAll(".raka-lp .selldo-slot, .raka-lp .selldo-eager")
@@ -50,6 +50,8 @@ function mountRakaLeadForms() {
       slot.setAttribute("data-raka-form", "1");
       slot.setAttribute("data-loaded", "1");
       slot.innerHTML = rakaLeadFormHtml(formSourceForSlot(slot));
+      const form = slot.querySelector(".raka-lead-form");
+      if (form) wireLpPhoneInput(form);
     });
 }
 
@@ -75,7 +77,7 @@ export function bindRakaCrmForm() {
       event.preventDefault();
       event.stopPropagation();
 
-      const error = validate(form);
+      const error = validateLpLeadForm(form);
       if (error) {
         setStatus(form, error, "error");
         return;
@@ -89,34 +91,13 @@ export function bindRakaCrmForm() {
       }
       setStatus(form, "");
 
-      const name = form.name.value.trim();
-      const email = form.email.value.trim();
-      const phoneDigits = String(form.phone.value || "").replace(/\D/g, "");
-      const phone = phoneDigits.length === 10 ? `+91${phoneDigits}` : `+${phoneDigits}`;
       const formSource = form.getAttribute("data-form-source") || "My Home Raka LP";
       const isBrochure = formSource.includes("Brochure");
-      const utm = getUtm();
-      const message = formatUtmBlock(utm);
-
-      const payload = {
-        name,
-        email,
-        phone,
-        countryCode: "IN",
+      const payload = buildLpLeadPayload(form, {
         projectSlug: PROJECT_SLUG,
-        project_name: PROJECT_NAME,
-        project: PROJECT_NAME,
-        FormSource: formSource,
+        projectName: PROJECT_NAME,
         formSource,
-        message,
-        disclaimer: form.consent?.checked ? "yes" : "",
-        consent: !!form.consent?.checked,
-        pageUrl: typeof window !== "undefined" ? window.location.href : "",
-        referrer: typeof document !== "undefined" ? document.referrer || "" : "",
-        userAgent:
-          typeof navigator !== "undefined" ? navigator.userAgent || "" : "",
-        utm,
-      };
+      });
 
       try {
         const [crmRes, leadOk] = await Promise.all([

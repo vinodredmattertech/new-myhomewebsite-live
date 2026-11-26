@@ -5659,19 +5659,42 @@ background-color: #3651ab;
   width: 100%;
 }
 .apas-lead-field input,
+.apas-lead-field textarea,
 .apas-lead-phone input {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
   border: 0;
-  background: #fff;
-  color: #1a1a18;
+  background: #fff !important;
+  color: #222 !important;
+  -webkit-text-fill-color: #222 !important;
   font-size: 15px;
+}
+.apas-lead-field textarea {
+  resize: vertical;
+  min-height: 72px;
 }
 .apas-lead-phone {
   display: flex;
   align-items: stretch;
   background: #fff;
+}
+.apas-lead-country {
+  flex: 0 0 6.5rem;
+  max-width: 6.5rem;
+  border: 0;
+  border-right: 1px solid #d5dee4;
+  padding: 12px 8px 12px 10px;
+  background: #f3f6f9 !important;
+  color: #222 !important;
+  -webkit-text-fill-color: #222 !important;
+  font-size: 13px;
+  cursor: pointer;
+  appearance: auto;
+}
+.apas-lead-country option {
+  color: #222 !important;
+  background: #fff !important;
 }
 .apas-lead-dial {
   display: inline-flex;
@@ -5683,7 +5706,9 @@ background-color: #3651ab;
   white-space: nowrap;
 }
 .apas-lead-phone input {
-  border-left: 1px solid #d5dee4;
+  flex: 1 1 auto;
+  min-width: 0;
+  border-left: 0;
 }
 .apas-lead-consent {
   display: flex;

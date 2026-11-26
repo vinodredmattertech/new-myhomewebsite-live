@@ -1,7 +1,11 @@
 import { pushToCRM } from "@/lib/crm";
 import { submitLead } from "@/lib/strapi";
-import { formatUtmBlock, getUtm } from "@/lib/utm";
 import { gravaLeadFormHtml } from "@/components/grava-lp/gravaLeadFormHtml";
+import {
+  buildLpLeadPayload,
+  validateLpLeadForm,
+  wireLpPhoneInput,
+} from "@/components/lp/lpLeadFormHelpers";
 
 const PROJECT_SLUG = "my-home-grava";
 const PROJECT_NAME = "My Home Grava";
@@ -9,6 +13,13 @@ const PROJECT_NAME = "My Home Grava";
 function formSourceForSlot(slot) {
   if (slot.closest("#unlockModal")) return "My Home Grava LP Unlock Price";
   if (slot.closest("#exampleModal")) return "My Home Grava LP Enquire";
+  if (
+    slot.closest(".grava-banner-form") ||
+    slot.closest("#main-banner") ||
+    slot.closest(".grava-mobile-banner-form-wrap")
+  ) {
+    return "My Home Grava LP Banner";
+  }
   if (slot.classList.contains("selldo-eager")) return "My Home Grava LP Footer";
   if (slot.closest("footer") || slot.closest(".footer-new")) {
     return "My Home Grava LP Footer";
@@ -24,19 +35,6 @@ function setStatus(form, message, kind) {
   if (kind) note.classList.add(kind === "error" ? "is-error" : "is-success");
 }
 
-function validate(form) {
-  const name = form.name?.value?.trim() || "";
-  const email = form.email?.value?.trim() || "";
-  const phoneDigits = String(form.phone?.value || "").replace(/\D/g, "");
-  const consent = !!form.consent?.checked;
-
-  if (name.length < 2) return "Please enter your full name.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email.";
-  if (phoneDigits.length < 10) return "Please enter a valid 10-digit phone number.";
-  if (!consent) return "Please accept the privacy consent to continue.";
-  return "";
-}
-
 function mountGravaLeadForms() {
   document
     .querySelectorAll(".grava-lp .selldo-slot, .grava-lp .selldo-eager")
@@ -46,6 +44,8 @@ function mountGravaLeadForms() {
       slot.setAttribute("data-grava-form", "1");
       slot.setAttribute("data-loaded", "1");
       slot.innerHTML = gravaLeadFormHtml(formSourceForSlot(slot));
+      const form = slot.querySelector(".grava-lead-form");
+      if (form) wireLpPhoneInput(form);
     });
 }
 
@@ -71,7 +71,7 @@ export function bindGravaCrmForm() {
       event.preventDefault();
       event.stopPropagation();
 
-      const error = validate(form);
+      const error = validateLpLeadForm(form);
       if (error) {
         setStatus(form, error, "error");
         return;
@@ -85,34 +85,13 @@ export function bindGravaCrmForm() {
       }
       setStatus(form, "");
 
-      const name = form.name.value.trim();
-      const email = form.email.value.trim();
-      const phoneDigits = String(form.phone.value || "").replace(/\D/g, "");
-      const phone = phoneDigits.length === 10 ? `+91${phoneDigits}` : `+${phoneDigits}`;
       const formSource =
         form.getAttribute("data-form-source") || "My Home Grava LP";
-      const utm = getUtm();
-      const message = formatUtmBlock(utm);
-
-      const payload = {
-        name,
-        email,
-        phone,
-        countryCode: "IN",
+      const payload = buildLpLeadPayload(form, {
         projectSlug: PROJECT_SLUG,
-        project_name: PROJECT_NAME,
-        project: PROJECT_NAME,
-        FormSource: formSource,
+        projectName: PROJECT_NAME,
         formSource,
-        message,
-        disclaimer: form.consent?.checked ? "yes" : "",
-        consent: !!form.consent?.checked,
-        pageUrl: typeof window !== "undefined" ? window.location.href : "",
-        referrer: typeof document !== "undefined" ? document.referrer || "" : "",
-        userAgent:
-          typeof navigator !== "undefined" ? navigator.userAgent || "" : "",
-        utm,
-      };
+      });
 
       try {
         const [crmRes, leadOk] = await Promise.all([

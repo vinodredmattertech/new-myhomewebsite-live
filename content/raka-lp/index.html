@@ -160,45 +160,23 @@
 
   </header>
 
-  <img class="d-none d-md-block w-100 hero-banner" id="hero-desktop" width="1600" height="667" alt="My Home Raka banner" decoding="sync">
-  
-
-  <!-- <section id="hero-section-one" class="d-none d-md-block">
-
-    <div class="hero-slider-item bg-one lp">
-
-      <div class="container">
-
-        <div class="row align-items-center">
-
-          <div class="col-md-8"></div>
-
-          <div class="col-md-4">
-
-            <div class="fform">
-
-              <h2 class="text-center">ENQUIRE NOW</h2>
-
-              <dl>
-
-         <div class="selldo-slot"></div>
-              </dl>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
+  <!-- Desktop: banner + enquire form overlaid on the right (same native lead form as modals/footer) -->
+  <section id="main-banner-desktop" class="raka-banner-section d-none d-md-block">
+    <div class="raka-banner-block">
+      <img class="w-100 hero-banner" id="hero-desktop" width="1600" height="667" alt="My Home Raka banner" decoding="sync">
     </div>
+    <div class="raka-banner-form-overlay">
+      <div class="raka-banner-form-card">
+        <div class="fform raka-banner-form">
+          <h2 class="text-center form_heading">ENQUIRE NOW</h2>
+          <div class="selldo-slot"></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  </section> -->
-
-
-
-  <section class="d-block d-md-none" style="margin-top: 120px;">
+  <!-- Mobile: image + same form stacked below -->
+  <section class="d-block d-md-none raka-mobile-banner-form-wrap" style="margin-top: 120px;">
 
     <div class="container-fluid">
 
@@ -210,9 +188,9 @@
 
         </div>
 
-        <div class="col-md-6 fform" id="main-banner">
+        <div class="col-md-6 fform raka-banner-form" id="main-banner">
 
-          <h2 class="text-center">ENQUIRE NOW</h2>
+          <h2 class="text-center form_heading">ENQUIRE NOW</h2>
 
           <dl>
 

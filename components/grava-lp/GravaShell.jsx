@@ -113,10 +113,33 @@ const PAGE_STYLE = `
     color: #fff !important;
   }
   .grava-lp .fform .grava-lead-field input,
+  .grava-lp .fform .grava-lead-field textarea,
   .grava-lp .fform .grava-lead-phone input,
+  .grava-lp .fform .grava-lead-country,
+  .grava-lp .fform .grava-lead-country option,
   .grava-lp .modal .grava-lead-field input,
-  .grava-lp .modal .grava-lead-phone input {
+  .grava-lp .modal .grava-lead-field textarea,
+  .grava-lp .modal .grava-lead-phone input,
+  .grava-lp .modal .grava-lead-country,
+  .grava-lp .modal .grava-lead-country option {
     color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    background-color: #fff !important;
+    caret-color: #222 !important;
+  }
+  .grava-lp .fform .grava-lead-country,
+  .grava-lp .modal .grava-lead-country {
+    background-color: #f3f6f9 !important;
+  }
+  .grava-lp .fform .grava-lead-field input::placeholder,
+  .grava-lp .fform .grava-lead-field textarea::placeholder,
+  .grava-lp .fform .grava-lead-phone input::placeholder,
+  .grava-lp .modal .grava-lead-field input::placeholder,
+  .grava-lp .modal .grava-lead-field textarea::placeholder,
+  .grava-lp .modal .grava-lead-phone input::placeholder {
+    color: #6b7280 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+    opacity: 1 !important;
   }
   .grava-lp .unlock,
   .grava-lp .unlock-price tr:nth-child(1),
@@ -150,6 +173,87 @@ const PAGE_STYLE = `
   .grava-lp section,
   .grava-lp h2 {
     scroll-margin-top: 120px;
+  }
+
+  /* Banner enquire form — right overlay (desktop) / stacked (mobile), aligned with Raka */
+  .grava-lp #main-banner.banner_section {
+    position: relative;
+    overflow: hidden;
+  }
+  .grava-lp #main-banner .grava-banner-form-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 100px 48px 30px;
+    pointer-events: none;
+  }
+  .grava-lp #main-banner .grava-banner-form-card {
+    pointer-events: auto;
+    width: 360px;
+    max-width: 100%;
+  }
+  .grava-lp #main-banner .grava-banner-form.fform,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form.fform {
+    background: #2a51a3 !important;
+    color: #fff !important;
+    border-radius: 10px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  }
+  .grava-lp #main-banner .grava-banner-form .form_heading,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .form_heading {
+    color: #fff !important;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 14px;
+    letter-spacing: 0.04em;
+  }
+  .grava-lp #main-banner .grava-banner-form .grava-lead-form,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-form {
+    gap: 10px;
+  }
+  .grava-lp #main-banner .grava-banner-form .grava-lead-field input,
+  .grava-lp #main-banner .grava-banner-form .grava-lead-field textarea,
+  .grava-lp #main-banner .grava-banner-form .grava-lead-phone,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-field input,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-field textarea,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-phone {
+    border-radius: 8px;
+  }
+  .grava-lp #main-banner .grava-banner-form .grava-lead-country,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-country {
+    border-radius: 8px 0 0 8px;
+  }
+  .grava-lp #main-banner .grava-banner-form .grava-lead-submit,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-submit {
+    width: 100%;
+    background: #e57213;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 1.05rem;
+  }
+  .grava-lp #main-banner .grava-banner-form .grava-lead-status.is-error,
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form .grava-lead-status.is-error {
+    color: #ffe0e0;
+  }
+  .grava-lp .grava-mobile-banner-form-wrap {
+    padding: 0;
+    margin: 0;
+  }
+  .grava-lp .grava-mobile-banner-form-wrap .grava-banner-form.fform {
+    border-radius: 0;
+    box-shadow: none;
+    padding: 22px 16px 26px;
+  }
+  @media (max-width: 1199px) and (min-width: 768px) {
+    .grava-lp #main-banner .grava-banner-form-overlay {
+      padding-right: 24px;
+    }
+    .grava-lp #main-banner .grava-banner-form-card {
+      width: 320px;
+    }
   }
 
   /* Header: logos + menu on one aligned row */
@@ -354,28 +458,61 @@ const PAGE_STYLE = `
     gap: 12px;
     width: 100%;
   }
-  .grava-lp .grava-lead-field input {
+  .grava-lp .grava-lead-field input,
+  .grava-lp .grava-lead-field textarea {
     width: 100%;
     border: 1px solid #cfd6dd;
     border-radius: 4px;
     padding: 12px 14px;
     font-size: 15px;
-    background: #fff;
-    color: #222;
+    background: #fff !important;
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    box-sizing: border-box;
+  }
+  .grava-lp .grava-lead-field textarea {
+    resize: vertical;
+    min-height: 72px;
   }
   .grava-lp .grava-lead-phone {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0;
     border: 1px solid #cfd6dd;
     border-radius: 4px;
-    padding: 0 12px;
-    background: #fff;
+    padding: 0;
+    background: #fff !important;
+    overflow: hidden;
+  }
+  .grava-lp .grava-lead-country {
+    flex: 0 0 6.5rem;
+    max-width: 6.5rem;
+    border: 0;
+    border-right: 1px solid #d5dee4;
+    border-radius: 4px 0 0 4px;
+    padding: 12px 8px 12px 10px;
+    background: #f3f6f9 !important;
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    font-size: 13px;
+    line-height: 1.2;
+    outline: none;
+    cursor: pointer;
+    appearance: auto;
+  }
+  .grava-lp .grava-lead-country option {
+    color: #222 !important;
+    background: #fff !important;
   }
   .grava-lp .grava-lead-phone input {
+    flex: 1 1 auto;
+    min-width: 0;
     border: 0;
-    padding: 12px 0;
+    padding: 12px 12px 12px 10px;
     outline: none;
+    background: #fff !important;
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
   }
   .grava-lp .grava-lead-dial {
     color: #555;

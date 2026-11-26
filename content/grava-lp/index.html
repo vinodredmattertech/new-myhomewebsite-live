@@ -62,40 +62,59 @@
 
 
 
-  <section id="main-banner">
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-indicators">
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
-          aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-          aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-          aria-label="Slide 3"></button>
+  <section id="main-banner" class="banner_section">
+    <div class="banner_block">
+      <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+            aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+            aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+            aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+
+            <img src="/my-home-grava-lp/assets/img/grava_new/1.webp" class="d-none d-md-block w-100" alt="banner image">
+            <img src="/my-home-grava-lp/assets/img/grava_new/1-m.webp" class="d-block d-md-none w-100" alt="banner image">
+          </div>
+
+          <div class="carousel-item">
+
+            <img src="/my-home-grava-lp/assets/img/grava_new/2.webp" class="d-none d-md-block w-100" alt="banner image">
+            <img src="/my-home-grava-lp/assets/img/grava_new/2-m.webp" class="d-block d-md-none w-100" alt="banner image">
+
+          </div>
+          <div class="carousel-item">
+
+            <img src="/my-home-grava-lp/assets/img/grava_new/3.webp" class="d-none d-md-block w-100" alt="banner image">
+            <img src="/my-home-grava-lp/assets/img/grava_new/3-m.webp" class="d-block d-md-none w-100" alt="banner image">
+            <h1 style="display:none;">4 BHK Luxury Flats and Apartments at Neopolis, Kokapet</h1>
+
+          </div>
+        </div>
+
       </div>
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-
-          <img src="/my-home-grava-lp/assets/img/grava_new/1.webp" class="d-none d-md-block w-100" alt="banner image">
-          <img src="/my-home-grava-lp/assets/img/grava_new/1-m.webp" class="d-block d-md-none w-100" alt="banner image">
-        </div>
-
-        <div class="carousel-item">
-
-          <img src="/my-home-grava-lp/assets/img/grava_new/2.webp" class="d-none d-md-block w-100" alt="banner image">
-          <img src="/my-home-grava-lp/assets/img/grava_new/2-m.webp" class="d-block d-md-none w-100" alt="banner image">
-
-        </div>
-        <div class="carousel-item">
-
-          <img src="/my-home-grava-lp/assets/img/grava_new/3.webp" class="d-none d-md-block w-100" alt="banner image">
-          <img src="/my-home-grava-lp/assets/img/grava_new/3-m.webp" class="d-block d-md-none w-100" alt="banner image">
-          <h1 style="display:none;">4 BHK Luxury Flats and Apartments at Neopolis, Kokapet</h1>
-
-        </div>
-      </div>
-
     </div>
 
+    <!-- Desktop: enquire form overlaid on banner right (aligned with Raka) -->
+    <div class="grava-banner-form-overlay d-none d-md-flex">
+      <div class="grava-banner-form-card">
+        <div class="fform contact_form grava-banner-form">
+          <h2 class="form_heading text-center">ENQUIRE NOW</h2>
+          <div class="selldo-slot"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile: same form stacked under the banner -->
+  <section class="d-block d-md-none grava-mobile-banner-form-wrap">
+    <div class="fform contact_form grava-banner-form">
+      <h2 class="form_heading text-center">ENQUIRE NOW</h2>
+      <div class="selldo-slot selldo-eager"></div>
+    </div>
   </section>
 
 

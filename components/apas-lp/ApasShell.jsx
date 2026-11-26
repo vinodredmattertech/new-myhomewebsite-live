@@ -152,6 +152,194 @@ const PAGE_STYLE = `
   }
   .apas-lp #hero-section-one .hero-slider-item {
     min-height: 420px;
+    position: relative;
+  }
+  /* Desktop banner enquire form — right overlay (aligned with Raka) */
+  .apas-lp .apas-banner-section .apas-banner-form-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 24px 48px;
+    pointer-events: none;
+  }
+  .apas-lp .apas-banner-form-card {
+    pointer-events: auto;
+    width: 360px;
+    max-width: 100%;
+  }
+  .apas-lp .apas-banner-form.fform {
+    background: #577486 !important;
+    color: #fff !important;
+    border-radius: 10px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  }
+  .apas-lp .apas-banner-form .form_heading,
+  .apas-lp .apas-banner-form h2 {
+    color: #fff !important;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 14px;
+    letter-spacing: 0.04em;
+  }
+  .apas-lp .apas-banner-form .apas-lead-form {
+    gap: 10px;
+  }
+  .apas-lp .apas-banner-form .apas-lead-field input,
+  .apas-lp .apas-banner-form .apas-lead-field textarea,
+  .apas-lp .apas-banner-form .apas-lead-phone {
+    border-radius: 8px;
+  }
+  .apas-lp .apas-banner-form .apas-lead-country {
+    border-radius: 8px 0 0 8px;
+  }
+  .apas-lp .apas-lead-form {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+  }
+  .apas-lp .apas-lead-field input,
+  .apas-lp .apas-lead-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #cfd6dd;
+    border-radius: 4px;
+    background: #fff !important;
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    font-size: 15px;
+  }
+  .apas-lp .apas-lead-field textarea {
+    resize: vertical;
+    min-height: 72px;
+  }
+  .apas-lp .apas-lead-phone {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid #cfd6dd;
+    border-radius: 4px;
+    padding: 0;
+    background: #fff !important;
+    overflow: hidden;
+  }
+  .apas-lp .apas-lead-country {
+    flex: 0 0 6.5rem;
+    max-width: 6.5rem;
+    border: 0;
+    border-right: 1px solid #d5dee4;
+    border-radius: 4px 0 0 4px;
+    padding: 12px 8px 12px 10px;
+    background: #f3f6f9 !important;
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    font-size: 13px;
+    line-height: 1.2;
+    cursor: pointer;
+    appearance: auto;
+  }
+  .apas-lp .apas-lead-country option {
+    color: #222 !important;
+    background: #fff !important;
+  }
+  .apas-lp .apas-lead-phone input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    padding: 12px 12px 12px 10px;
+    outline: none;
+    background: #fff !important;
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+  }
+  .apas-lp .fform .apas-lead-field input,
+  .apas-lp .fform .apas-lead-field textarea,
+  .apas-lp .fform .apas-lead-phone input,
+  .apas-lp .fform .apas-lead-country,
+  .apas-lp .fform .apas-lead-country option,
+  .apas-lp .modal .apas-lead-field input,
+  .apas-lp .modal .apas-lead-field textarea,
+  .apas-lp .modal .apas-lead-phone input,
+  .apas-lp .modal .apas-lead-country,
+  .apas-lp .modal .apas-lead-country option {
+    color: #222 !important;
+    -webkit-text-fill-color: #222 !important;
+    background-color: #fff !important;
+    caret-color: #222 !important;
+  }
+  .apas-lp .fform .apas-lead-country,
+  .apas-lp .modal .apas-lead-country {
+    background-color: #f3f6f9 !important;
+  }
+  .apas-lp .fform .apas-lead-field input::placeholder,
+  .apas-lp .fform .apas-lead-field textarea::placeholder,
+  .apas-lp .fform .apas-lead-phone input::placeholder,
+  .apas-lp .modal .apas-lead-field input::placeholder,
+  .apas-lp .modal .apas-lead-field textarea::placeholder,
+  .apas-lp .modal .apas-lead-phone input::placeholder {
+    color: #6b7280 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+    opacity: 1 !important;
+  }
+  .apas-lp .apas-lead-consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #fff;
+    margin: 0;
+  }
+  .apas-lp .apas-lead-consent input {
+    margin-top: 3px;
+    flex: 0 0 auto;
+  }
+  .apas-lp .apas-lead-status {
+    min-height: 1.2em;
+    font-size: 13px;
+  }
+  .apas-lp .apas-lead-submit {
+    border: 0;
+    background: #1a1a18;
+    color: #fff !important;
+    padding: 12px 18px;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .apas-lp .apas-banner-form .apas-lead-consent,
+  .apas-lp .apas-banner-form .apas-lead-consent span,
+  .apas-lp .apas-banner-form .apas-lead-dial {
+    color: #fff !important;
+  }
+  .apas-lp .apas-banner-form .apas-lead-submit {
+    width: 100%;
+    background: #e57213;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 1.05rem;
+  }
+  .apas-lp .apas-banner-form .apas-lead-status.is-error {
+    color: #ffe0e0;
+  }
+  .apas-lp .apas-mobile-banner-form-wrap .apas-banner-form.fform {
+    background: #577486 !important;
+    color: #fff !important;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 22px 16px 26px;
+  }
+  @media (max-width: 1199px) and (min-width: 768px) {
+    .apas-lp .apas-banner-section .apas-banner-form-overlay {
+      padding-right: 24px;
+    }
+    .apas-lp .apas-banner-form-card {
+      width: 320px;
+    }
   }
   .apas-lp .footer-new .footer-contact {
     margin: 0 0 18px;
