@@ -269,19 +269,13 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
   // the CMS. Left empty, the whole field is dropped from the form.
   const inquiryConfigOptions = lines(iq.configOptions);
 
-  // Banner RERA strip (right of title) — Detail Banner fields, Grava only for now.
-  // Other projects stay hidden even if admin fields are filled.
-  // Fall back to Inquiry RERA when Detail Banner fields are still empty.
-  const showBannerRera = project.slug === "my-home-grava";
-  const bannerReraNumber = showBannerRera
-    ? txt(db.reraNumber) || txt(iq.reraNumber)
-    : "";
-  const bannerBuildingPermissionNo = showBannerRera
-    ? txt(db.buildingPermissionNo) || txt(iq.buildingPermissionNo)
-    : "";
-  const bannerReraUrl = showBannerRera
-    ? txt(db.reraUrl) || txt(iq.reraUrl)
-    : "";
+  // Banner RERA strip (top-right under header) — Detail Banner fields for every
+  // project. Empty fields hide the box; fall back to Inquiry RERA when Detail
+  // Banner values are still blank.
+  const bannerReraNumber = txt(db.reraNumber) || txt(iq.reraNumber);
+  const bannerBuildingPermissionNo =
+    txt(db.buildingPermissionNo) || txt(iq.buildingPermissionNo);
+  const bannerReraUrl = txt(db.reraUrl) || txt(iq.reraUrl);
 
   // Each section renders only when it actually has content. A CMS component
   // that exists but was left empty must NOT produce an empty section, so we
