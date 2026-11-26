@@ -1,6 +1,4 @@
 import React, { useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useGSAP } from "@gsap/react";
@@ -60,11 +58,12 @@ export default function ProjectInquiry({
   description = "We believe in complete regulatory compliance and open communication. Review our official registration details or reach out to our dedicated consultants to take the next step toward your new home.",
   address = "My Home Akrida, Nallagandla - Tellapur Rd, Tellapur Village, Ramachandrapuram, Tellapur, Nallagandla, Hyderabad, Telangana 502034",
   disclaimer = "Images are for representation only. Specifications and details are subject to change. Please refer to the sanctioned plans and MahaRERA website for accurate project information.",
-  reraNumber = "P02400005741",
-  // Optional line under the RERA number — renders only when set in the CMS.
-  buildingPermissionNo = "",
-  reraUrl = "https://maharera.mahaonline.gov.in",
-  qrSrc = "/assets/myhome/projects/akrida-qr.png",
+  // RERA/QR props kept for CMS compatibility; inquiry section no longer renders them
+  // (banner carries statutory copy).
+  reraNumber: _reraNumber = "P02400005741",
+  buildingPermissionNo: _buildingPermissionNo = "",
+  reraUrl: _reraUrl = "https://maharera.mahaonline.gov.in",
+  qrSrc: _qrSrc = "/assets/myhome/projects/akrida-qr.png",
   configOptions = [],
   projectName,
   projectSlug,
@@ -237,7 +236,7 @@ export default function ProjectInquiry({
         </p>
 
         {/* Form + info row */}
-        <div className="mt-[40px] lg:mt-[3.125vw] grid grid-cols-1 lg:grid-cols-[31.771vw_1fr] gap-[40px] lg:gap-[8.281vw] items-start lg:divide-x lg:divide-[#33333322]">
+        <div className="mt-[40px] lg:mt-[3.125vw] grid grid-cols-1 lg:grid-cols-[31.771vw_1fr] gap-[40px] lg:gap-[8.281vw] items-start lg:items-center lg:divide-x lg:divide-[#33333322]">
           {/* Form */}
           <form
             ref={formRef}
@@ -363,13 +362,13 @@ export default function ProjectInquiry({
           {/* Info column */}
           <div
             ref={infoRef}
-            className="flex flex-col gap-[36px] lg:gap-[5.208vw] w-full lg:pl-[3.385vw]"
+            className="flex flex-col justify-center gap-[24px] lg:gap-[2.344vw] w-full lg:pl-[3.385vw] lg:h-full"
           >
             {(address || disclaimer) && (
-              <div className="flex flex-col gap-[24px] lg:gap-[2.344vw]">
+              <>
                 {address && (
                   <p
-                    className="text-[#333]
+                    className="text-[#333] text-left
                            text-[15px] leading-[26px]
                            sm:text-[17px] sm:leading-[30px]
                            lg:text-[1.094vw] lg:leading-[1.823vw]"
@@ -381,7 +380,7 @@ export default function ProjectInquiry({
                 )}
                 {disclaimer && (
                   <p
-                    className="text-[#333]
+                    className="text-[#333] text-left
                            text-[15px] leading-[26px]
                            sm:text-[17px] sm:leading-[30px]
                            lg:text-[1.094vw] lg:leading-[1.823vw]"
@@ -391,87 +390,7 @@ export default function ProjectInquiry({
                     <span style={{ fontWeight: 400 }}>{disclaimer}</span>
                   </p>
                 )}
-              </div>
-            )}
-
-            {/* RERA block — each piece (QR, number, link) is optional in the
-                CMS, so render only the parts that actually have data. */}
-            {(qrSrc || reraNumber || buildingPermissionNo || reraUrl) && (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[20px] sm:gap-[30px] lg:gap-[1.563vw]">
-                {qrSrc && (
-                  <div className="relative shrink-0 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] lg:w-[10.625vw] lg:h-[10.833vw] bg-white">
-                    <Image
-                      src={qrSrc}
-                      alt={
-                        reraNumber ? `RERA QR code for ${reraNumber}` : "RERA QR code"
-                      }
-                      fill
-                      unoptimized
-                      sizes="180px"
-                      className="object-contain object-left select-none"
-                    />
-                  </div>
-                )}
-                {(reraNumber || buildingPermissionNo || reraUrl) && (
-                  <div className="flex flex-col gap-[4px] lg:gap-[0.156vw] min-w-0">
-                    {reraNumber && (
-                      <>
-                        <p
-                          className="text-[#333]
-                             text-[15px] lg:text-[1.094vw] leading-[1.4]"
-                          style={{
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {/* MahaRERA No.: */}
-                        </p>
-                        <p
-                          className="text-[#333]
-                             text-[28px] sm:text-[36px] lg:text-[2.344vw] leading-[1.1]"
-                          style={{
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {reraNumber}
-                        </p>
-                      </>
-                    )}
-                    {buildingPermissionNo && (
-                      <p
-                        className="text-[#333] break-words
-                           mt-[6px] sm:mt-[8px] lg:mt-[0.417vw]
-                           text-[13px] sm:text-[15px] lg:text-[1.094vw] leading-[1.4]"
-                        style={{
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 500,
-                        }}
-                      >
-                        Building Permission no.:{" "}
-                        <span style={{ fontWeight: 600 }}>
-                          {buildingPermissionNo}
-                        </span>
-                      </p>
-                    )}
-                    {reraUrl && (
-                      <Link
-                        href={reraUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#333] hover:text-[#ef493d] transition-colors break-all
-                             text-[13px] sm:text-[15px] lg:text-[1.094vw] leading-[1.4]"
-                        style={{
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 500,
-                        }}
-                      >
-                        {reraUrl}
-                      </Link>
-                    )}
-                  </div>
-                )}
-              </div>
+              </>
             )}
           </div>
         </div>

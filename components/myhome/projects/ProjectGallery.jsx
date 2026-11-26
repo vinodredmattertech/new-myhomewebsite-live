@@ -22,12 +22,12 @@ const DEFAULT_TABS = [
     label: "Gallery",
     kind: "images",
     items: [
-      { image: "/assets/myhome/projects/gallery-pool.jpg", alt: "Resort-style pool view" },
-      { image: "/assets/myhome/projects/amenity-pool.jpg", alt: "Infinity pool and deck" },
-      { image: "/assets/myhome/projects/amenity-amphitheatre.jpg", alt: "Open-air amphitheatre" },
-      { image: "/assets/myhome/projects/amenity-sports.jpg", alt: "Sports zone court" },
-      { image: "/assets/myhome/projects/akrida-entrance.jpg", alt: "Tower entrance" },
-      { image: "/assets/myhome/projects/akrida-banner.jpg", alt: "Tower skyline view" },
+      { image: "/assets/myhome/projects/gallery-pool.jpg", alt: "Resort-style pool view", caption: "Resort-style pool view" },
+      { image: "/assets/myhome/projects/amenity-pool.jpg", alt: "Infinity pool and deck", caption: "Infinity pool and deck" },
+      { image: "/assets/myhome/projects/amenity-amphitheatre.jpg", alt: "Open-air amphitheatre", caption: "Open-air amphitheatre" },
+      { image: "/assets/myhome/projects/amenity-sports.jpg", alt: "Sports zone court", caption: "Sports zone court" },
+      { image: "/assets/myhome/projects/akrida-entrance.jpg", alt: "Tower entrance", caption: "Tower entrance" },
+      { image: "/assets/myhome/projects/akrida-banner.jpg", alt: "Tower skyline view", caption: "Tower skyline view" },
     ],
   },
   {
@@ -168,6 +168,34 @@ export default function ProjectGallery({
       className="relative w-full bg-[#2a2828] pt-[20px] pb-[50px] lg:pt-[3.125vw] lg:pb-[4.688vw] overflow-hidden"
       data-section="project-gallery"
     >
+      {/* Fancybox caption — top-left glass pill (matches Contact Us / on-image) */}
+      <style jsx global>{`
+        .fancybox__slide {
+          display: flex;
+          flex-direction: column;
+        }
+        .fancybox__caption {
+          order: -1;
+          align-self: flex-start !important;
+          width: auto !important;
+          max-width: 85% !important;
+          margin: 12px 0 12px 12px !important;
+          padding: 9px 18px !important;
+          text-align: left !important;
+          justify-content: flex-start !important;
+          color: #fff !important;
+          font-family: Montserrat, sans-serif !important;
+          font-weight: 500 !important;
+          font-size: 14px !important;
+          letter-spacing: 0.04em !important;
+          text-transform: capitalize !important;
+          background: rgba(255, 255, 255, 0.1) !important;
+          backdrop-filter: blur(12px) !important;
+          -webkit-backdrop-filter: blur(12px) !important;
+          border: 1px solid rgba(255, 255, 255, 0.25) !important;
+          border-radius: 9999px !important;
+        }
+      `}</style>
       {/* Sidebar */}
       <div
         ref={sidebarRef}
@@ -386,20 +414,22 @@ export default function ProjectGallery({
             }}
             className="rounded-[12px] !overflow-hidden"
           >
-            {activeItems.map((item, idx) => (
+            {activeItems.map((item, idx) => {
+              const caption = (item.caption || item.alt || "").trim();
+              return (
               <SwiperSlide key={`image-${idx}`} className="!h-auto">
                 <a
                   href="javascript:void(0)"
                   data-src={item.image}
                   data-fancybox={`gallery-${activeTab}`}
-                  data-caption={item.alt || ""}
+                  data-caption={caption}
                   rel="nofollow"
                   className="relative w-full aspect-[1398/632] rounded-[12px] overflow-hidden bg-black/30 block group"
                 >
                   {item.image && (
                     <Image
                       src={item.image}
-                      alt={item.alt || ""}
+                      alt={item.alt || caption || ""}
                       fill
                       unoptimized
                       sizes="(min-width:1024px) 73vw, 95vw"
@@ -407,9 +437,27 @@ export default function ProjectGallery({
                       priority={idx === 0}
                     />
                   )}
+                  {caption ? (
+                    <span
+                      className="pointer-events-none absolute left-[12px] top-[12px] z-[2]
+                                 sm:left-[16px] sm:top-[16px] lg:left-[1.042vw] lg:top-[1.042vw]
+                                 max-w-[85%]
+                                 inline-flex items-center
+                                 px-[14px] py-[9px] sm:px-[18px] sm:py-[10px]
+                                 lg:px-[1.042vw] lg:py-[0.625vw]
+                                 bg-white/10 backdrop-blur-md border border-white/25 rounded-full
+                                 text-white text-left capitalize
+                                 text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.3]
+                                 tracking-[0.04em]"
+                      style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 500 }}
+                    >
+                      {caption}
+                    </span>
+                  ) : null}
                 </a>
               </SwiperSlide>
-            ))}
+              );
+            })}
           </Swiper>
         )}
 

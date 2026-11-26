@@ -27,34 +27,48 @@ export default function ProjectDetailBanner({
   const logoCardRef = useRef(null);
   const hasRera = Boolean(reraNumber || buildingPermissionNo || reraUrl);
 
+  const buildingPermissionLabel = "Building Permission no.:";
+  const buildingPermissionValue = (() => {
+    const raw = (buildingPermissionNo || "").trim();
+    if (!raw) return "";
+    return raw
+      .replace(/^building\s*permission\s*no\.?\s*:?\s*/i, "")
+      .trim();
+  })();
+
   const reraInner = (
-    <>
+    <div className="flex flex-col gap-[3px]">
       {reraNumber ? (
-        <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium">
-          {/^rera\b/i.test(reraNumber.trim())
+        <p className="m-0 text-[9px] leading-none font-bold">
+          {/^tg\s*rera\b/i.test(reraNumber.trim())
             ? reraNumber
-            : `RERA NO : ${reraNumber}`}
+            : /^rera\b/i.test(reraNumber.trim())
+              ? reraNumber.replace(/^rera/i, "TG RERA")
+              : `TG RERA NO : ${reraNumber}`}
         </p>
       ) : null}
-      {buildingPermissionNo ? (
-        <p className="text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium mt-[2px]">
-          {/building\s*permission/i.test(buildingPermissionNo.trim())
-            ? buildingPermissionNo
-            : `Building Permission no.: ${buildingPermissionNo}`}
-        </p>
+      {buildingPermissionValue ? (
+        <>
+          <p className="m-0 text-[9px] leading-none font-medium whitespace-nowrap">
+            {buildingPermissionLabel}
+          </p>
+          <p className="m-0 text-[9px] leading-none font-medium break-all">
+            {buildingPermissionValue}
+          </p>
+        </>
       ) : null}
       {reraUrl ? (
         <Link
           href={reraUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block text-[12px] sm:text-[14px] lg:text-[0.833vw] leading-[1.45] font-medium
-                     mt-[2px] break-all hover:text-[#ef493d] transition-colors"
+          className="block m-0 text-[9px] leading-none font-medium
+                     break-all hover:text-[#ef493d] transition-colors"
         >
           {reraUrl.replace(/\/$/, "")}
         </Link>
       ) : null}
-    </>
+    </div>
   );
 
   useGSAP(
@@ -159,9 +173,8 @@ export default function ProjectDetailBanner({
                      top-[74px] right-5 max-w-[min(100%-2.5rem,280px)]
                      md:top-[92px] md:right-10 md:max-w-[320px]
                      lg:top-[calc(5.77vw+0.6vw)] lg:right-[3.5vw] lg:max-w-[28vw]
-                     border border-white/85 text-white
-                     px-[14px] py-[12px] sm:px-[18px] sm:py-[14px]
-                     lg:px-[1.042vw] lg:py-[0.729vw]"
+                     bg-white/10 backdrop-blur-md border border-white/25 rounded-[12px]
+                     text-white px-[10px] py-[8px] sm:px-[12px] sm:py-[10px]"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
           {reraInner}

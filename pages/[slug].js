@@ -203,10 +203,15 @@ export default function ProjectDetailPage({ project, preview, isDraft, previewPa
       });
       return { key: t.key, label: t.label, kind: "videos", items: videos };
     }
-    const items = (t.items?.data || []).map((m) => ({
-      image: mediaUrl({ data: m }),
-      alt: m.attributes?.alternativeText || "",
-    }));
+    const items = (t.items?.data || []).map((m) => {
+      const alt = m.attributes?.alternativeText || "";
+      const caption = (m.attributes?.caption || "").trim() || alt;
+      return {
+        image: mediaUrl({ data: m }),
+        alt,
+        caption,
+      };
+    });
     return { key: t.key, label: t.label, kind: "images", items };
   });
 
