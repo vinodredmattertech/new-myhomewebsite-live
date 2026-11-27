@@ -6,11 +6,19 @@ import {
   validateLpLeadForm,
   wireLpPhoneInput,
 } from "@/components/lp/lpLeadFormHelpers";
+import { captureUtm } from "@/lib/utm";
+import {
+  finishBrochureLead,
+  thankYouHref,
+} from "@/lib/brochureDownload";
 
 const PROJECT_SLUG = "my-home-grava";
 const PROJECT_NAME = "My Home Grava";
+const BROCHURE_HREF = "/my-home-grava-lp/assets/docs/Ebrochure.pdf";
+const BROCHURE_NAME = "My Home Grava Brochure.pdf";
 
 function formSourceForSlot(slot) {
+  if (slot.closest("#downloadModal")) return "My Home Grava LP Brochure";
   if (slot.closest("#unlockModal")) return "My Home Grava LP Unlock Price";
   if (slot.closest("#exampleModal")) return "My Home Grava LP Enquire";
   if (
@@ -39,7 +47,12 @@ function mountGravaLeadForms() {
   document
     .querySelectorAll(".grava-lp .selldo-slot, .grava-lp .selldo-eager")
     .forEach((slot) => {
-      if (slot.getAttribute("data-grava-form") === "1") return;
+      if (
+        slot.getAttribute("data-grava-form") === "1" &&
+        slot.querySelector(".grava-lead-form")
+      ) {
+        return;
+      }
       if (!slot.closest(".fform") && !slot.closest(".modal")) return;
       slot.setAttribute("data-grava-form", "1");
       slot.setAttribute("data-loaded", "1");
@@ -85,8 +98,11 @@ export function bindGravaCrmForm() {
       }
       setStatus(form, "");
 
+      captureUtm();
+
       const formSource =
         form.getAttribute("data-form-source") || "My Home Grava LP";
+      const isBrochure = formSource.includes("Brochure");
       const payload = buildLpLeadPayload(form, {
         projectSlug: PROJECT_SLUG,
         projectName: PROJECT_NAME,
@@ -102,7 +118,11 @@ export function bindGravaCrmForm() {
         const selldoError = body?.data?.error || body?.error;
         const rejected = Array.isArray(selldoError) && selldoError.length > 0;
         if (crmRes.ok && !rejected) {
-          window.location.assign("/my-home-grava-lp/thank-you");
+          if (isBrochure) {
+            finishBrochureLead(BROCHURE_HREF, BROCHURE_NAME);
+            return;
+          }
+          window.location.assign(thankYouHref());
           return;
         }
         if (leadOk && !crmRes.ok) {

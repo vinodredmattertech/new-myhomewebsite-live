@@ -953,7 +953,9 @@ select {
 @media (max-width: 767.98px) {
   body:has(.apas-lp .float-bottom) #liv-prop-chat-root,
   body:has(.raka-lp .float-bottom) #liv-prop-chat-root,
-  body:has(.grava-lp .float-bottom) #liv-prop-chat-root {
+  body:has(.grava-lp .float-bottom) #liv-prop-chat-root,
+  body:has(.avali-lp .float-bottom) #liv-prop-chat-root,
+  body:has(.udyan-lp .float-bottom) #liv-prop-chat-root {
     bottom: 72px !important;
     max-height: calc(100vh - 180px) !important;
   }

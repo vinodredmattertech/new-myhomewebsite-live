@@ -94,6 +94,7 @@ export default function MyHomeApasLanding({ html, progress }) {
 MyHomeApasLanding.getLayout = (page) => page;
 MyHomeApasLanding.formPage = true;
 MyHomeApasLanding.ownFloatingActions = true;
+MyHomeApasLanding.preventChatAutoLaunch = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(path.join(process.cwd(), "content/apas-lp/index.html"), "utf8");

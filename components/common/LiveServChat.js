@@ -36,9 +36,35 @@ import Script from "next/script";
 const CHAT_ROOT_ID = "liv-prop-chat-root";
 // Anything shorter than this is the launcher; the open window is ~505px.
 const OPEN_MIN_HEIGHT = 300;
+const LP_ACTIVE_KEY = "lp_active";
 
-function useChatCollapsedFlag() {
+function blockVendorAutoLaunch() {
+  try {
+    // LivHousing bot reads this before appending the iframe. "0" keeps the
+    // launcher but skips autoLaunch=1 on the webchat URL.
+    sessionStorage.setItem(LP_ACTIVE_KEY, "0");
+  } catch {
+    /* private mode / blocked storage */
+  }
+}
+
+function stripAutoLaunchFromIframe(root) {
+  const iframe = root?.querySelector("iframe");
+  if (!iframe?.src) return;
+  try {
+    const url = new URL(iframe.src);
+    if (!url.searchParams.has("autoLaunch")) return;
+    url.searchParams.delete("autoLaunch");
+    iframe.src = url.toString();
+  } catch {
+    /* ignore bad src */
+  }
+}
+
+function useChatCollapsedFlag(preventAutoLaunch) {
   useEffect(() => {
+    if (preventAutoLaunch) blockVendorAutoLaunch();
+
     const getRoot = () => document.getElementById(CHAT_ROOT_ID);
     const setCollapsed = (root, collapsed) => {
       if (collapsed) root.setAttribute("data-lp-collapsed", "");
@@ -61,7 +87,13 @@ function useChatCollapsedFlag() {
     const init = () => {
       const root = getRoot();
       if (!root) return false;
-      setCollapsed(root, parseFloat(root.style.height) < OPEN_MIN_HEIGHT);
+      if (preventAutoLaunch) {
+        blockVendorAutoLaunch();
+        stripAutoLaunchFromIframe(root);
+        setCollapsed(root, true);
+      } else {
+        setCollapsed(root, parseFloat(root.style.height) < OPEN_MIN_HEIGHT);
+      }
       return true;
     };
     let bodyObserver;
@@ -76,11 +108,16 @@ function useChatCollapsedFlag() {
       window.removeEventListener("message", onMessage);
       bodyObserver?.disconnect();
     };
-  }, []);
+  }, [preventAutoLaunch]);
 }
 
-export default function LiveServChat() {
-  useChatCollapsedFlag();
+export default function LiveServChat({ preventAutoLaunch = false }) {
+  // Set before paint so lazyOnload vendor scripts see collapsed state.
+  if (typeof window !== "undefined" && preventAutoLaunch) {
+    blockVendorAutoLaunch();
+  }
+
+  useChatCollapsedFlag(preventAutoLaunch);
 
   // Vendor injects #liv-prop-chat-root onto <body>; remove it when this
   // component unmounts so pages that opt out (disableLiveChat) stay clear.

@@ -6,9 +6,16 @@ import {
   validateLpLeadForm,
   wireLpPhoneInput,
 } from "@/components/lp/lpLeadFormHelpers";
+import { captureUtm } from "@/lib/utm";
+import {
+  finishBrochureLead,
+  thankYouHref,
+} from "@/lib/brochureDownload";
 
 const PROJECT_SLUG = "my-home-raka";
 const PROJECT_NAME = "My Home Raka";
+const BROCHURE_HREF = "/my-home-raka-lp/assets-avali/Brochure.pdf";
+const BROCHURE_NAME = "My Home Raka Brochure.pdf";
 
 function formSourceForSlot(slot) {
   if (slot.closest("#downloadModal")) return "My Home Raka LP Brochure";
@@ -91,6 +98,8 @@ export function bindRakaCrmForm() {
       }
       setStatus(form, "");
 
+      captureUtm();
+
       const formSource = form.getAttribute("data-form-source") || "My Home Raka LP";
       const isBrochure = formSource.includes("Brochure");
       const payload = buildLpLeadPayload(form, {
@@ -109,19 +118,10 @@ export function bindRakaCrmForm() {
         const rejected = Array.isArray(selldoError) && selldoError.length > 0;
         if (crmRes.ok && !rejected) {
           if (isBrochure) {
-            try {
-              window.sessionStorage.setItem(
-                "raka-lp-brochure",
-                JSON.stringify({
-                  href: "/my-home-raka-lp/assets-avali/Brochure.pdf",
-                  name: "My Home Raka Brochure.pdf",
-                })
-              );
-            } catch (err) {
-              /* ignore */
-            }
+            finishBrochureLead(BROCHURE_HREF, BROCHURE_NAME);
+            return;
           }
-          window.location.assign("/my-home-raka-lp/thank-you");
+          window.location.assign(thankYouHref());
           return;
         }
         if (leadOk && !crmRes.ok) {

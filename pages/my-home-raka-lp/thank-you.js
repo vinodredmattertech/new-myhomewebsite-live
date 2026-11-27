@@ -68,6 +68,7 @@ export default function MyHomeRakaThankYou({ html }) {
 MyHomeRakaThankYou.getLayout = (page) => page;
 MyHomeRakaThankYou.formPage = true;
 MyHomeRakaThankYou.ownFloatingActions = true;
+MyHomeRakaThankYou.preventChatAutoLaunch = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(path.join(process.cwd(), "content/raka-lp/thank-you.html"), "utf8");

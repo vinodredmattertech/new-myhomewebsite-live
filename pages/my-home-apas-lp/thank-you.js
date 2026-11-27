@@ -79,6 +79,7 @@ export default function MyHomeApasThankYou({ html }) {
 MyHomeApasThankYou.getLayout = (page) => page;
 MyHomeApasThankYou.formPage = true;
 MyHomeApasThankYou.ownFloatingActions = true;
+MyHomeApasThankYou.preventChatAutoLaunch = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(path.join(process.cwd(), "content/apas-lp/thank-you.html"), "utf8");

@@ -230,8 +230,8 @@
         <button style="border: none; background: none; margin: 5px;"><a data-bs-toggle="modal"
             data-bs-target="#exampleModal" class="btn button-primary">Enquire Now</a></button>
 
-        <button style="border: none; background: none; margin: 5px;"><a href="/my-home-grava-lp/assets/docs/Ebrochure.pdf" target="_blank"
-            class="btn button-primary">Download Brochure</a></button>
+        <button style="border: none; background: none; margin: 5px;"><a href="#downloadModal" data-bs-toggle="modal"
+            data-bs-target="#downloadModal" class="btn button-primary">Download Brochure</a></button>
       </div>
     </div>
   </section>
@@ -1503,9 +1503,31 @@
     </div>
   </div>
   <!-- modal end -->
+
+  <!-- Modal Download Brochure -->
+  <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5 text-center" id="downloadModalLabel">Download Brochure</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="fform">
+            <dl>
+              <div class="selldo-slot"></div>
+            </dl>
+          </div>
+        </div>
+        <div class="modal-footer"></div>
+      </div>
+    </div>
+  </div>
+  <!-- modal end -->
+
   <div class="floating-btn">
     <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn button-primary-float">ENQUIRE NOW</a>
-    <a href="/my-home-grava-lp/assets/docs/Ebrochure.pdf" target="_blank" class="btn button-primary-float">DOWNLOAD BROCHURE</a>
+    <a href="#downloadModal" data-bs-toggle="modal" data-bs-target="#downloadModal" class="btn button-primary-float">DOWNLOAD BROCHURE</a>
   </div>
 
   <div class="float-bottom forall d-block d-md-none noth moth">

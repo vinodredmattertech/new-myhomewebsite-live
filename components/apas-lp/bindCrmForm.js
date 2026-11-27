@@ -6,9 +6,17 @@ import {
   validateLpLeadForm,
   wireLpPhoneInput,
 } from "@/components/lp/lpLeadFormHelpers";
+import { captureUtm } from "@/lib/utm";
+import {
+  finishBrochureLead,
+  thankYouHref,
+} from "@/lib/brochureDownload";
 
 const PROJECT_SLUG = "my-home-apas";
 const PROJECT_NAME = "My Home Apas";
+const BROCHURE_HREF =
+  "/my-home-apas-lp/assests/brochure/my-home-apas-brochure.pdf";
+const BROCHURE_NAME = "My Home Apas Brochure.pdf";
 
 function formSourceForSlot(slot) {
   if (slot.closest("#downloadModal")) return "My Home Apas LP Brochure";
@@ -87,6 +95,8 @@ export function bindApasCrmForm() {
       }
       setStatus(form, "", null);
 
+      captureUtm();
+
       const formSource = form.getAttribute("data-form-source") || "My Home Apas LP";
       const isBrochure = formSource.includes("Brochure");
       const payload = buildLpLeadPayload(form, {
@@ -107,19 +117,10 @@ export function bindApasCrmForm() {
         if (crmRes.ok && !rejected) {
           setStatus(form, "Thank you! Redirecting…", "success");
           if (isBrochure) {
-            try {
-              window.sessionStorage.setItem(
-                "apas-lp-brochure",
-                JSON.stringify({
-                  href: "/my-home-apas-lp/assests/brochure/my-home-apas-brochure.pdf",
-                  name: "My Home Apas Brochure.pdf",
-                })
-              );
-            } catch (err) {
-              /* ignore */
-            }
+            finishBrochureLead(BROCHURE_HREF, BROCHURE_NAME);
+            return;
           }
-          window.location.assign("/my-home-apas-lp/thank-you");
+          window.location.assign(thankYouHref());
           return;
         }
 

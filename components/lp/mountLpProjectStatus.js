@@ -50,11 +50,15 @@ export function mountLpProjectStatus(root, progress) {
     asOf.style.display = "none";
   }
 
-  let row = section.querySelector(".row");
+  // One status grid only — drop leftover static rows (e.g. duplicate Club Avali).
+  const container = section.querySelector(".container") || section;
+  const rows = [...section.querySelectorAll(".row")];
+  let row = rows[0];
+  rows.slice(1).forEach((extra) => extra.remove());
   if (!row) {
     row = document.createElement("div");
     row.className = "row";
-    (section.querySelector(".container") || section).appendChild(row);
+    container.appendChild(row);
   }
 
   const items = images.map((item, index) => ({

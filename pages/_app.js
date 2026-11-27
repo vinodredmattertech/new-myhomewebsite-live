@@ -35,7 +35,9 @@ export default function App({ Component, pageProps }) {
           project-specific actions (project detail) opt out of the generic
           sticky Request Site Visit. */}
       {!Component.ownFloatingActions && <ProjectFloatingActions />}
-      {!Component.disableLiveChat && <LiveServChat />}
+      {!Component.disableLiveChat && (
+        <LiveServChat preventAutoLaunch={!!Component.preventChatAutoLaunch} />
+      )}
     </>
   );
 }

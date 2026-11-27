@@ -215,7 +215,7 @@ export default function MyHomeRakaLanding({ html, progress }) {
         const openBrochure = document.querySelector("#downloadModal.show");
         if (openBrochure) {
           window.sessionStorage.setItem(
-            "raka-lp-brochure",
+            "mh:pending-brochure-download",
             JSON.stringify({
               href: "/my-home-raka-lp/assets-avali/Brochure.pdf",
               name: "My Home Raka Brochure.pdf",
@@ -225,7 +225,7 @@ export default function MyHomeRakaLanding({ html, progress }) {
       } catch (err) {
         /* ignore */
       }
-      window.location = "/my-home-raka-lp/thank-you";
+      window.location = "/thank-you";
     };
     window.sell_do_form_rendered = function () {
       document.querySelectorAll(".sell_do_form_actual_container").forEach(function (el) {
@@ -278,6 +278,7 @@ export default function MyHomeRakaLanding({ html, progress }) {
 MyHomeRakaLanding.getLayout = (page) => page;
 MyHomeRakaLanding.formPage = true;
 MyHomeRakaLanding.ownFloatingActions = true;
+MyHomeRakaLanding.preventChatAutoLaunch = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(path.join(process.cwd(), "content/raka-lp/index.html"), "utf8");

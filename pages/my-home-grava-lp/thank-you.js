@@ -46,6 +46,7 @@ export default function MyHomeGravaThankYou({ html }) {
 MyHomeGravaThankYou.getLayout = (page) => page;
 MyHomeGravaThankYou.formPage = true;
 MyHomeGravaThankYou.ownFloatingActions = true;
+MyHomeGravaThankYou.preventChatAutoLaunch = true;
 
 export async function getStaticProps() {
   const html = fs.readFileSync(
